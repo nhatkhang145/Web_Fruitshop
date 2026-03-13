@@ -1,0 +1,57 @@
+# Maven #
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Ngôn ngữ & Hệ điều hành #
+.kotlin
+.DS_Store
+
+# IDE Khác (Giữ lại cho team dùng Eclipse/VSCode/NetBeans)
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# VS Code
+.vscode/
+
+
+# ẩn tất cả thư mục .idea và file sinh ra
+.idea/*
+*.iws
+*.iml
+*.ipr
+out/
+
+#  các file cấu hình cần thiết cho Team
+!.idea/misc.xml
+!.idea/compiler.xml
+!.idea/encodings.xml
+!.idea/vcs.xml
+!.idea/modules.xml
+!.idea/jarRepositories.xml
+!.idea/runConfigurations/
+
+# ẩn các file cá nhân
+.idea/workspace.xml
+.idea/copilot.data.migration.*.xml
+.idea/shelf/
+.idea/tasks.xml
+.idea/usage.statistics.xml
+.idea/github-copilot-workspace.xml
