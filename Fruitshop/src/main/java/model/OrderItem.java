@@ -8,7 +8,6 @@ public class OrderItem {
     private Integer productId;
     private String productName;
 
-
     private String dealType;
     private Integer dealId;
     private BigDecimal originalPrice;
@@ -18,9 +17,7 @@ public class OrderItem {
     private int quantity;
     private BigDecimal total;
 
-
     private Product product;
-
 
     private double price;
 
@@ -28,7 +25,7 @@ public class OrderItem {
     }
 
     public OrderItem(int id, int orderId, Integer productId, String productName,
-                     double price, int quantity, double total) {
+            double price, int quantity, double total) {
         this.id = id;
         this.orderId = orderId;
         this.productId = productId;
@@ -38,7 +35,6 @@ public class OrderItem {
         this.quantity = quantity;
         this.total = BigDecimal.valueOf(total);
     }
-
 
     public int getId() {
         return id;
