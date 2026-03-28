@@ -13,10 +13,10 @@ public class Product {
     private String image;
     private int categoryId;
     private String productCode;
-    private int status; // 1 = hiển thị, 0 = ẩn
-    private List<ProductImage> productImages; // Danh sách ảnh phụ
-    private double averageRating; // Điểm đánh giá trung bình
-    private int reviewCount; // Số lượng đánh giá
+    private int status;
+    private List<ProductImage> productImages;
+    private double averageRating;
+    private int reviewCount;
 
 
     public Product() {

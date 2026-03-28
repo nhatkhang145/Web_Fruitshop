@@ -3,7 +3,6 @@ package dal;
 import model.Order;
 import model.OrderItem;
 import model.Product;
-
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -152,7 +151,6 @@ public class AdminOrderDAO {
                     .orElse(null);
 
             if (order != null) {
-                // Lấy chi tiết đơn hàng
                 List<OrderItem> items = getOrderDetails(orderId);
                 order.setOrderDetails(items);
             }
