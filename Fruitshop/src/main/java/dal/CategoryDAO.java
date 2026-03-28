@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoryDao {
+public class CategoryDAO {
 
     public List<Category> getAllCategories() {
         String query = "SELECT id, name, description, parent_id AS parentId, status FROM Categories";
@@ -99,7 +99,7 @@ public class CategoryDao {
     }
 
     public static void main(String[] args) {
-        CategoryDao dao = new CategoryDao();
+        CategoryDAO dao = new CategoryDAO();
         List<Category> list = dao.getAllCategories();
         System.out.println("Số lượng danh mục: " + list.size());
         for (Category c : list) {

@@ -4,7 +4,7 @@ import model.Product;
 import model.ProductImage;
 import java.util.List;
 
-public class ProductDao {
+public class ProductDAO {
 
     public List<Product> getAllProducts() {
         String sql = "SELECT id, name, price, sale_price, quantity, short_description AS description, image, category_id AS categoryId, status FROM products";
