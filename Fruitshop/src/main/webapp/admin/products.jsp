@@ -14,47 +14,34 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/admin_style.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/admin_products.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/style.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/products.css" />
 
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-<%--    <style>--%>
-<%--        /* CSS thêm cho ảnh sản phẩm và nút bấm */--%>
-<%--        .product-img {--%>
-<%--            width: 50px;--%>
-<%--            height: 50px;--%>
-<%--            object-fit: cover;--%>
-<%--            border-radius: 5px;--%>
-<%--        }--%>
-
-<%--        .status.out-stock {--%>
-<%--            background-color: #ffcccc;--%>
-<%--            color: #d8000c;--%>
-<%--        }--%>
-<%--    </style>--%>
 </head>
 
 <body>
 
-<jsp:include page="sidebar.jsp">
+<jsp:include page="/admin/sidebar.jsp">
     <jsp:param name="activePage" value="products" />
 </jsp:include>
 
 <div class="content">
-    <jsp:include page="header.jsp" />
+    <jsp:include page="/admin/header.jsp" />
+
     <main>
         <div class="header">
             <div class="left">
                 <h1>Quản lý sản phẩm</h1>
                 <ul class="breadcrumb">
-                    <li><a href="#">Quản lý</a></li>
+                    <li><a href="${pageContext.request.contextPath}/admin/dashboard">Quản lý</a></li>
                     <li>/</li>
                     <li><a href="#" class="active">Sản phẩm</a></li>
                 </ul>
             </div>
-            <a href="product-form" class="report">
+            <a href="${pageContext.request.contextPath}/admin/product-form" class="report">
                 <i class="bx bx-plus"></i>
                 <span>Thêm sản phẩm</span>
             </a>
@@ -161,10 +148,10 @@
                                 </c:choose>
                             </td>
                             <td>
-                                <a href="product-form?id=${p.id}" class="action-btn edit" title="Sửa">
+                                <a href="${pageContext.request.contextPath}/admin/product-form?id=${p.id}" class="action-btn edit" title="Sửa">
                                     <i class="bx bx-edit"></i>
                                 </a>
-                                <a href="product-delete?id=${p.id}" class="action-btn delete" title="Xóa"
+                                <a href="${pageContext.request.contextPath}/admin/product-delete?id=${p.id}" class="action-btn delete" title="Xóa"
                                    onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm: ${p.name}?');">
                                     <i class="bx bx-trash"></i>
                                 </a>

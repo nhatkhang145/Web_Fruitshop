@@ -2,17 +2,15 @@
 
 
 
-/* ============================================== */
-/* === CUSTOM DATATABLES STYLE (Giao diện mới) === */
-/* ============================================== */
 
-/* 1. Wrapper tổng thể */
+
+
 .dataTables_wrapper {
     padding: 10px 0;
     font-family: 'Roboto', sans-serif;
 }
 
-/* 2. Thanh điều khiển trên cùng (Show entries & Search) */
+
 .dataTables_length,
 .dataTables_filter {
     margin-bottom: 20px;
@@ -29,27 +27,27 @@
 .dataTables_filter input {
     padding: 8px 15px;
     border: 1px solid #ddd;
-    border-radius: 20px; /* Bo tròn ô tìm kiếm */
+    border-radius: 20px;
     outline: none;
     margin-left: 10px;
     transition: all 0.3s ease;
 }
 
 .dataTables_filter input:focus {
-    border-color: var(--primary-color);
+    border-color: var(--primary);
     box-shadow: 0 0 5px rgba(61, 139, 145, 0.2);
 }
 
-/* 3. Bảng dữ liệu */
+
 table.dataTable {
     border-collapse: collapse !important;
     width: 100% !important;
     border-bottom: 1px solid #eee;
 }
 
-/* Header bảng - Màu xanh chủ đạo */
+
 table.dataTable thead th {
-    background-color: var(--primary-color); /* Lấy màu từ base.css */
+    background-color: var(--primary);
     color: #fff;
     padding: 15px 10px !important;
     font-weight: 600;
@@ -58,7 +56,7 @@ table.dataTable thead th {
     border-bottom: none !important;
 }
 
-/* Bo tròn góc trên trái/phải của header */
+
 table.dataTable thead th:first-child {
     border-top-left-radius: 10px;
 }
@@ -66,22 +64,21 @@ table.dataTable thead th:last-child {
     border-top-right-radius: 10px;
 }
 
-/* Các dòng dữ liệu */
+
 table.dataTable tbody td {
     padding: 15px 10px !important;
     vertical-align: middle;
     font-size: 14px;
-    color: var(--text-dark);
+    color: var(--dark);
     border-bottom: 1px solid #eee;
 }
 
-/* Hiệu ứng hover dòng */
+
 table.dataTable tbody tr:hover {
-    background-color: #f1f8ff !important; /* Màu xanh rất nhạt khi di chuột */
+    background-color: #f1f8ff !important;
     cursor: default;
 }
 
-/* Ảnh sản phẩm trong bảng */
 table.dataTable tbody td img {
     width: 45px;
     height: 45px;
@@ -90,7 +87,14 @@ table.dataTable tbody td img {
     border: 1px solid #eee;
 }
 
-/* 4. Phân trang (Pagination) */
+.product-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+
 .dataTables_paginate {
     margin-top: 20px;
     display: flex;
@@ -103,7 +107,7 @@ table.dataTable tbody td img {
     border-radius: 6px !important;
     border: 1px solid transparent !important;
     font-size: 13px;
-    color: var(--text-color) !important;
+    color: var(--dark) !important;
     cursor: pointer;
     background: transparent !important;
     transition: all 0.3s ease;
@@ -114,30 +118,29 @@ table.dataTable tbody td img {
     color: var(--dark) !important;
 }
 
-/* Nút trang hiện tại (Active) */
+
 .dataTables_paginate .paginate_button.current,
 .dataTables_paginate .paginate_button.current:hover {
-    background: var(--primary-color) !important;
+    background: var(--primary) !important;
     color: #fff !important;
     border: none;
     font-weight: bold;
     box-shadow: 0 2px 5px rgba(61, 139, 145, 0.4);
 }
 
-/* Nút Previous / Next */
+
 .dataTables_paginate .paginate_button.previous,
 .dataTables_paginate .paginate_button.next {
     font-weight: 600;
 }
 
-/* 5. Thông tin (Showing 1 to 10...) */
+
 .dataTables_info {
     margin-top: 20px;
     font-size: 13px;
     color: #888;
 }
 
-/* Fix CSS cũ của bạn (Badge trạng thái) */
 .status {
     padding: 6px 12px;
     border-radius: 20px;
@@ -155,13 +158,6 @@ table.dataTable tbody td img {
 .status.low-stock {
     background: #fef3c7;
     color: #b45309;
-}
-/* CSS thêm cho ảnh sản phẩm và nút bấm */
-.product-img {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 5px;
 }
 
 .status.out-stock {
