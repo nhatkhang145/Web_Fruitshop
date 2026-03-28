@@ -150,7 +150,7 @@ public class AdminReviewDAO {
             Double avg = handle.createQuery(query)
                     .mapTo(Double.class)
                     .one();
-            return (avg != null) ? avg : 0.0; // Trả về 0.0 nếu không có dữ liệu
+            return (avg != null) ? avg : 0.0;
         });
     }
 
