@@ -47,6 +47,7 @@ public class AdminWeekendDealServlet extends HttpServlet {
 
             List<WeekendDeal> deals = dealDAO.getAllDeals();
             request.setAttribute("deals", deals);
+            request.setAttribute("now", System.currentTimeMillis());
             request.getRequestDispatcher("weekend-deals.jsp").forward(request, response);
         }
     }

@@ -24,10 +24,10 @@ public class AdminOrderDetailServlet extends HttpServlet {
                 req.setAttribute("order", order);
                 req.getRequestDispatcher("/admin/order-detail.jsp").forward(req, resp);
             } catch (NumberFormatException e) {
-                resp.sendRedirect("orders");
+                resp.sendRedirect(req.getContextPath() + "/admin/orders");
             }
         } else {
-            resp.sendRedirect("orders");
+            resp.sendRedirect(req.getContextPath() + "/admin/orders");
         }
     }
 
@@ -42,17 +42,19 @@ public class AdminOrderDetailServlet extends HttpServlet {
                 boolean success = orderDAO.updateStatus(orderId, status);
 
                 if (success) {
-                    resp.sendRedirect("order-detail?id=" + orderId + "&msg=success");
+                    resp.sendRedirect(req.getContextPath() + "/admin/order-detail?id=" + orderId + "&msg=success");
+
                 } else {
-                    resp.sendRedirect("order-detail?id=" + orderId + "&msg=error");
+                    resp.sendRedirect(req.getContextPath() + "/admin/order-detail?id=" + orderId + "&msg=error");
+
                 }
             } else {
-                resp.sendRedirect("orders");
+                resp.sendRedirect(req.getContextPath() + "/admin/orders");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            resp.sendRedirect("orders");
+            resp.sendRedirect(req.getContextPath() + "/admin/orders");
         }
     }
 }

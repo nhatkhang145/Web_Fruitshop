@@ -29,7 +29,6 @@
                 <c:choose>
                     <c:when test="${not empty banners}">
                         <c:forEach items="${banners}" var="banner">
-                            <%-- Xác định URL cho banner --%>
                             <c:set var="bannerUrl" value="#" />
                             <c:if test="${not empty banner.linkType and banner.linkType != 'none'}">
                                 <c:set var="bannerUrl" value="${banner.getFullUrl(pageContext.request.contextPath)}" />
@@ -37,8 +36,6 @@
                             <c:if test="${empty banner.linkType and not empty banner.link}">
                                 <c:set var="bannerUrl" value="${banner.link}" />
                             </c:if>
-
-                            <%-- Toàn bộ slide-item có thể click --%>
                             <div class="slide-item" onclick="window.location.href='${bannerUrl}'" style="cursor: ${bannerUrl != '#' ? 'pointer' : 'default'};">
                                 <img src="${pageContext.request.contextPath}/${banner.imageUrl}" alt="${banner.title}" />
                                 <div class="slide-caption">
@@ -115,9 +112,9 @@
                                                     </c:choose>
                                                 </a>
 
-                                                    <%-- Hiển thị badge discount --%>
+
                                                 <c:choose>
-                                                    <%-- Ưu tiên 1: Weekend Deal badge --%>
+
                                                     <c:when test="${not empty weekendDeal}">
                                                         <div class="product-badge sale" style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f);">-${weekendDeal.discountPercent}%</div>
                                                         <c:if test="${not empty weekendDeal.tag}">
@@ -126,7 +123,7 @@
                                                             </div>
                                                         </c:if>
                                                     </c:when>
-                                                    <%-- Ưu tiên 2: Sale thường badge --%>
+
                                                     <c:when test="${product.salePrice > 0 && product.salePrice < product.price}">
                                                         <div class="product-badge sale">-<fmt:formatNumber value="${(product.price - product.salePrice) / product.price * 100}" maxFractionDigits="0" />%</div>
                                                     </c:when>
@@ -170,22 +167,22 @@
 
                                                 <div class="price">
                                                     <c:choose>
-                                                        <%-- Kiểm tra hết hàng trước --%>
+
                                                         <c:when test="${product.quantity == 0}">
                                                             <span class="current" style="color: #999; font-weight: 600;">Hết hàng</span>
                                                         </c:when>
-                                                        <%-- Ưu tiên 1: Weekend Deal price --%>
+
                                                         <c:when test="${not empty weekendDeal}">
                                                             <c:set var="weekendPrice" value="${product.price * (1 - weekendDeal.discountPercent / 100.0)}" />
                                                             <span class="current" style="color: #ff6b6b;"><fmt:formatNumber value="${weekendPrice}" type="number" groupingUsed="true" />đ</span>
                                                             <span class="original"><fmt:formatNumber value="${product.price}" type="number" groupingUsed="true" />đ</span>
                                                         </c:when>
-                                                        <%-- Ưu tiên 2: Sale thường --%>
+
                                                         <c:when test="${product.salePrice > 0 && product.salePrice < product.price}">
                                                             <span class="current"><fmt:formatNumber value="${product.salePrice}" type="number" groupingUsed="true" />đ</span>
                                                             <span class="original"><fmt:formatNumber value="${product.price}" type="number" groupingUsed="true" />đ</span>
                                                         </c:when>
-                                                        <%-- Mặc định: Giá gốc --%>
+
                                                         <c:otherwise>
                                                             <span class="current"><fmt:formatNumber value="${product.price}" type="number" groupingUsed="true" />đ</span>
                                                         </c:otherwise>
@@ -206,8 +203,6 @@
                     </div>
                 </div>
             </section>
-
-            <!-- -------------------------------------------------------------------------- -->
 
             <section id="weekend-deals">
                 <div class="container">
@@ -243,7 +238,7 @@
                                                 </div>
 
                                                 <div class="deal-timer" data-end-time="${deal.endDate.time}">
-                                                    <div class="timer-label">⏰ Kết thúc sau:</div>
+                                                    <div class="timer-label"> Kết thúc sau:</div>
                                                     <div class="timer-boxes">
                                                         <div class="timer-box">
                                                             <span class="timer-value days">0</span>
