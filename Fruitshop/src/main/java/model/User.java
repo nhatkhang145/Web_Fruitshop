@@ -18,7 +18,6 @@ public class User {
     private Timestamp createdAt;
 
     public User(){
-
     }
 
     public User(int id, String fullName, String email, String password, String phone, int role, String avatar, String gender, Date birthDate, int status, String loginType, String socialId, Timestamp createdAt) {
