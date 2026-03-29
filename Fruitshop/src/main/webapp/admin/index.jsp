@@ -17,12 +17,12 @@
 </head>
 <body>
 
-<jsp:include page="sidebar.jsp">
+<jsp:include page="layout/sidebar.jsp">
     <jsp:param name="activePage" value="dashboard" />
 </jsp:include>
 <div class="content">
 
-    <jsp:include page="header.jsp" />
+    <jsp:include page="layout/header.jsp" />
 
     <main>
         <div class="header">

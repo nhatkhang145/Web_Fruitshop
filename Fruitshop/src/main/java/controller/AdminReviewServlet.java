@@ -8,9 +8,24 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet(name = "AdminReviewServlet", urlPatterns = {"/admin/review"})
+@WebServlet(name = "AdminReviewServlet", urlPatterns = {"/admin/reviews", "/admin/review-action"})
+
 public class AdminReviewServlet extends HttpServlet {
 
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        AdminReviewDAO reviewDAO = new AdminReviewDAO();
+
+        request.setAttribute("reviews", reviewDAO.getAllReviews());
+        request.setAttribute("totalReviews", reviewDAO.getTotalReviews());
+        request.setAttribute("unrepliedCount", reviewDAO.getUnrepliedReviews());
+        request.setAttribute("avgRating", reviewDAO.getAverageRating());
+
+        request.getRequestDispatcher("/admin/reviews.jsp").forward(request, response);
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
@@ -32,6 +47,6 @@ public class AdminReviewServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        response.sendRedirect("reviews.jsp");
+        response.sendRedirect(request.getContextPath() + "/admin/reviews");;
     }
 }
