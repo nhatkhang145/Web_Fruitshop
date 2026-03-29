@@ -51,7 +51,7 @@ public class WishlistDAO {
                         .bind("uid", userId)
                         .map((rs, ctx) -> {
                             WishlistItem item = new WishlistItem();
-                            // Không set id vì bảng wishlists không có cột id
+
                             item.setUserId(rs.getInt("user_id"));
                             item.setProductId(rs.getInt("product_id"));
                             item.setCreatedAt(rs.getTimestamp("created_at"));
@@ -63,7 +63,6 @@ public class WishlistDAO {
                             product.setSalePrice(rs.getDouble("sale_price"));
                             product.setImage(rs.getString("image"));
 
-                            // 2. SỬA MAPPER: Set số lượng cho sản phẩm
                             product.setQuantity(rs.getInt("quantity"));
 
                             item.setProduct(product);
