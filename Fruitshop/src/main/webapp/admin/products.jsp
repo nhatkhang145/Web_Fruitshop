@@ -24,7 +24,7 @@
 
 <body>
 
-<jsp:include page="/admin/sidebar.jsp">
+<jsp:include page="/admin/layout/sidebar.jsp">
     <jsp:param name="activePage" value="products" />
 </jsp:include>
 

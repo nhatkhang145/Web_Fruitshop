@@ -1,0 +1,155 @@
+
+
+.dataTables_wrapper {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+table.dataTable thead th,
+#usersTable thead th {
+    background-color: #37878d !important;
+    color: #ffffff !important;
+    border-bottom: none !important;
+    padding: 15px 10px !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+table.dataTable thead th:first-child {
+    border-top-left-radius: 10px;
+}
+
+table.dataTable thead th:last-child {
+    border-top-right-radius: 10px;
+}
+
+table.dataTable tbody tr:hover {
+    background-color: #f1f8ff !important;
+}
+
+
+
+
+.dataTables_filter input {
+    border-radius: 20px;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    outline: none;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover,
+.dataTables_paginate .paginate_button.current,
+.dataTables_paginate .paginate_button.current:hover {
+    background: #37878d !important;
+    color: #fff !important;
+    border: none;
+}
+
+
+
+.status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status.pending {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.status.processing {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.status.shipped {
+    background: #ddd6fe;
+    color: #6d28d9;
+}
+
+.status.completed {
+    background: #d1fae5;
+    color: #047857;
+}
+
+.status.cancelled {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.status.active {
+    background: var(--success);
+}
+
+.status.banned {
+    background: var(--danger);
+}
+
+
+
+.action-btn {
+    display: inline-flex;
+    width: 35px;
+    height: 35px;
+    border-radius: 5px;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.2s ease;
+}
+
+.action-btn.view {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.action-btn.view:hover {
+    background: #0369a1;
+    color: #fff;
+}
+
+.users-report-btn {
+    background: var(--primary);
+}
+
+
+
+.content main .bottom-data .orders table td:first-child {
+    display: flex;
+    align-items: center;
+    grid-gap: 12px;
+    padding-left: 6px;
+}
+
+.content main .bottom-data .orders table td {
+    vertical-align: middle;
+}
+
+.content main .bottom-data .orders table td img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.content main .insights li .bx.bx-group {
+    background: var(--light-primary);
+    color: var(--primary);
+}
+
+.content main .insights li .bx.bx-user-plus {
+    background: var(--light-success);
+    color: var(--success);
+}
+
+.content main .insights li .bx.bx-user-x {
+    background: var(--light-danger);
+    color: var(--danger);
+}

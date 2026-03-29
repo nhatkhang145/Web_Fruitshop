@@ -1,0 +1,162 @@
+
+
+.dataTables_wrapper {
+    padding: 10px 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+
+.dataTables_length,
+.dataTables_filter {
+    margin-bottom: 20px;
+}
+
+.dataTables_length select {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    background: #f9f9f9;
+}
+
+.dataTables_filter input {
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    outline: none;
+    margin-left: 10px;
+    transition: all 0.3s ease;
+}
+
+.dataTables_filter input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 5px rgba(61, 139, 145, 0.2);
+}
+
+
+table.dataTable {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    border-bottom: 1px solid #eee;
+}
+
+
+table.dataTable thead th {
+    background-color: var(--primary);
+    color: #fff;
+    padding: 15px 10px !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 13px;
+    border-bottom: none !important;
+}
+
+
+table.dataTable thead th:first-child {
+    border-top-left-radius: 10px;
+}
+table.dataTable thead th:last-child {
+    border-top-right-radius: 10px;
+}
+
+
+table.dataTable tbody td {
+    padding: 15px 10px !important;
+    vertical-align: middle;
+    font-size: 14px;
+    color: var(--dark);
+    border-bottom: 1px solid #eee;
+}
+
+
+table.dataTable tbody tr:hover {
+    background-color: #f1f8ff !important;
+    cursor: default;
+}
+
+
+table.dataTable tbody td img {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.product-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+
+.dataTables_paginate {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+}
+
+.dataTables_paginate .paginate_button {
+    padding: 6px 12px !important;
+    border-radius: 6px !important;
+    border: 1px solid transparent !important;
+    font-size: 13px;
+    color: var(--dark) !important;
+    cursor: pointer;
+    background: transparent !important;
+    transition: all 0.3s ease;
+}
+
+.dataTables_paginate .paginate_button:hover {
+    background: #eee !important;
+    color: var(--dark) !important;
+}
+
+
+.dataTables_paginate .paginate_button.current,
+.dataTables_paginate .paginate_button.current:hover {
+    background: var(--primary) !important;
+    color: #fff !important;
+    border: none;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(61, 139, 145, 0.4);
+}
+
+
+.dataTables_paginate .paginate_button.previous,
+.dataTables_paginate .paginate_button.next {
+    font-weight: 600;
+}
+
+
+.dataTables_info {
+    margin-top: 20px;
+    font-size: 13px;
+    color: #888;
+}
+
+.status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.status.active {
+    background: #d1fae5;
+    color: #047857;
+}
+.status.hidden {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+.status.low-stock {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.status.out-stock {
+    background-color: #ffcccc;
+    color: #d8000c;
+}

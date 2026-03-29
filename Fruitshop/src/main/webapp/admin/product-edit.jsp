@@ -22,12 +22,12 @@
 
 <body data-context-path="${pageContext.request.contextPath}">
 
-<jsp:include page="/admin/sidebar.jsp">
+<jsp:include page="/admin/layout/sidebar.jsp">
     <jsp:param name="activePage" value="products" />
 </jsp:include>
 
 <div class="content">
-    <jsp:include page="/admin/header.jsp" />
+    <jsp:include page="/admin/layout/header.jsp" />
 
     <main>
         <div class="header">

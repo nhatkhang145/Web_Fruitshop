@@ -48,7 +48,7 @@ public class AdminWeekendDealServlet extends HttpServlet {
             List<WeekendDeal> deals = dealDAO.getAllDeals();
             request.setAttribute("deals", deals);
             request.setAttribute("now", System.currentTimeMillis());
-            request.getRequestDispatcher("weekend-deals.jsp").forward(request, response);
+            request.getRequestDispatcher("/admin/weekend-deals.jsp").forward(request, response);
         }
     }
 
@@ -90,7 +90,7 @@ public class AdminWeekendDealServlet extends HttpServlet {
         List<Product> products = productDAO.getAllProducts();
         request.setAttribute("products", products);
 
-        request.getRequestDispatcher("weekend-deal-edit.jsp").forward(request, response);
+        request.getRequestDispatcher("/admin/weekend-deal-edit.jsp").forward(request, response);  request.getRequestDispatcher("weekend-deal-edit.jsp").forward(request, response);
     }
 
     private void handleSave(HttpServletRequest request, HttpServletResponse response, HttpSession session)

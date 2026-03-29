@@ -52,7 +52,7 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("wishlistCount", wishlistCount);
 
             if (account.getRole() == 1) {
-                response.sendRedirect("admin/index.jsp");
+                response.sendRedirect("admin/dashboard");
             } else {
                 response.sendRedirect(request.getContextPath() + "/");
             }
