@@ -1,0 +1,252 @@
+/* =========================================
+   AUTH PAGE STYLES (Login / Register)
+   ========================================= */
+
+/* Reset cơ bản */
+* {
+    box-sizing: border-box;
+}
+
+/* Nền trang login */
+body {
+    background-color: #f0f2f5;
+    /* Màu nền xám nhẹ giúp card nổi bật */
+    margin: 0;
+    font-family: "Roboto", sans-serif;
+}
+
+/* Layout Container */
+.fm-auth {
+    width: 100%;
+    max-width: 1000px;
+    margin: 40px auto;
+    /* Căn giữa dọc và ngang */
+    padding: 0 20px;
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Card chứa nội dung (Khung trắng) */
+.fm-card {
+    display: flex;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+    /* Đổ bóng */
+    overflow: hidden;
+    height: 650px;
+}
+
+/* --- CỘT TRÁI: Giới thiệu & Ảnh --- */
+.fm-left {
+    flex: 1;
+    background-color: #f8f9fa;
+    padding: 20px 40px 32px;
+    /* giảm padding-top để kéo tiêu đề lên cao */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 1px solid #eee;
+}
+
+.fm-logo {
+    font-weight: 800;
+    color: var(--primary-color);
+    /* Sử dụng biến màu từ main.css */
+    font-size: 40px;
+    margin-bottom: 50px;
+    /* giảm khoảng cách dưới logo */
+}
+
+.fm-left h2 {
+    margin: 4px 0 10px 0;
+    /* giảm khoảng cách trên/dưới heading */
+    font-size: 24px;
+    color: #333;
+    line-height: 1.3;
+}
+
+.fm-left p {
+    font-size: 15px;
+    color: #666;
+    margin: 0 0 18px 0;
+    /* giảm khoảng cách dưới đoạn mô tả */
+    line-height: 1.6;
+}
+
+.fm-illustration {
+    width: 100%;
+    height: 220px;
+    border-radius: 8px;
+    background-image: url('https://larafood24h.com/wp-content/uploads/2024/01/trai-cay-nhap-khau-theo-mua-1400x700.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* --- CỘT PHẢI: Form --- */
+.fm-right {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #fff;
+}
+
+.fm-form-wrap {
+    width: 100%;
+    max-width: 380px;
+    margin: 0 auto;
+}
+
+/* Tabs (Đăng nhập / Đăng ký) */
+.fm-tabs {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.fm-tab {
+    background: transparent;
+    border: none;
+    padding: 10px 0;
+    font-size: 18px;
+    cursor: pointer;
+    color: #999;
+    font-weight: 600;
+    position: relative;
+    bottom: -2px;
+    transition: all 0.3s ease;
+}
+
+.fm-tab.active {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+}
+
+/* Form Elements */
+.fm-label {
+    display: block;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+.fm-label input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 14px;
+    margin-top: 6px;
+    transition: border 0.3s ease;
+}
+
+.fm-label input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(47, 180, 90, 0.1);
+}
+
+.fm-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px 0 24px 0;
+}
+
+.fm-check {
+    font-size: 13px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.fm-link {
+    font-size: 13px;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.fm-link:hover {
+    text-decoration: underline;
+}
+
+/* Nút bấm */
+.fm-btn {
+    width: 100%;
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-transform: uppercase;
+}
+
+.fm-btn:hover {
+    background-color: var(--primary-color);
+}
+
+/* Tin nhắn & Footer form */
+.fm-message {
+    margin-top: 15px;
+    font-size: 13px;
+    text-align: center;
+    min-height: 20px;
+    /* Giữ chỗ tránh nhảy layout */
+}
+
+.fm-or {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+    font-size: 14px;
+}
+
+.fm-or a {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-left: 5px;
+    text-decoration: none;
+}
+
+.fm-or a:hover {
+    text-decoration: underline;
+}
+
+/* Utility */
+.hidden {
+    display: none;
+}
+
+/* Responsive */
+@media (max-width: 880px) {
+    .fm-card {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .fm-left {
+        display: none;
+        /* Ẩn cột trái trên mobile cho gọn */
+    }
+
+    .fm-right {
+        padding: 30px 20px;
+    }
+}
