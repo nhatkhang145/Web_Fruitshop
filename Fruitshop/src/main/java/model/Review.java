@@ -9,7 +9,7 @@ public class Review {
     private int rating; // 1 đến 5 sao
     private String comment;
     private String adminReply;
-    private String status; // 'approved', 'hidden'
+    private String status;
     private Timestamp createdAt;
     private Product product;
 
@@ -30,7 +30,7 @@ public class Review {
         this.product = product;
     }
 
-    // Getters and Setters
+
     public int getId() {
         return id;
     }

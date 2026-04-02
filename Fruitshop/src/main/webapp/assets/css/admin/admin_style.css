@@ -1,8 +1,4 @@
-/* =================================== */
-/* === PHẦN 1: CSS CHUNG (CHO MỌI TRANG) === */
-/* =================================== */
 
-/* === BIẾN MÀU & RESET === */
 :root {
     --light: #f6f6f9;
     --primary: #3d8b91;
@@ -51,7 +47,7 @@ body.dark {
     --dark: #fbfbfb;
 }
 
-/* === SIDEBAR (THANH BÊN) === */
+
 .sidebar {
     position: fixed;
     top: 0;
@@ -188,7 +184,7 @@ body.dark {
     left: 60px;
 }
 
-/* === NAVBAR (THANH ĐIỀU HƯỚNG TRÊN) === */
+
 .content nav {
     height: 56px;
     background: var(--light);
@@ -291,7 +287,7 @@ body.dark {
     border: 2px solid var(--primary);
 }
 
-/* === MAIN CONTENT (LAYOUT CHUNG) === */
+
 .content main {
     max-width: 100%;
     padding: 36px 24px;
@@ -347,7 +343,7 @@ body.dark {
     font-weight: 500;
 }
 
-/* === INSIGHTS (WIDGETS CHUNG) === */
+
 .content main .insights {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));

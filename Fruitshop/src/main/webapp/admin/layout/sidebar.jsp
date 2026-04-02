@@ -9,7 +9,7 @@
     </a>
     <ul class="side-menu">
         <li class="${param.activePage == 'dashboard' ? 'active' : ''}">
-            <a href="${pageContext.request.contextPath}/admin/index.jsp"><i class='bx bxs-dashboard'></i>Tổng quan</a>
+            <a href="${pageContext.request.contextPath}/admin/dashboard"><i class='bx bxs-dashboard'></i>Tổng quan</a>
         </li>
         <li class="${param.activePage == 'products' ? 'active' : ''}">
             <a href="${pageContext.request.contextPath}/admin/products"><i class='bx bx-basket'></i>Quản lý sản phẩm</a>
@@ -30,7 +30,7 @@
             <a href="${pageContext.request.contextPath}/admin/banners"><i class='bx bx-images'></i>Quản lý Banner</a>
         </li>
         <li class="${param.activePage == 'reviews' ? 'active' : ''}">
-            <a href="${pageContext.request.contextPath}/admin/reviews.jsp"><i class='bx bx-star'></i>Đánh giá</a>
+            <a href="${pageContext.request.contextPath}/admin/reviews"><i class='bx bx-star'></i>Đánh giá</a>
         </li>
         <li class="${param.activePage == 'notifications' ? 'active' : ''}">
             <a href="${pageContext.request.contextPath}/admin/notifications"><i class='bx bx-bell'></i>Lịch sử Thông báo</a>

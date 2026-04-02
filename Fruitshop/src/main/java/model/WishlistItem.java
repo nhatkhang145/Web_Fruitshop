@@ -12,6 +12,7 @@ public class WishlistItem {
 
     public WishlistItem() {
     }
+
     public WishlistItem(int id, int userId, int productId, Timestamp createdAt, Product product) {
         this.id = id;
         this.userId = userId;

@@ -1,0 +1,344 @@
+
+
+.product-edit {
+    width: 100%;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+#productForm {
+    display: flex;
+    width: 100%;
+    gap: 24px;
+    background: transparent;
+    box-shadow: none;
+}
+
+
+.product-edit__form-left,
+.product-edit__form-right {
+    background: var(--light);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    border: 1px solid var(--grey);
+}
+
+.product-edit__form-left {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.product-edit__form-right {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    height: fit-content;
+}
+
+
+.form-input {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--dark);
+    margin-left: 2px;
+}
+
+.required-mark {
+    color: red;
+}
+
+.form-control,
+.form-textarea,
+.form-select {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    background: #fff;
+    color: var(--dark);
+    font-size: 15px;
+    outline: none;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+
+.form-control:focus,
+.form-textarea:focus,
+.form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(61, 139, 145, 0.1);
+}
+
+.form-textarea {
+    min-height: 120px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+
+.form-input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 5px;
+    border-bottom: 2px solid var(--grey);
+    padding-bottom: 10px;
+}
+
+.image-group-title {
+    font-size: 13px;
+    color: var(--dark-grey);
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.upload-area {
+    width: 100%;
+    position: relative;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    background: #f8fafc;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+}
+
+.upload-area:hover {
+    border-color: var(--primary);
+    background: rgba(61, 139, 145, 0.05);
+}
+
+.upload-area img#mainImagePreview {
+    max-width: 100%;
+    max-height: 220px;
+    object-fit: contain;
+    border-radius: 8px;
+    display: block;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #64748b;
+}
+
+.upload-placeholder i {
+    font-size: 48px;
+    margin-bottom: 10px;
+    color: #94a3b8;
+}
+
+.upload-placeholder span {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+.secondary-images-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.sub-image-item {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+
+.sub-image-item img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.btn-upload-sub {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 10px;
+    border: 1px dashed var(--primary);
+    background: rgba(61, 139, 145, 0.05);
+    color: var(--primary);
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s;
+    gap: 6px;
+}
+
+.btn-upload-sub:hover {
+    background: var(--primary);
+    color: var(--light);
+}
+
+
+.status-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.status-toggle {
+    position: relative;
+    width: 44px;
+    height: 24px;
+}
+
+.status-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.status-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.status-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .status-slider {
+    background-color: var(--success);
+}
+
+input:checked + .status-slider:before {
+    transform: translateX(20px);
+}
+
+.status-label-text {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.status-current-row {
+    margin-top: 5px;
+    font-size: 13px;
+    text-align: right;
+}
+
+.status-current-text {
+    font-weight: bold;
+}
+
+.file-input-hidden,
+.is-hidden {
+    display: none;
+}
+
+
+.product-edit__bottom {
+    margin-top: 30px;
+    padding: 20px;
+    background: var(--light);
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
+}
+
+.btn-save, .btn-cancel {
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s;
+}
+
+.btn-save {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(61, 139, 145, 0.3);
+}
+
+.btn-save:hover {
+    background: #2a6b70;
+    transform: translateY(-2px);
+}
+
+.btn-cancel {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.btn-cancel:hover {
+    background: #cbd5e1;
+}
+
+
+@media screen and (max-width: 992px) {
+    #productForm {
+        flex-direction: column;
+    }
+    .product-edit__form-left, .product-edit__form-right {
+        width: 100%;
+    }
+}
+@media screen and (max-width: 768px) {
+    .form-input-row {
+        grid-template-columns: 1fr;
+    }
+}
