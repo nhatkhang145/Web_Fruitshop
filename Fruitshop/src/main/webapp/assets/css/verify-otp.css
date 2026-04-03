@@ -1,0 +1,218 @@
+:root {
+    --primary-color: #3d8b91;
+    --primary-brand-color: #2fb45a;
+    --secondary-brand-color: #ff6b6b;
+    --white-color: #fff;
+    --text-dark: #333;
+    --text-light: #666;
+    --bg-light: #f9f9f9;
+    --border-color: #ddd;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-brand-color) 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.otp-container {
+    background: var(--white-color);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 50px 40px;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.otp-icon {
+    font-size: 80px;
+    color: var(--primary-brand-color);
+    margin-bottom: 20px;
+    animation: bounce 1s ease-in-out;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+h2 {
+    color: var(--text-dark);
+    margin-bottom: 10px;
+    font-size: 28px;
+}
+
+.subtitle {
+    color: var(--text-light);
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+.email-sent {
+    background: linear-gradient(135deg, #f0f8ff, #e8f5e9);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    color: var(--text-dark);
+    border: 2px solid var(--primary-brand-color);
+}
+
+.email-sent strong {
+    color: var(--primary-brand-color);
+    word-break: break-all;
+}
+
+.otp-inputs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.otp-input {
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    transition: all 0.3s;
+    background: var(--bg-light);
+}
+
+.otp-input:focus {
+    border-color: var(--primary-brand-color);
+    outline: none;
+    transform: scale(1.1);
+    background: var(--white-color);
+    box-shadow: 0 0 10px rgba(47, 180, 90, 0.3);
+}
+
+.error-message {
+    color: var(--secondary-brand-color);
+    background: #ffebee;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    border-left: 4px solid var(--secondary-brand-color);
+}
+
+.success-message {
+    color: var(--primary-brand-color);
+    background: #e8f5e9;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    border-left: 4px solid var(--primary-brand-color);
+}
+
+.btn-verify {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--primary-brand-color), #27a04f);
+    color: var(--white-color);
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(47, 180, 90, 0.3);
+}
+
+.btn-verify:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(47, 180, 90, 0.5);
+}
+
+.btn-verify:active {
+    transform: translateY(0);
+}
+
+.resend-section {
+    margin-top: 20px;
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+.resend-link {
+    color: var(--primary-brand-color);
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.resend-link:hover {
+    text-decoration: underline;
+    color: #27a04f;
+}
+
+.timer {
+    color: var(--secondary-brand-color);
+    font-weight: bold;
+}
+
+.back-login {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.back-login a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.back-login a:hover {
+    text-decoration: underline;
+    color: var(--primary-brand-color);
+}
+
+.loading {
+    display: none;
+    margin-top: 10px;
+}
+
+.spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--primary-brand-color);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
