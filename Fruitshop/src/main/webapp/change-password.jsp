@@ -50,22 +50,22 @@
 
                 <ul class="profile-menu">
                     <li class="profile-menu-item ">
-                        <a href="profile"><i class="fa-regular fa-user"></i> Hồ sơ của tôi</a>
+                        <a href="<c:url value='/profile'/>"><i class="fa-regular fa-user"></i> Hồ sơ của tôi</a>
                     </li>
                     <li class="profile-menu-item">
-                        <a href="orders"><i class="fa-solid fa-box-open"></i> Đơn mua</a>
+                        <a href="<c:url value='/orders'/>"><i class="fa-solid fa-box-open"></i> Đơn mua</a>
                     </li>
                     <li class="profile-menu-item">
-                        <a href="addresses"><i class="fa-solid fa-location-dot"></i> Địa chỉ</a>
+                        <a href="<c:url value='/addresses'/>"><i class="fa-solid fa-location-dot"></i> Địa chỉ</a>
                     </li>
                     <li class="profile-menu-item active">
-                        <a href="change-password.jsp"><i class="fa-solid fa-key"></i> Đổi mật khẩu</a>
+                        <a href="<c:url value='/change-password.jsp'/>"><i class="fa-solid fa-key"></i> Đổi mật khẩu</a>
                     </li>
                     <li class="profile-menu-item">
-                        <a href="wishlist"><i class="fa-regular fa-heart"></i> Yêu thích</a>
+                        <a href="<c:url value='/wishlist'/>"><i class="fa-regular fa-heart"></i> Yêu thích</a>
                     </li>
                     <li class="profile-menu-item">
-                        <a href="logout" style="color: red;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
+                        <a href="<c:url value='/logout'/>" style="color: red;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
                     </li>
                 </ul>
             </aside>
