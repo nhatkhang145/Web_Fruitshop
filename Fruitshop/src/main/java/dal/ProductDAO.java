@@ -48,6 +48,20 @@ public class ProductDAO {
         return product;
     }
 
+    public int getSoldQuantityByProductId(int productId) {
+        String sql = """
+                SELECT COALESCE(SUM(od.quantity), 0)
+                FROM orders o
+                JOIN order_details od ON o.id = od.order_id
+                WHERE od.product_id = :pid AND o.status = 'completed'
+                """;
+
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .bind("pid", productId)
+                .mapTo(Integer.class)
+                .one());
+    }
+
     public List<ProductImage> getProductImages(int productId) {
         String sql = "SELECT id, product_id AS productId, image_url AS imageUrl, sort_order AS sortOrder " +
                 "FROM product_images WHERE product_id = ? ORDER BY sort_order ASC";

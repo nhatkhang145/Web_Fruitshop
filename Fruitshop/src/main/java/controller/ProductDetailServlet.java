@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(name = "ProductDetailServlet", urlPatterns = {"/product-detail"})
+@WebServlet(name = "ProductDetailServlet", urlPatterns = { "/product-detail" })
 public class ProductDetailServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -35,10 +35,13 @@ public class ProductDetailServlet extends HttpServlet {
             int id = Integer.parseInt(idRaw);
 
             Product p = pDao.getProductByID(id);
-            if(p == null) {
+            if (p == null) {
                 response.sendRedirect("index.jsp");
                 return;
             }
+
+            int soldCount = pDao.getSoldQuantityByProductId(id);
+            request.setAttribute("soldCount", soldCount);
 
             WeekendDeal activeDeal = wdDao.getActiveDealByProductId(id);
             if (activeDeal != null) {
@@ -50,7 +53,6 @@ public class ProductDetailServlet extends HttpServlet {
             List<Category> listC = cDao.getAllCategories();
             request.setAttribute("listC", listC);
 
-
             List<Review> listR = new ArrayList<>();
             try {
                 listR = rDao.getReviewsByProductId(id);
@@ -60,7 +62,7 @@ public class ProductDetailServlet extends HttpServlet {
             }
             request.setAttribute("listR", listR);
 
-            request.setAttribute("detail", p);       // Biến 'detail' chứa thông tin 1 sản phẩm
+            request.setAttribute("detail", p); // Biến 'detail' chứa thông tin 1 sản phẩm
             request.setAttribute("relatedP", relatedP); // Biến 'relatedP' chứa list sản phẩm liên quan
 
             request.getRequestDispatcher("product-detail.jsp").forward(request, response);

@@ -573,21 +573,42 @@
                         }
                     }
 
-                    document.addEventListener('DOMContentLoaded', function () {
+                    function bindProductCardNavigation() {
                         const cards = document.querySelectorAll('.product-card[data-href]');
                         cards.forEach(function (card) {
                             card.style.cursor = 'pointer';
+                            card.onclick = null;
                             card.addEventListener('click', function (e) {
-                                if (e.target.closest('a, button')) {
+                                if (e.target.closest('a, button, input, textarea, select, label')) {
                                     return;
                                 }
                                 const href = card.getAttribute('data-href');
                                 if (href) {
-                                    window.location.href = href;
+                                    window.location.assign(href);
                                 }
                             });
                         });
-                    });
+
+                        document.addEventListener('click', function (e) {
+                            const card = e.target.closest('.product-card[data-href]');
+                            if (!card) {
+                                return;
+                            }
+                            if (e.target.closest('a, button, input, textarea, select, label')) {
+                                return;
+                            }
+                            const href = card.getAttribute('data-href');
+                            if (href) {
+                                window.location.assign(href);
+                            }
+                        });
+                    }
+
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', bindProductCardNavigation);
+                    } else {
+                        bindProductCardNavigation();
+                    }
                 </script>
                 </div>
             </body>
