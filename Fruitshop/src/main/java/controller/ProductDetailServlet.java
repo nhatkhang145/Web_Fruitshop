@@ -25,7 +25,7 @@ public class ProductDetailServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
-        String idRaw = request.getParameter("pid"); // Lấy id từ URL
+        String idRaw = request.getParameter("pid");
         ProductDAO pDao = new ProductDAO();
         CategoryDAO cDao = new CategoryDAO();
         WeekendDealDAO wdDao = new WeekendDealDAO();
@@ -60,8 +60,8 @@ public class ProductDetailServlet extends HttpServlet {
             }
             request.setAttribute("listR", listR);
 
-            request.setAttribute("detail", p);       // Biến 'detail' chứa thông tin 1 sản phẩm
-            request.setAttribute("relatedP", relatedP); // Biến 'relatedP' chứa list sản phẩm liên quan
+            request.setAttribute("detail", p);
+            request.setAttribute("relatedP", relatedP);
 
             request.getRequestDispatcher("product-detail.jsp").forward(request, response);
 

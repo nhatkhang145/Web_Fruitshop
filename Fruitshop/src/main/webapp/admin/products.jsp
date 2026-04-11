@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/style.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/admin_style.css" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/products.css" />
 
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
@@ -29,7 +29,7 @@
 </jsp:include>
 
 <div class="content">
-    <jsp:include page="/admin/header.jsp" />
+    <jsp:include page="/admin/layout/header.jsp" />
 
     <main>
         <div class="header">

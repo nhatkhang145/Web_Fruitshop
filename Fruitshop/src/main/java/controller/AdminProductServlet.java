@@ -63,7 +63,7 @@ public class AdminProductServlet extends HttpServlet {
         req.getRequestDispatcher("/admin/products.jsp").forward(req, resp);
     }
 
-    // hiển thị Form
+   
     private void showForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String idStr = req.getParameter("id");
         Product product = new Product();
@@ -78,7 +78,7 @@ public class AdminProductServlet extends HttpServlet {
         req.getRequestDispatcher("/admin/product-edit.jsp").forward(req, resp);
     }
 
-    //  xóa sản phẩm
+   
     private void deleteProduct(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String idStr = req.getParameter("id");
         if (idStr != null) {
@@ -87,7 +87,7 @@ public class AdminProductServlet extends HttpServlet {
         resp.sendRedirect(req.getContextPath() + "/admin/products");
     }
 
-    // thêm mới câp nhật sản phẩm
+    
     private void saveProduct(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             req.setCharacterEncoding("UTF-8");
@@ -103,7 +103,7 @@ public class AdminProductServlet extends HttpServlet {
             String statusStr = req.getParameter("status");
             int status = (statusStr != null && statusStr.equals("1")) ? 1 : 0;
 
-            // Xử lý upload ảnh
+            
             Part filePart = req.getPart("image");
             String fileName = null;
             String uploadBasePath = req.getServletContext().getRealPath("") + File.separator + "assets" + File.separator
@@ -121,7 +121,7 @@ public class AdminProductServlet extends HttpServlet {
                 fileName = req.getParameter("currentImage");
             }
 
-            // Upload các ảnh phụ
+            
             String subImageUploadPath = uploadBasePath + File.separator + "products";
             File subImageDir = new File(subImageUploadPath);
             if (!subImageDir.exists())

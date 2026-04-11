@@ -7,7 +7,6 @@ import java.util.List;
 public class AdminProductDAO {
 
     private final AdminReviewDAO reviewDAO = new AdminReviewDAO();
-    // phương thức để enrich thông tin sản phẩm với điểm đánh giá và số lượng đánh giá
     private void enrichProductWithRating(Product product) {
         if (product != null && product.getId() > 0) {
             product.setAverageRating(reviewDAO.getAverageRatingByProductId(product.getId()));
@@ -58,7 +57,7 @@ public class AdminProductDAO {
                 "VALUES (:name, :productCode, :price, :salePrice, :quantity, :description, :image, :categoryId, :status)";
 
         return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
-                .bindBean(p) // Tự động map các getter trong Product với param :name, :price...
+                .bindBean(p)
                 .executeAndReturnGeneratedKeys("id")
                 .mapTo(Integer.class)
                 .one());

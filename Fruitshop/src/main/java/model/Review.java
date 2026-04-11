@@ -6,7 +6,7 @@ public class Review {
     private int id;
     private int userId;
     private int productId;
-    private int rating; // 1 đến 5 sao
+    private int rating;
     private String comment;
     private String adminReply;
     private String status;

@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -11,9 +11,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/style.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/admin_style.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/order-detail.css"/>
-    <title>Chi tiết Đơn hàng #${order.id}</title>
+    <title>Chi tiáº¿t ÄÆ¡n hÃ ng #${order.id}</title>
 </head>
 
 <body>
@@ -29,9 +29,9 @@
     <main>
         <div class="header">
             <div class="left">
-                <h1 id="pageTitle">Chi tiết Đơn hàng #${order.id}</h1>
+                <h1 id="pageTitle">Chi tiáº¿t ÄÆ¡n hÃ ng #${order.id}</h1>
                 <ul class="breadcrumb">
-                    <li><a href="${pageContext.request.contextPath}/admin/orders">Đơn hàng</a></li>
+                    <li><a href="${pageContext.request.contextPath}/admin/orders">ÄÆ¡n hÃ ng</a></li>
                     <li>/</li>
                     <li>
                         <a href="#" class="active" id="breadcrumbTitle">#${order.id}</a>
@@ -40,7 +40,7 @@
             </div>
             <a href="#" class="report" id="printInvoiceBtn" onclick="window.print()">
                 <i class="bx bx-printer"></i>
-                <span>In Hóa đơn</span>
+                <span>In HÃ³a Ä‘Æ¡n</span>
             </a>
         </div>
 
@@ -51,14 +51,14 @@
 
                     <div class="order-detail__main">
                         <div class="order-detail__card">
-                            <legend class="order-detail__legend">Sản phẩm</legend>
+                            <legend class="order-detail__legend">Sáº£n pháº©m</legend>
                             <table class="order-detail__item-table">
                                 <thead>
                                 <tr>
-                                    <th>Sản phẩm</th>
-                                    <th>Giá</th>
-                                    <th>Số lượng</th>
-                                    <th>Tổng</th>
+                                    <th>Sáº£n pháº©m</th>
+                                    <th>GiÃ¡</th>
+                                    <th>Sá»‘ lÆ°á»£ng</th>
+                                    <th>Tá»•ng</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -95,10 +95,10 @@
 
                         <div class="order-detail__card">
                             <legend class="order-detail__legend">
-                                Ghi chú của Khách hàng
+                                Ghi chÃº cá»§a KhÃ¡ch hÃ ng
                             </legend>
                             <p class="order-detail__customer-note">
-                                ${not empty order.note ? order.note : "Không có ghi chú."}
+                                ${not empty order.note ? order.note : "KhÃ´ng cÃ³ ghi chÃº."}
                             </p>
                         </div>
                     </div>
@@ -106,71 +106,71 @@
                     <div class="order-detail__sidebar">
                         <div class="order-detail__card">
                             <legend class="order-detail__legend">
-                                Trạng thái Đơn hàng
+                                Tráº¡ng thÃ¡i ÄÆ¡n hÃ ng
                             </legend>
                             <div class="order-detail__group">
 
                                 <select id="orderStatus" name="status" class="order-detail__input">
-                                    <option value="pending" ${order.status == 'pending' ? 'selected' : ''}>Chờ xử lý
+                                    <option value="pending" ${order.status == 'pending' ? 'selected' : ''}>Chá» xá»­ lÃ½
                                     </option>
-                                    <option value="processing" ${order.status == 'processing' ? 'selected' : ''}>Đang xử
-                                        lý
+                                    <option value="processing" ${order.status == 'processing' ? 'selected' : ''}>Äang xá»­
+                                        lÃ½
                                     </option>
-                                    <option value="shipped" ${order.status == 'shipped' ? 'selected' : ''}>Đang giao
+                                    <option value="shipped" ${order.status == 'shipped' ? 'selected' : ''}>Äang giao
                                     </option>
-                                    <option value="completed" ${order.status == 'completed' ? 'selected' : ''}>Hoàn
-                                        thành
+                                    <option value="completed" ${order.status == 'completed' ? 'selected' : ''}>HoÃ n
+                                        thÃ nh
                                     </option>
-                                    <option value="cancelled" ${order.status == 'cancelled' ? 'selected' : ''}>Đã hủy
+                                    <option value="cancelled" ${order.status == 'cancelled' ? 'selected' : ''}>ÄÃ£ há»§y
                                     </option>
                                 </select>
                                 <button type="submit" class="btn-submit order-detail__save-btn">
-                                    Cập nhật
+                                    Cáº­p nháº­t
                                 </button>
                             </div>
                         </div>
 
                         <div class="order-detail__card">
-                            <legend class="order-detail__legend">Khách hàng</legend>
+                            <legend class="order-detail__legend">KhÃ¡ch hÃ ng</legend>
                             <div class="order-detail__customer-info">
                                 <p><strong>${order.fullname}</strong></p>
                                 <p>${order.phone}</p>
                                 <hr/>
                                 <p>
-                                    <strong>Địa chỉ Giao hàng:</strong><br/>
+                                    <strong>Äá»‹a chá»‰ Giao hÃ ng:</strong><br/>
                                     ${order.address}
                                 </p>
                             </div>
                         </div>
 
                         <div class="order-detail__card">
-                            <legend class="order-detail__legend">Thanh toán</legend>
+                            <legend class="order-detail__legend">Thanh toÃ¡n</legend>
                             <ul class="order-detail__financials">
                                 <li>
-                                    <span>Tổng tiền hàng:</span>
+                                    <span>Tá»•ng tiá»n hÃ ng:</span>
                                     <span><fmt:formatNumber value="${order.totalProductsMoney}" pattern="#,###" /> VND</span>
                                 </li>
                                 <li>
-                                    <span>Vận chuyển:</span>
+                                    <span>Váº­n chuyá»ƒn:</span>
                                     <span><fmt:formatNumber value="${order.shippingFee}" pattern="#,###" /> VND</span>
                                 </li>
                                 <c:if test="${order.discountAmount > 0}">
                                     <li>
-                                        <span>Giảm giá:</span>
+                                        <span>Giáº£m giÃ¡:</span>
                                         <span>-<fmt:formatNumber value="${order.discountAmount}" pattern="#,###" /> VND</span>
                                     </li>
                                 </c:if>
                                 <li class="total">
-                                    <strong>Tổng cộng:</strong>
+                                    <strong>Tá»•ng cá»™ng:</strong>
                                     <strong><fmt:formatNumber value="${order.finalAmount}" pattern="#,###" /> VND</strong>
                                 </li>
                             </ul>
                             <hr/>
-                            <p><strong>P.thức:</strong> ${order.paymentMethod}</p>
+                            <p><strong>P.thá»©c:</strong> ${order.paymentMethod}</p>
                             <p>
-                                <strong>TT Thanh toán:</strong>
+                                <strong>TT Thanh toÃ¡n:</strong>
                                 <span class="status ${order.paymentStatus == 1 ? 'completed' : 'pending'}">
-                                    ${order.paymentStatus == 1 ? 'Đã thanh toán' : 'Chưa thanh toán'}
+                                    ${order.paymentStatus == 1 ? 'ÄÃ£ thanh toÃ¡n' : 'ChÆ°a thanh toÃ¡n'}
                                 </span>
                             </p>
                         </div>
@@ -198,27 +198,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/style.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/admin_style.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/order-detail.css"/>
-    <title>Chi tiết Đơn hàng #${order.id}</title>
+    <title>Chi tiáº¿t ÄÆ¡n hÃ ng #${order.id}</title>
 </head>
 
 <body>
 
-<jsp:include page="/admin/sidebar.jsp">
+<jsp:include page="/admin/layout/sidebar.jsp">
     <jsp:param name="activePage" value="orders"/>
 </jsp:include>
 
 <div class="content">
 
-    <jsp:include page="/admin/header.jsp"/>
+    <jsp:include page="/admin/layout/header.jsp"/>
 
     <main>
         <div class="header">
             <div class="left">
-                <h1 id="pageTitle">Chi tiết Đơn hàng #${order.id}</h1>
+                <h1 id="pageTitle">Chi tiáº¿t ÄÆ¡n hÃ ng #${order.id}</h1>
                 <ul class="breadcrumb">
-                    <li><a href="${pageContext.request.contextPath}/admin/orders">Đơn hàng</a></li>
+                    <li><a href="${pageContext.request.contextPath}/admin/orders">ÄÆ¡n hÃ ng</a></li>
                     <li>/</li>
                     <li>
                         <a href="#" class="active" id="breadcrumbTitle">#${order.id}</a>
@@ -227,7 +227,7 @@
             </div>
             <a href="#" class="report" id="printInvoiceBtn" onclick="window.print()">
                 <i class="bx bx-printer"></i>
-                <span>In Hóa đơn</span>
+                <span>In HÃ³a Ä‘Æ¡n</span>
             </a>
         </div>
 
@@ -238,14 +238,14 @@
 
                     <div class="order-detail__main">
                         <div class="order-detail__card">
-                            <legend class="order-detail__legend">Sản phẩm</legend>
+                            <legend class="order-detail__legend">Sáº£n pháº©m</legend>
                             <table class="order-detail__item-table">
                                 <thead>
                                 <tr>
-                                    <th>Sản phẩm</th>
-                                    <th>Giá</th>
-                                    <th>Số lượng</th>
-                                    <th>Tổng</th>
+                                    <th>Sáº£n pháº©m</th>
+                                    <th>GiÃ¡</th>
+                                    <th>Sá»‘ lÆ°á»£ng</th>
+                                    <th>Tá»•ng</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -282,10 +282,10 @@
 
                         <div class="order-detail__card">
                             <legend class="order-detail__legend">
-                                Ghi chú của Khách hàng
+                                Ghi chÃº cá»§a KhÃ¡ch hÃ ng
                             </legend>
                             <p class="order-detail__customer-note">
-                                ${not empty order.note ? order.note : "Không có ghi chú."}
+                                ${not empty order.note ? order.note : "KhÃ´ng cÃ³ ghi chÃº."}
                             </p>
                         </div>
                     </div>
@@ -293,71 +293,71 @@
                     <div class="order-detail__sidebar">
                         <div class="order-detail__card">
                             <legend class="order-detail__legend">
-                                Trạng thái Đơn hàng
+                                Tráº¡ng thÃ¡i ÄÆ¡n hÃ ng
                             </legend>
                             <div class="order-detail__group">
 
                                 <select id="orderStatus" name="status" class="order-detail__input">
-                                    <option value="pending" ${order.status == 'pending' ? 'selected' : ''}>Chờ xử lý
+                                    <option value="pending" ${order.status == 'pending' ? 'selected' : ''}>Chá» xá»­ lÃ½
                                     </option>
-                                    <option value="processing" ${order.status == 'processing' ? 'selected' : ''}>Đang xử
-                                        lý
+                                    <option value="processing" ${order.status == 'processing' ? 'selected' : ''}>Äang xá»­
+                                        lÃ½
                                     </option>
-                                    <option value="shipped" ${order.status == 'shipped' ? 'selected' : ''}>Đang giao
+                                    <option value="shipped" ${order.status == 'shipped' ? 'selected' : ''}>Äang giao
                                     </option>
-                                    <option value="completed" ${order.status == 'completed' ? 'selected' : ''}>Hoàn
-                                        thành
+                                    <option value="completed" ${order.status == 'completed' ? 'selected' : ''}>HoÃ n
+                                        thÃ nh
                                     </option>
-                                    <option value="cancelled" ${order.status == 'cancelled' ? 'selected' : ''}>Đã hủy
+                                    <option value="cancelled" ${order.status == 'cancelled' ? 'selected' : ''}>ÄÃ£ há»§y
                                     </option>
                                 </select>
                                 <button type="submit" class="btn-submit order-detail__save-btn">
-                                    Cập nhật
+                                    Cáº­p nháº­t
                                 </button>
                             </div>
                         </div>
 
                         <div class="order-detail__card">
-                            <legend class="order-detail__legend">Khách hàng</legend>
+                            <legend class="order-detail__legend">KhÃ¡ch hÃ ng</legend>
                             <div class="order-detail__customer-info">
                                 <p><strong>${order.fullname}</strong></p>
                                 <p>${order.phone}</p>
                                 <hr/>
                                 <p>
-                                    <strong>Địa chỉ Giao hàng:</strong><br/>
+                                    <strong>Äá»‹a chá»‰ Giao hÃ ng:</strong><br/>
                                     ${order.address}
                                 </p>
                             </div>
                         </div>
 
                         <div class="order-detail__card">
-                            <legend class="order-detail__legend">Thanh toán</legend>
+                            <legend class="order-detail__legend">Thanh toÃ¡n</legend>
                             <ul class="order-detail__financials">
                                 <li>
-                                    <span>Tổng tiền hàng:</span>
+                                    <span>Tá»•ng tiá»n hÃ ng:</span>
                                     <span><fmt:formatNumber value="${order.totalProductsMoney}" pattern="#,###" /> VND</span>
                                 </li>
                                 <li>
-                                    <span>Vận chuyển:</span>
+                                    <span>Váº­n chuyá»ƒn:</span>
                                     <span><fmt:formatNumber value="${order.shippingFee}" pattern="#,###" /> VND</span>
                                 </li>
                                 <c:if test="${order.discountAmount > 0}">
                                     <li>
-                                        <span>Giảm giá:</span>
+                                        <span>Giáº£m giÃ¡:</span>
                                         <span>-<fmt:formatNumber value="${order.discountAmount}" pattern="#,###" /> VND</span>
                                     </li>
                                 </c:if>
                                 <li class="total">
-                                    <strong>Tổng cộng:</strong>
+                                    <strong>Tá»•ng cá»™ng:</strong>
                                     <strong><fmt:formatNumber value="${order.finalAmount}" pattern="#,###" /> VND</strong>
                                 </li>
                             </ul>
                             <hr/>
-                            <p><strong>P.thức:</strong> ${order.paymentMethod}</p>
+                            <p><strong>P.thá»©c:</strong> ${order.paymentMethod}</p>
                             <p>
-                                <strong>TT Thanh toán:</strong>
+                                <strong>TT Thanh toÃ¡n:</strong>
                                 <span class="status ${order.paymentStatus == 1 ? 'completed' : 'pending'}">
-                                    ${order.paymentStatus == 1 ? 'Đã thanh toán' : 'Chưa thanh toán'}
+                                    ${order.paymentStatus == 1 ? 'ÄÃ£ thanh toÃ¡n' : 'ChÆ°a thanh toÃ¡n'}
                                 </span>
                             </p>
                         </div>

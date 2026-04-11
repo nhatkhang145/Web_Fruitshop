@@ -178,6 +178,16 @@
     font-weight: 700;
 }
 
+.cate-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.cate-link:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
 .category-card.sub-card {
     width: calc(100% - 40px);
     margin-left: 40px;
@@ -280,6 +290,16 @@
 .btn-icon.edit {
     background: var(--light-warning);
     color: var(--warning);
+}
+
+.btn-icon.view {
+    background: var(--light-primary);
+    color: var(--primary);
+}
+
+.btn-icon.view:hover {
+    background: var(--primary);
+    color: #fff;
 }
 
 .btn-icon.edit:hover {
