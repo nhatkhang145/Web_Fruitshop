@@ -190,9 +190,11 @@
                                             <c:forEach items="${listP}" var="p">
                                                 <c:set var="weekendDeal" value="${weekendDealMap[p.id]}" />
                                                 <div class="grid__column-2-4">
-                                                    <div class="product-card">
+                                                    <div class="product-card"
+                                                        data-href="${pageContext.request.contextPath}/product-detail?pid=${p.id}">
                                                         <div class="product-image">
-                                                            <a href="product-detail?pid=${p.id}">
+                                                            <a
+                                                                href="${pageContext.request.contextPath}/product-detail?pid=${p.id}">
                                                                 <img src="${p.image}" alt="${p.name}" loading="lazy" />
                                                             </a>
 
@@ -234,14 +236,14 @@
                                                                             style="${isLiked ? 'color: red;' : ''}"></i>
                                                                     </a>
 
-                                                                    <a href="product-detail?pid=${p.id}"
+                                                                    <a href="${pageContext.request.contextPath}/product-detail?pid=${p.id}"
                                                                         class="action-btn" title="Xem nhanh">
                                                                         <i class="far fa-eye"></i>
                                                                     </a>
 
                                                                     <c:choose>
                                                                         <c:when test="${p.quantity == 0}">
-                                                                            <a href="product-detail?pid=${p.id}"
+                                                                            <a href="${pageContext.request.contextPath}/product-detail?pid=${p.id}"
                                                                                 class="action-btn"
                                                                                 style="opacity: 0.5; cursor: not-allowed;"
                                                                                 title="Hết hàng">
@@ -262,7 +264,7 @@
                                                             <div class="category">Trái cây nhập khẩu</div>
 
                                                             <h3>
-                                                                <a href="product-detail?pid=${p.id}"
+                                                                <a href="${pageContext.request.contextPath}/product-detail?pid=${p.id}"
                                                                     title="${p.name}">${p.name}</a>
                                                             </h3>
 
@@ -570,6 +572,22 @@
                             toggle.textContent = '+';
                         }
                     }
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const cards = document.querySelectorAll('.product-card[data-href]');
+                        cards.forEach(function (card) {
+                            card.style.cursor = 'pointer';
+                            card.addEventListener('click', function (e) {
+                                if (e.target.closest('a, button')) {
+                                    return;
+                                }
+                                const href = card.getAttribute('data-href');
+                                if (href) {
+                                    window.location.href = href;
+                                }
+                            });
+                        });
+                    });
                 </script>
                 </div>
             </body>
