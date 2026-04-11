@@ -109,7 +109,9 @@ public class CheckoutServlet extends HttpServlet {
 
         if (addressIdStr != null && !addressIdStr.isEmpty()) {
             int addressId = Integer.parseInt(addressIdStr);
-            Address selectedAddress = addressDAO.getAddressById(addressId);
+
+            Address selectedAddress = addressDAO.getAddressById(addressId).orElse(null);
+
             if (selectedAddress != null && selectedAddress.getUserId() == user.getId()) {
                 fullname = selectedAddress.getReceiverName();
                 phone = selectedAddress.getPhoneNumber();
