@@ -7,7 +7,6 @@ import java.util.List;
 public class AdminProductDAO {
 
     private final AdminReviewDAO reviewDAO = new AdminReviewDAO();
-    // phương thức để enrich thông tin sản phẩm với điểm đánh giá và số lượng đánh giá
     private void enrichProductWithRating(Product product) {
         if (product != null && product.getId() > 0) {
             product.setAverageRating(reviewDAO.getAverageRatingByProductId(product.getId()));
@@ -58,7 +57,7 @@ public class AdminProductDAO {
                 "VALUES (:name, :productCode, :price, :salePrice, :quantity, :description, :image, :categoryId, :status)";
 
         return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
-                .bindBean(p) // Tự động map các getter trong Product với param :name, :price...
+                .bindBean(p)
                 .executeAndReturnGeneratedKeys("id")
                 .mapTo(Integer.class)
                 .one());
@@ -132,6 +131,48 @@ public class AdminProductDAO {
                 .mapToBean(Product.class)
                 .list());
     }
+
+
+   // --------------------------------------------------------------------------------------------------------------------------------
+
+  public List<Product> getProductsByCategoryId(int categoryId) {
+        String sql = "SELECT id, name, product_code AS productCode, price, sale_price AS salePrice, quantity, "
+                + "short_description AS description, image, category_id AS categoryId, status "
+                + "FROM products WHERE category_id = ? ORDER BY id DESC";
+
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .bind(0, categoryId)
+                .mapToBean(Product.class)
+                .list());
+    }
+
+    public List<Product> getProductsWithoutCategory() {
+        String sql = "SELECT id, name, product_code AS productCode, price, sale_price AS salePrice, quantity, "
+                + "short_description AS description, image, category_id AS categoryId, status "
+                + "FROM products WHERE category_id IS NULL OR category_id = 0 ORDER BY id DESC";
+
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .mapToBean(Product.class)
+                .list());
+    }
+
+    public int assignProductToCategory(int productId, int categoryId) {
+        String sql = "UPDATE products SET category_id = ? WHERE id = ?";
+        return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
+                .bind(0, categoryId)
+                .bind(1, productId)
+                .execute());
+    }
+
+    public int removeProductFromCategory(int productId, int categoryId) {
+        String sql = "UPDATE products SET category_id = NULL WHERE id = ? AND category_id = ?";
+        return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
+                .bind(0, productId)
+                .bind(1, categoryId)
+                .execute());
+    }
+
+
 
 
 }

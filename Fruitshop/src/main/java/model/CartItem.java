@@ -78,17 +78,17 @@ public class CartItem {
         this.finalPrice = finalPrice;
     }
 
-    // Tính tổng tiền của item này
+    
     public BigDecimal getTotalPrice() {
         return finalPrice.multiply(BigDecimal.valueOf(quantity));
     }
 
-    // Tương thích với code cũ
+   
     public double getTotalPriceDouble() {
         return getTotalPrice().doubleValue();
     }
 
-    // Check có deal không
+  
     public boolean hasDeal() {
         return dealType != null && discountAmount != null && discountAmount.compareTo(BigDecimal.ZERO) > 0;
     }

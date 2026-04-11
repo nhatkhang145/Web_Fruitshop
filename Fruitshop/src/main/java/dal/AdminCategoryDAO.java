@@ -17,6 +17,15 @@ public class AdminCategoryDAO {
                 .list());
     }
 
+     public Category getCategoryById(int id) {
+        String sql = "SELECT id, name, description, parent_id AS parentId, status FROM Categories WHERE id = ?";
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .bind(0, id)
+                .mapToBean(Category.class)
+                .findFirst()
+                .orElse(null));
+    }
+
     private static void closeResources(Connection conn, PreparedStatement ps, ResultSet rs) {
         try {
             if (rs != null)

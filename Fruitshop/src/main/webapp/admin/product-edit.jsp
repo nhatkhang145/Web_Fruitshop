@@ -15,7 +15,7 @@
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/style.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/admin_style.css" />
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/product-edit.css" />
 </head>
@@ -45,11 +45,15 @@
 
         <div class="bottom-data">
             <div class="product-edit">
+                <c:if test="${not empty errorMessage}">
+                    <div class="error-message" style="margin-bottom:12px;color:#c0392b;font-weight:600;">${errorMessage}</div>
+                </c:if>
                 <form id="productForm" action="${pageContext.request.contextPath}/admin/product-save" method="post"
                       enctype="multipart/form-data">
 
                     <input type="hidden" name="id" value="${product.id > 0 ? product.id : 0}">
                     <input type="hidden" name="currentImage" value="${product.image}">
+                    <input type="hidden" name="fromCategoryId" value="${fromCategoryId}">
 
                     <div class="product-edit__form-left">
 
@@ -192,7 +196,7 @@
 
                 </form>
                 <div class="product-edit__bottom">
-                    <a href="${pageContext.request.contextPath}/admin/products" class="btn-cancel">
+                    <a href="${not empty fromCategoryId ? pageContext.request.contextPath.concat('/admin/category-products?categoryId=').concat(fromCategoryId) : pageContext.request.contextPath.concat('/admin/products')}" class="btn-cancel">
                         <i class='bx bx-arrow-back'></i> Quay lại
                     </a>
                     <button type="submit" form="productForm" class="btn-save">
