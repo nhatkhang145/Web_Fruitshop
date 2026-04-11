@@ -13,7 +13,7 @@
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/style.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/admin_style.css" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/Categories.css" />
 </head>
 
@@ -64,7 +64,9 @@
                             <i class='bx bxs-folder-open'></i>
                         </div>
                         <div class="text-content">
-                            <h3 class="cate-name">${parent.name}</h3>
+                            <h3 class="cate-name">
+                                <a class="cate-link" href="${pageContext.request.contextPath}/admin/category-products?categoryId=${parent.id}">${parent.name}</a>
+                            </h3>
                             <p class="cate-desc">${parent.description != null && !parent.description.isEmpty() ?
                                     parent.description : '...'}</p>
                         </div>
@@ -86,6 +88,10 @@
                     </div>
 
                     <div class="card-actions">
+                        <a href="${pageContext.request.contextPath}/admin/category-products?categoryId=${parent.id}"
+                           class="btn-icon view" title="Quan ly san pham">
+                            <i class='bx bx-list-ul'></i>
+                        </a>
                         <button type="button"
                                 class="btn-icon edit js-edit-category"
                                 data-id="${parent.id}"
@@ -112,7 +118,9 @@
                                     <i class='bx bx-subdirectory-right'></i>
                                 </div>
                                 <div class="text-content">
-                                    <h3 class="cate-name">${child.name}</h3>
+                                    <h3 class="cate-name">
+                                        <a class="cate-link" href="${pageContext.request.contextPath}/admin/category-products?categoryId=${child.id}">${child.name}</a>
+                                    </h3>
                                     <p class="cate-desc">${child.description != null && !child.description.isEmpty() ?
                                             child.description : '...'}</p>
                                 </div>
@@ -135,6 +143,10 @@
                             </div>
 
                             <div class="card-actions">
+                                <a href="${pageContext.request.contextPath}/admin/category-products?categoryId=${child.id}"
+                                   class="btn-icon view" title="Quan ly san pham">
+                                    <i class='bx bx-list-ul'></i>
+                                </a>
                                 <button type="button"
                                         class="btn-icon edit js-edit-category"
                                         data-id="${child.id}"

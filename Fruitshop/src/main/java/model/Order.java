@@ -16,8 +16,8 @@ public class Order {
     private double discountAmount;
     private double finalAmount;
     private String paymentMethod;
-    private int paymentStatus; // 0: Chưa thanh toán, 1: Đã thanh toán
-    private String status; // pending, processing, shipped, completed, cancelled
+    private int paymentStatus; 
+    private String status; 
     private Timestamp createdAt;
 
     // For display

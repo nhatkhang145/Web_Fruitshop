@@ -1,0 +1,622 @@
+/* PROFILE PAGE STYLES */
+.profile-section {
+    padding: 40px 0 80px;
+    background-color: #f5f5f5;
+}
+
+.profile-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    width: 100%;
+}
+
+/* --- 1. SIDEBAR --- */
+.profile-sidebar {
+    width: 250px;
+    flex-shrink: 0;
+}
+
+.profile-user-brief {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 0;
+    border-bottom: 1px solid #efefef;
+    margin-bottom: 15px;
+}
+
+.brief-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+
+    /* THÊM 2 DÒNG NÀY */
+    background-color: #fff; /* Nền trắng */
+    padding: 2px; /* Tạo khoảng cách nhỏ */
+}
+
+.brief-name {
+    font-weight: 600;
+    color: var(--text-dark);
+    display: block;
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.brief-edit {
+    color: #888;
+    font-size: 1.2rem;
+}
+.brief-edit:hover {
+    color: var(--primary-color);
+}
+
+.profile-menu {
+    list-style: none;
+}
+
+.profile-menu-item a {
+    display: block;
+    padding: 10px 0;
+    color: var(--text-dark);
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: color 0.2s;
+}
+
+.profile-menu-item a:hover,
+.profile-menu-item.active a {
+    color: var(--primary-color);
+}
+.profile-menu-item i {
+    width: 20px;
+    text-align: center;
+    font-size: 1.6rem;
+}
+
+/* --- 2. MAIN CONTENT --- */
+.profile-content {
+    min-width: 0;
+    flex: 1;
+    background: #fff;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.13);
+    padding: 30px;
+}
+
+.profile-header {
+    border-bottom: 1px solid #efefef;
+    padding-bottom: 18px;
+    margin-bottom: 30px;
+}
+
+.profile-header h3 {
+    font-size: 1.8rem;
+    font-weight: 500;
+    margin: 0 0 5px;
+    color: #333;
+}
+
+.profile-header p {
+    font-size: 1.4rem;
+    color: #555;
+    margin: 0;
+}
+
+/* --- FORM LAYOUT --- */
+.profile-form {
+    display: flex;
+    gap: 5px;
+}
+
+.profile-form-left {
+    flex: 1;
+    padding-right: 20px;
+}
+
+.profile-form-right {
+    width: 280px;
+    display: flex;
+    justify-content: center;
+
+}
+
+/* Form Controls */
+.form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.form-group label {
+    width: 120px;
+    text-align: right;
+    color: rgba(85, 85, 85, 0.8);
+    margin-right: 20px;
+    font-size: 1.4rem;
+}
+
+.form-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    outline: none;
+    transition: border 0.2s;
+}
+.form-input:focus {
+    border-color: #888;
+}
+
+.static-text {
+    font-size: 1.4rem;
+    color: #333;
+}
+
+.input-with-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 1.4rem;
+}
+.input-with-link a {
+    color: var(--primary-brand-color);
+    text-decoration: underline;
+    font-size: 1.3rem;
+}
+
+/* Radio Group */
+.radio-group {
+    display: flex;
+    gap: 15px;
+}
+.radio-label {
+    font-size: 1.4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.radio-label input {
+    accent-color: var(--primary-color);
+}
+
+/* Date Select */
+.date-select-group {
+    display: flex;
+    gap: 10px;
+}
+.form-select {
+    padding: 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    width: 32%;
+}
+
+/* Date Group - Ngày sinh */
+.date-group {
+    display: flex;
+    gap: 10px;
+    position: relative;
+}
+
+.custom-select-wrapper {
+    position: relative;
+}
+
+.custom-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 1.4rem;
+    background-color: #fff;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+}
+
+.custom-select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.custom-select option {
+    padding: 8px 12px;
+}
+
+/* Đảm bảo dropdown sổ xuống dưới */
+.form-group:has(.date-group) {
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 10;
+}
+
+/* Button Save */
+.btn-save {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 4px;
+    font-size: 1.4rem;
+    cursor: pointer;
+    margin-left: 140px;
+    transition: opacity 0.2s;
+}
+.btn-save:hover {
+    opacity: 0.9;
+}
+
+/* --- AVATAR UPLOADER (RIGHT SIDE) --- */
+.avatar-uploader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+}
+
+.avatar-uploader img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 20px;
+    background-color: #f8f9fa;
+    padding: 5px;
+}
+
+.btn-outline-light {
+    background: #fff;
+    border: 1px solid #ddd;
+    color: #555;
+    padding: 8px 15px;
+    border-radius: 2px;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-outline-light:hover {
+    background: #f8f8f8;
+}
+
+.avatar-note {
+    margin-top: 12px;
+    font-size: 1.2rem;
+    color: #999;
+    text-align: center;
+    line-height: 1.5;
+}
+
+
+/* Tùy chỉnh input type="date" cho đồng bộ */
+input[type="date"] {
+    /* Đảm bảo font chữ và màu sắc giống text input */
+    font-family: inherit;
+    color: var(--text-dark);
+    cursor: pointer;
+}
+
+/* Tùy chỉnh icon lịch (Calendar icon) bên trong input */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    filter: invert(0.5) sepia(1) saturate(5) hue-rotate(120deg); /* Chỉnh màu icon sang xanh (ước lượng) */
+    opacity: 0.6;
+    transition: 0.2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Responsive: Khi màn hình nhỏ hơn 992px (Tablet) */
+@media (max-width: 992px) {
+    .profile-form {
+        flex-direction: column-reverse; /* Đảo avatar lên trên */
+        gap: 3px;
+    }
+
+    .profile-form-right {
+        width: 100%;
+        border-left: none;
+        border-bottom: 1px dashed #ddd;
+        padding-bottom: 20px;
+    }
+
+    .profile-form-left {
+        padding-right: 0;
+    }
+}
+
+/* Responsive: Khi màn hình nhỏ hơn 768px (Mobile) */
+@media (max-width: 768px) {
+    .profile-container {
+        flex-direction: column; /* Menu chồng lên nội dung */
+    }
+
+    .profile-sidebar {
+        width: 100%; /* Sidebar full chiều rộng */
+        margin-bottom: 20px;
+    }
+
+    .profile-content {
+        padding: 20px; /* Giảm padding cho đỡ chật */
+    }
+
+    .form-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .form-group label {
+        text-align: left;
+        margin-bottom: 5px;
+        width: 100%; /* Label full dòng */
+    }
+
+    .btn-save {
+        margin-left: 0;
+        width: 100%; /* Nút Lưu full dòng */
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .profile-container {
+        flex-direction: column;
+    }
+    .profile-sidebar {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    .profile-form {
+        flex-direction: column-reverse;
+        gap: 2px;
+    }
+    .profile-form-left {
+        padding-right: 0;
+    }
+    .profile-form-right {
+        width: 100%;
+        border-left: none;
+        border-bottom: 1px solid #efefef;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+    }
+    .form-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .form-group label {
+        text-align: left;
+        margin-bottom: 5px;
+    }
+    .btn-save {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
+/* Wrapper để định vị icon mắt */
+.password-input-wrapper {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Input trong wrapper chiếm hết chỗ */
+.password-input-wrapper .form-input {
+    width: 100%;
+    padding-right: 40px; /* Chừa chỗ cho icon */
+}
+
+/* Icon Mắt (Show/Hide) */
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: #999;
+    font-size: 1.4rem;
+    transition: color 0.2s;
+}
+
+.toggle-password:hover {
+    color: var(--primary-color);
+}
+
+/* Gợi ý mật khẩu */
+.password-hints {
+    list-style: disc;
+    padding-left: 20px;
+    margin: 0;
+    color: #888;
+    font-size: 1.2rem;
+}
+
+.password-hints li {
+    margin-bottom: 5px;
+}
+
+/* Responsive tinh chỉnh cho form đổi pass */
+@media (max-width: 768px) {
+    .password-change-form .profile-form-left {
+        width: 100%;
+    }
+}
+
+
+/* Buttons Styles (Ghi đè hoặc thêm mới) */
+.btn {
+    min-width: 140px;
+    padding: 10px 0;
+    text-align: center;
+    border-radius: 4px;
+    font-size: 1.4rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: 1px solid var(--primary-color);
+}
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.btn-outline {
+    background-color: #fff;
+    color: #555;
+    border: 1px solid #dbdbdb;
+}
+.btn-outline:hover {
+    background-color: #f8f8f8;
+    border-color: #ccc;
+}
+
+.btn-disabled {
+    background-color: #ccc;
+    color: #fff;
+    border: none;
+    cursor: not-allowed;
+}
+
+/* Thêm style cho thông báo */
+.alert {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Custom Dropdown Style - Shopee */
+.date-dropdown-group {
+    display: flex;
+    gap: 10px;
+}
+
+.dropdown-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+.dropdown-trigger {
+    width: 100%;
+    padding: 10px 35px 10px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: border-color 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdown-trigger:hover {
+    border-color: #ccc;
+}
+
+.dropdown-trigger.active {
+    border-color: var(--primary-color, #ee4d2d);
+}
+
+.dropdown-trigger::after {
+    content: '';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 5px solid transparent;
+    border-top-color: #999;
+    transition: transform 0.2s;
+}
+
+.dropdown-trigger.active::after {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: background 0.15s;
+}
+
+.dropdown-item:hover {
+    background: #fafafa;
+    color: var(--primary-color, #ee4d2d);
+}
+
+.dropdown-item.selected {
+    background: #fff5f5;
+    color: var(--primary-color, #ee4d2d);
+}
+
+/* Scrollbar đẹp */
+.dropdown-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}

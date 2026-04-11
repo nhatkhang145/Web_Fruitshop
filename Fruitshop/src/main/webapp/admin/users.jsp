@@ -13,19 +13,19 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/style.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/admin_style.css" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/users.css" />
 
 </head>
 
 <body>
 
-<jsp:include page="/admin/sidebar.jsp">
+<jsp:include page="/admin/layout/sidebar.jsp">
     <jsp:param name="activePage" value="users" />
 </jsp:include>
 
 <div class="content">
-    <jsp:include page="/admin/header.jsp" />
+    <jsp:include page="/admin/layout/header.jsp" />
 
     <main>
         <div class="header">
