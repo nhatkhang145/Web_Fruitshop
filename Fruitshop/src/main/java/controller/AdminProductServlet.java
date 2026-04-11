@@ -1,3 +1,4 @@
+
 package controller;
 
 import dal.AdminCategoryDAO;
@@ -66,15 +67,26 @@ public class AdminProductServlet extends HttpServlet {
    
     private void showForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String idStr = req.getParameter("id");
+        String categoryIdStr = req.getParameter("categoryId");
+        String fromCategoryId = req.getParameter("fromCategoryId");
         Product product = new Product();
 
         if (idStr != null && !idStr.isEmpty()) {
             int id = Integer.parseInt(idStr);
             product = productDAO.getProductByID(id);
+        } else {
+            Integer categoryId = tryParsePositiveInt(categoryIdStr);
+            if (categoryId != null) {
+                product.setCategoryId(categoryId);
+                if (fromCategoryId == null || fromCategoryId.isBlank()) {
+                    fromCategoryId = String.valueOf(categoryId);
+                }
+            }
         }
         List<Category> categories = categoryDAO.getAllCategories();
         req.setAttribute("product", product);
         req.setAttribute("categories", categories);
+        req.setAttribute("fromCategoryId", fromCategoryId);
         req.getRequestDispatcher("/admin/product-edit.jsp").forward(req, resp);
     }
 
@@ -92,6 +104,7 @@ public class AdminProductServlet extends HttpServlet {
         try {
             req.setCharacterEncoding("UTF-8");
             String idStr = req.getParameter("id");
+            Integer fromCategoryId = tryParsePositiveInt(req.getParameter("fromCategoryId"));
             String name = req.getParameter("name");
             String productCode = req.getParameter("productCode");
             double price = Double.parseDouble(req.getParameter("price"));
@@ -173,15 +186,33 @@ public class AdminProductServlet extends HttpServlet {
                 productDAO.insertProductImages(productId, subImageUrls, startOrder);
             }
 
-            resp.sendRedirect(req.getContextPath() + "/admin/products");
+            if (fromCategoryId != null) {
+                resp.sendRedirect(req.getContextPath() + "/admin/category-products?categoryId=" + fromCategoryId + "&success=created");
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/admin/products");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             req.setAttribute("errorMessage", "Lỗi khi lưu sản phẩm: " + e.getMessage());
+            req.setAttribute("categories", categoryDAO.getAllCategories());
+            req.setAttribute("fromCategoryId", req.getParameter("fromCategoryId"));
             try {
                 req.getRequestDispatcher("/admin/product-edit.jsp").forward(req, resp);
             } catch (Exception ex) {
                 resp.sendRedirect(req.getContextPath() + "/admin/products");
             }
+        }
+    }
+
+    private Integer tryParsePositiveInt(String rawValue) {
+        if (rawValue == null || rawValue.isBlank()) {
+            return null;
+        }
+        try {
+            int value = Integer.parseInt(rawValue);
+            return value > 0 ? value : null;
+        } catch (NumberFormatException ex) {
+            return null;
         }
     }
 }

@@ -133,4 +133,46 @@ public class AdminProductDAO {
     }
 
 
+   // --------------------------------------------------------------------------------------------------------------------------------
+
+  public List<Product> getProductsByCategoryId(int categoryId) {
+        String sql = "SELECT id, name, product_code AS productCode, price, sale_price AS salePrice, quantity, "
+                + "short_description AS description, image, category_id AS categoryId, status "
+                + "FROM products WHERE category_id = ? ORDER BY id DESC";
+
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .bind(0, categoryId)
+                .mapToBean(Product.class)
+                .list());
+    }
+
+    public List<Product> getProductsWithoutCategory() {
+        String sql = "SELECT id, name, product_code AS productCode, price, sale_price AS salePrice, quantity, "
+                + "short_description AS description, image, category_id AS categoryId, status "
+                + "FROM products WHERE category_id IS NULL OR category_id = 0 ORDER BY id DESC";
+
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .mapToBean(Product.class)
+                .list());
+    }
+
+    public int assignProductToCategory(int productId, int categoryId) {
+        String sql = "UPDATE products SET category_id = ? WHERE id = ?";
+        return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
+                .bind(0, categoryId)
+                .bind(1, productId)
+                .execute());
+    }
+
+    public int removeProductFromCategory(int productId, int categoryId) {
+        String sql = "UPDATE products SET category_id = NULL WHERE id = ? AND category_id = ?";
+        return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
+                .bind(0, productId)
+                .bind(1, categoryId)
+                .execute());
+    }
+
+
+
+
 }
