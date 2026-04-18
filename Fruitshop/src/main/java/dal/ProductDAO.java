@@ -21,6 +21,21 @@ public class ProductDAO {
                 .list());
     }
 
+    public List<Product> getRelatedProducts(int categoryId, int excludeProductId, int limit) {
+        String sql = "SELECT id, name, price, sale_price AS salePrice, quantity, short_description AS description, image, category_id AS categoryId "
+                + "FROM products "
+                + "WHERE status = 1 AND category_id = :categoryId AND id <> :excludeProductId "
+                + "ORDER BY id DESC "
+                + "LIMIT :limit";
+
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .bind("categoryId", categoryId)
+                .bind("excludeProductId", excludeProductId)
+                .bind("limit", limit)
+                .mapToBean(Product.class)
+                .list());
+    }
+
     public Product getProductByID(int id) {
         String sql = "SELECT id, " +
                 "       name, " +

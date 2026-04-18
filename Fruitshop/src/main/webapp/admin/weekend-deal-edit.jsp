@@ -11,17 +11,17 @@
 
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/admin_style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/weekend-deal-edit.css">
 </head>
 
 <body data-context-path="${pageContext.request.contextPath}" data-has-deal="${not empty deal}">
-<jsp:include page="/admin/sidebar.jsp">
+<jsp:include page="/admin/layout/sidebar.jsp">
     <jsp:param name="activePage" value="weekend-deals" />
 </jsp:include>
 
 <div class="content">
-    <jsp:include page="/admin/header.jsp" />
+    <jsp:include page="/admin/layout/header.jsp" />
 
     <main>
         <div class="header">
