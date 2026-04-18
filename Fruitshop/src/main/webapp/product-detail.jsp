@@ -45,20 +45,20 @@
                                     <div class="product-gallery__thumbs">
                                         <div class="thumb-item active" onclick="changeImage(this)">
                                             <img src="<c:out value='${detail.image}'/>"
-                                                alt="<c:out value='${detail.image}'/>">
+                                                alt="<c:out value='${detail.image}'/>" class="zoomable-thumb">
                                         </div>
                                         <c:forEach var="img" items="${detail.productImages}">
                                             <c:if test="${not empty img.imageUrl}">
                                                 <div class="thumb-item" onclick="changeImage(this)">
                                                     <img src="<c:out value='${img.imageUrl}'/>"
-                                                        alt="<c:out value='${detail.name}'/>">
+                                                        alt="<c:out value='${detail.name}'/>" class="zoomable-thumb">
                                                 </div>
                                             </c:if>
                                         </c:forEach>
                                     </div>
                                     <div class="product-gallery__main">
                                         <img id="mainImage" src="<c:out value='${detail.image}'/>"
-                                            alt="<c:out value='${detail.name}'/>">
+                                            alt="<c:out value='${detail.name}'/>" class="zoomable-main">
                                     </div>
                                 </div>
 
@@ -388,7 +388,16 @@
                         document.querySelectorAll('.thumb-item').forEach(el => el.classList.remove('active'));
                         element.classList.add('active');
                         const newSrc = element.querySelector('img').src;
-                        document.getElementById('mainImage').src = newSrc;
+                        const mainImage = document.getElementById('mainImage');
+                        mainImage.src = newSrc;
+                        mainImage.style.transform = 'scale(1)';
+                        mainImage.style.transformOrigin = 'center center';
+                        mainImage.dataset.zoom = '1';
+                        mainImage.style.cursor = 'zoom-in';
+                        const thumbAlt = element.querySelector('img').alt;
+                        if (thumbAlt) {
+                            mainImage.alt = thumbAlt;
+                        }
                     }
 
                     const qtyInput = document.getElementById('qtyInput');
@@ -420,7 +429,6 @@
                     }
 
                     document.addEventListener("DOMContentLoaded", function () {
-                        // Ẩn toàn bộ tab trước (phòng trường hợp CSS chưa ăn)
                         document.querySelectorAll(".tab-content").forEach(tab => {
                             tab.style.display = "none";
                         });
@@ -434,6 +442,72 @@
                         if (firstTabBtn) {
                             firstTabBtn.classList.add("active");
                         }
+
+                        const mainImage = document.getElementById('mainImage');
+                        const mainImageWrap = document.querySelector('.product-gallery__main');
+                        let inlineZoom = 1;
+
+                        function applyInlineZoom() {
+                            mainImage.style.transform = 'scale(' + inlineZoom + ')';
+                            mainImage.dataset.zoom = inlineZoom;
+                            mainImage.style.cursor = inlineZoom > 1 ? 'zoom-out' : 'zoom-in';
+                        }
+
+                        function setInlineZoom(value) {
+                            inlineZoom = Math.min(4, Math.max(1, value));
+                            applyInlineZoom();
+                            if (inlineZoom === 1) {
+                                mainImage.style.transformOrigin = 'center center';
+                            }
+                        }
+
+                        if (mainImage) {
+                            applyInlineZoom();
+
+                            mainImage.addEventListener('click', function () {
+                                if (inlineZoom > 1) {
+                                    setInlineZoom(1);
+                                } else {
+                                    setInlineZoom(2);
+                                }
+                            });
+
+                            mainImageWrap.addEventListener('wheel', function (e) {
+                                e.preventDefault();
+                                const step = e.deltaY > 0 ? -0.2 : 0.2;
+                                setInlineZoom(inlineZoom + step);
+                            }, { passive: false });
+
+                            mainImageWrap.addEventListener('mousemove', function (e) {
+                                if (inlineZoom <= 1) {
+                                    return;
+                                }
+                                const rect = mainImageWrap.getBoundingClientRect();
+                                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                                const cx = Math.max(0, Math.min(100, x));
+                                const cy = Math.max(0, Math.min(100, y));
+                                mainImage.style.transformOrigin = cx + '% ' + cy + '%';
+                            });
+
+                            mainImageWrap.addEventListener('mouseleave', function () {
+                                if (inlineZoom <= 1) {
+                                    mainImage.style.transformOrigin = 'center center';
+                                }
+                            });
+                        }
+
+                        document.querySelectorAll('.zoomable-thumb').forEach(function (thumb) {
+                            thumb.addEventListener('dblclick', function (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const parent = thumb.closest('.thumb-item');
+                                if (parent) {
+                                    changeImage(parent);
+                                    setInlineZoom(2);
+                                }
+                            });
+                        });
                     });
                 </script>
             </body>
