@@ -69,13 +69,21 @@
 
                                     <div class="product-meta-row">
                                         <div class="product-rating">
-                                            <i class="fa-solid fa-star"></i>
-                                            <i class="fa-solid fa-star"></i>
-                                            <i class="fa-solid fa-star"></i>
-                                            <i class="fa-solid fa-star"></i>
-                                            <i class="fa-solid fa-star-half-stroke"></i>
+                                            <c:forEach begin="1" end="5" var="i">
+                                                <c:choose>
+                                                    <c:when test="${i <= detail.averageRating}">
+                                                        <i class="fa-solid fa-star"></i>
+                                                    </c:when>
+                                                    <c:when test="${i - detail.averageRating <= 0.5}">
+                                                        <i class="fa-solid fa-star-half-stroke"></i>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <i class="fa-regular fa-star"></i>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </c:forEach>
                                             <span>(
-                                                <c:out value="${listR.size()}" /> đánh giá)
+                                                <c:out value="${detail.reviewCount}" /> đánh giá)
                                             </span>
                                         </div>
                                         <span class="divider">|</span>

@@ -270,12 +270,20 @@
 
                                                             <div class="rating"
                                                                 style="color: #ffc107; font-size: 0.8rem; margin-bottom: 5px;">
-                                                                <i class="fas fa-star"></i>
-                                                                <i class="fas fa-star"></i>
-                                                                <i class="fas fa-star"></i>
-                                                                <i class="fas fa-star"></i>
-                                                                <i class="fas fa-star-half-alt"></i>
-                                                                <span style="color: #999;">(15)</span>
+                                                                <c:forEach begin="1" end="5" var="i">
+                                                                    <c:choose>
+                                                                        <c:when test="${i <= p.averageRating}">
+                                                                            <i class="fas fa-star"></i>
+                                                                        </c:when>
+                                                                        <c:when test="${i - p.averageRating <= 0.5}">
+                                                                            <i class="fas fa-star-half-alt"></i>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <i class="far fa-star"></i>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </c:forEach>
+                                                                <span style="color: #999;">(${p.reviewCount})</span>
                                                             </div>
 
                                                             <div class="price">
