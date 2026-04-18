@@ -220,8 +220,13 @@
                                                                                 </c:otherwise>
                                                                             </c:choose>
                                                                         </c:forEach>
-                                                                        <span
-                                                                            style="color: #999;">(${product.reviewCount})</span>
+                                                                        <span style="color: #999;">
+                                                                            <fmt:formatNumber
+                                                                                value="${product.averageRating}"
+                                                                                minFractionDigits="1"
+                                                                                maxFractionDigits="1" />/5
+                                                                            (${product.reviewCount})
+                                                                        </span>
                                                                     </div>
 
                                                                     <div class="price">
@@ -564,8 +569,13 @@
                                                                             </c:otherwise>
                                                                         </c:choose>
                                                                     </c:forEach>
-                                                                    <span
-                                                                        style="color: #999;">(${product.reviewCount})</span>
+                                                                    <span style="color: #999;">
+                                                                        <fmt:formatNumber
+                                                                            value="${product.averageRating}"
+                                                                            minFractionDigits="1"
+                                                                            maxFractionDigits="1" />/5
+                                                                        (${product.reviewCount})
+                                                                    </span>
                                                                 </div>
 
                                                                 <div class="price">

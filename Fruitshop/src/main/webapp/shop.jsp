@@ -283,7 +283,11 @@
                                                                         </c:otherwise>
                                                                     </c:choose>
                                                                 </c:forEach>
-                                                                <span style="color: #999;">(${p.reviewCount})</span>
+                                                                <span style="color: #999;">
+                                                                    <fmt:formatNumber value="${p.averageRating}"
+                                                                        minFractionDigits="1" maxFractionDigits="1" />/5
+                                                                    (${p.reviewCount})
+                                                                </span>
                                                             </div>
 
                                                             <div class="price">

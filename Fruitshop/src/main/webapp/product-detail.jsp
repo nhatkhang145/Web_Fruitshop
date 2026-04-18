@@ -83,6 +83,8 @@
                                                 </c:choose>
                                             </c:forEach>
                                             <span>(
+                                                <fmt:formatNumber value="${detail.averageRating}" minFractionDigits="1"
+                                                    maxFractionDigits="1" />/5 -
                                                 <c:out value="${detail.reviewCount}" /> đánh giá)
                                             </span>
                                         </div>
