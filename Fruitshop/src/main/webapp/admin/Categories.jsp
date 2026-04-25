@@ -12,9 +12,9 @@
 
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
 
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/admin_style.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/Categories.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css?v=20260425" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/admin_style.css?v=20260425" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/Categories.css?v=20260425" />
 </head>
 
 <body>
@@ -54,6 +54,32 @@
             </div>
         </div>
 
+        <c:if test="${not empty errorCode}">
+            <div class="alert-banner alert-error">
+                <i class='bx bx-error-circle'></i>
+                <c:choose>
+                    <c:when test="${errorCode == 'missing_name'}">Tên danh mục không được để trống.</c:when>
+                    <c:when test="${errorCode == 'category_not_found'}">Danh mục không tồn tại hoặc đã bị xóa.</c:when>
+                    <c:when test="${errorCode == 'parent_not_found'}">Danh mục cha không hợp lệ.</c:when>
+                    <c:when test="${errorCode == 'self_parent'}">Không thể chọn chính danh mục hiện tại làm danh mục cha.</c:when>
+                    <c:when test="${errorCode == 'invalid_hierarchy'}">Cấu trúc danh mục cha không hợp lệ .</c:when>
+                    <c:otherwise>Có lỗi xảy ra, vui lòng thử lại.</c:otherwise>
+                </c:choose>
+            </div>
+        </c:if>
+
+        <c:if test="${not empty successCode}">
+            <div class="alert-banner alert-success">
+                <i class='bx bx-check-circle'></i>
+                <c:choose>
+                    <c:when test="${successCode == 'added'}">Tạo danh mục mới thành công.</c:when>
+                    <c:when test="${successCode == 'updated'}">Cập nhật danh mục thành công.</c:when>
+                    <c:when test="${successCode == 'deleted'}">Xóa danh mục thành công.</c:when>
+                    <c:otherwise>Thao tác thành công.</c:otherwise>
+                </c:choose>
+            </div>
+        </c:if>
+
         <div class="category-list-container" id="categoryContainer">
 
 
@@ -70,10 +96,6 @@
                             <p class="cate-desc">${parent.description != null && !parent.description.isEmpty() ?
                                     parent.description : '...'}</p>
                         </div>
-                    </div>
-
-                    <div class="card-meta">
-                        <span class="meta-badge">ID: #${parent.id}</span>
                     </div>
 
                     <div class="card-status">
@@ -126,11 +148,6 @@
                                 </div>
                             </div>
 
-                            <div class="card-meta">
-                                <span class="meta-badge">ID: #${child.id}</span>
-                                <span class="meta-badge parent-badge">Cha: ID #${child.parentId}</span>
-                            </div>
-
                             <div class="card-status">
                                 <c:choose>
                                     <c:when test="${child.status == 1}">
@@ -179,9 +196,12 @@
 </div>
 
 <div id="categoryModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content modal-enterprise">
         <div class="modal-header">
-            <h2 id="modalTitle">Thêm Danh Mục</h2>
+            <div>
+                <p class="modal-kicker">Category Management</p>
+                <h2 id="modalTitle">Thêm Danh Mục</h2>
+            </div>
             <span class="close" onclick="closeModal()">&times;</span>
         </div>
         <div class="modal-body">
@@ -189,35 +209,35 @@
                 <input type="hidden" name="action" id="formAction" value="add">
                 <input type="hidden" name="id" id="catId" value="">
 
-                <div class="form-group">
-                    <label>Tên danh mục <span class="required-mark">*</span></label>
-                    <input type="text" name="name" id="catName" required placeholder="Nhập tên...">
-                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Tên danh mục <span class="required-mark">*</span></label>
+                        <input type="text" name="name" id="catName" required placeholder="Ví dụ: Trái cây nhập khẩu">
+                    </div>
 
-                <div class="form-group">
-                    <label>Danh mục cha</label>
-                    <select name="parentId" id="catParent">
-                        <option value="0">-- Là Danh Mục Gốc --</option>
-                        <c:forEach items="${listC}" var="parent">
-
-                            <c:if test="${parent.parentId == 0}">
+                    <div class="form-group">
+                        <label>Danh mục cha</label>
+                        <select name="parentId" id="catParent">
+                            <option value="0">Danh mục gốc</option>
+                            <c:forEach items="${parentC}" var="parent">
                                 <option value="${parent.id}">${parent.name}</option>
-                            </c:if>
-                        </c:forEach>
-                    </select>
-                </div>
+                            </c:forEach>
+                        </select>
+                        <small class="field-note" id="parentHint">Danh mục cha chỉ nên là danh mục gốc để đảm bảo cấu trúc rõ ràng.</small>
+                    </div>
 
-                <div class="form-group">
-                    <label>Mô tả</label>
-                    <textarea name="description" id="catDesc" rows="3"></textarea>
-                </div>
+                    <div class="form-group form-group-full">
+                        <label>Mô tả</label>
+                        <textarea name="description" id="catDesc" rows="4" placeholder="Mô tả ngắn giúp nhân viên dễ phân loại sản phẩm."></textarea>
+                    </div>
 
-                <div class="form-group">
-                    <label>Trạng thái</label>
-                    <select name="status" id="catStatus">
-                        <option value="1">Hiển thị</option>
-                        <option value="0">Ẩn</option>
-                    </select>
+                    <div class="form-group">
+                        <label>Trạng thái</label>
+                        <select name="status" id="catStatus">
+                            <option value="1">Hiển thị</option>
+                            <option value="0">Ẩn</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
