@@ -164,7 +164,6 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                                <p class="meta-note">UI danh sách xuất kho, chưa kết nối dữ liệu backend.</p>
                             </div>
                         </div>
                     </main>

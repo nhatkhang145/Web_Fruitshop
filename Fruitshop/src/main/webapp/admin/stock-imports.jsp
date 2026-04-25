@@ -48,56 +48,58 @@
                             <li>
                                 <i class='bx bx-clipboard'></i>
                                 <span class="info">
-                                    <h3>128</h3>
+                                    <h3><c:out value="${totalReceipts}" /></h3>
                                     <p>Tổng phiếu nhập</p>
                                 </span>
                             </li>
                             <li>
                                 <i class='bx bx-time-five'></i>
                                 <span class="info">
-                                    <h3>9</h3>
+                                    <h3><c:out value="${pendingCount}" /></h3>
                                     <p>Phiếu chờ xác nhận</p>
                                 </span>
                             </li>
                             <li>
                                 <i class='bx bx-package'></i>
                                 <span class="info">
-                                    <h3>2,486</h3>
+                                    <h3><fmt:formatNumber value="${totalQuantity}" pattern="#,###" /></h3>
                                     <p>Tổng số lượng nhập</p>
                                 </span>
                             </li>
                             <li>
                                 <i class='bx bx-money'></i>
                                 <span class="info">
-                                    <h3>1.28 tỷ</h3>
+                                    <h3><fmt:formatNumber value="${totalAmount}" pattern="#,###" /> đ</h3>
                                     <p>Tổng giá trị nhập</p>
                                 </span>
                             </li>
                         </ul>
 
-                        <form class="inventory-toolbar" action="#" method="get">
+                        <form class="inventory-toolbar" action="${pageContext.request.contextPath}/admin/stock-imports"
+                            method="get">
                             <div class="field">
-                                <input type="text" name="keyword" placeholder="Tìm theo mã phiếu nhập" />
+                                <input type="text" name="keyword" placeholder="Tìm theo mã phiếu nhập"
+                                    value="${keyword}" />
                             </div>
                             <div class="field">
                                 <select name="supplier">
-                                    <option value="">Nhà cung cấp</option>
-                                    <option value="NCC001">NCC001 - Green Farm</option>
-                                    <option value="NCC002">NCC002 - Fresh Foods</option>
-                                    <option value="NCC003">NCC003 - Organic Hub</option>
+                                    <option value="" ${empty supplier ? 'selected' : ''}>Nhà cung cấp</option>
+                                    <c:forEach items="${suppliers}" var="sp">
+                                        <option value="${sp}" ${supplier == sp ? 'selected' : ''}>${sp}</option>
+                                    </c:forEach>
                                 </select>
                             </div>
                             <div class="field">
                                 <select name="sort">
-                                    <option value="newest">Mới nhất</option>
-                                    <option value="oldest">Cũ nhất</option>
+                                    <option value="newest" ${sort == 'newest' ? 'selected' : ''}>Mới nhất</option>
+                                    <option value="oldest" ${sort == 'oldest' ? 'selected' : ''}>Cũ nhất</option>
                                 </select>
                             </div>
                             <div class="field">
-                                <input type="date" name="fromDate" />
+                                <input type="date" name="fromDate" value="${fromDate}" />
                             </div>
                             <div class="field">
-                                <input type="date" name="toDate" />
+                                <input type="date" name="toDate" value="${toDate}" />
                             </div>
                             <button type="submit" class="btn-submit">Lọc</button>
                         </form>
@@ -122,49 +124,49 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>PNK-202604-001</td>
-                                            <td>25-04-2026 09:15</td>
-                                            <td>Green Farm</td>
-                                            <td>260</td>
-                                            <td>85,200,000 đ</td>
-                                            <td>admin01</td>
-                                            <td><span class="status confirmed">Đã xác nhận</span></td>
-                                            <td><a href="#" class="action-btn view"><i class="bx bx-show"></i></a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>PNK-202604-002</td>
-                                            <td>25-04-2026 10:50</td>
-                                            <td>Fresh Foods</td>
-                                            <td>120</td>
-                                            <td>47,800,000 đ</td>
-                                            <td>admin02</td>
-                                            <td><span class="status draft">Nháp</span></td>
-                                            <td><a href="#" class="action-btn view"><i class="bx bx-show"></i></a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>PNK-202604-003</td>
-                                            <td>24-04-2026 16:30</td>
-                                            <td>Organic Hub</td>
-                                            <td>300</td>
-                                            <td>96,400,000 đ</td>
-                                            <td>admin01</td>
-                                            <td><span class="status confirmed">Đã xác nhận</span></td>
-                                            <td><a href="#" class="action-btn view"><i class="bx bx-show"></i></a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>PNK-202604-004</td>
-                                            <td>23-04-2026 13:00</td>
-                                            <td>Green Farm</td>
-                                            <td>180</td>
-                                            <td>56,100,000 đ</td>
-                                            <td>admin03</td>
-                                            <td><span class="status cancelled">Đã hủy</span></td>
-                                            <td><a href="#" class="action-btn view"><i class="bx bx-show"></i></a></td>
-                                        </tr>
+                                        <c:choose>
+                                            <c:when test="${not empty imports}">
+                                                <c:forEach items="${imports}" var="it">
+                                                    <tr>
+                                                        <td><c:out value="${it.importCode}" /></td>
+                                                        <td>
+                                                            <c:choose>
+                                                                <c:when test="${it.createdAt != null}">
+                                                                    <fmt:formatDate value="${it.createdAt}"
+                                                                        pattern="dd-MM-yyyy HH:mm" />
+                                                                </c:when>
+                                                                <c:otherwise>-</c:otherwise>
+                                                            </c:choose>
+                                                        </td>
+                                                        <td><c:out value="${it.supplierName}" /></td>
+                                                        <td><fmt:formatNumber value="${it.totalQuantity}" pattern="#,###" /></td>
+                                                        <td><fmt:formatNumber value="${it.totalAmount}" pattern="#,###" /> đ</td>
+                                                        <td><c:out value="${it.createdBy}" /></td>
+                                                        <td>
+                                                            <c:choose>
+                                                                <c:when test="${it.status == 'confirmed' || it.status == 'completed'}">
+                                                                    <span class="status confirmed">Đã xác nhận</span>
+                                                                </c:when>
+                                                                <c:when test="${it.status == 'cancelled'}">
+                                                                    <span class="status cancelled">Đã hủy</span>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <span class="status draft">Nháp</span>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </td>
+                                                        <td><a href="#" class="action-btn view"><i class="bx bx-show"></i></a></td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <tr>
+                                                    <td colspan="8" style="text-align:center;">Không có dữ liệu phiếu nhập kho</td>
+                                                </tr>
+                                            </c:otherwise>
+                                        </c:choose>
                                     </tbody>
                                 </table>
-                                <p class="meta-note">UI danh sách nhập kho, chưa kết nối dữ liệu backend.</p>
                             </div>
                         </div>
                     </main>
