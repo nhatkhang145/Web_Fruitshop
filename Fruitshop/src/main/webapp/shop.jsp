@@ -351,9 +351,23 @@
                                             <div class="pagination-wrapper">
                                                 <c:if test="${endP > 1}">
                                                     <c:set var="currentPage"
-                                                        value="${empty param.index ? 1 : param.index}" />
+                                                        value="${empty param.index ? 1 : param.index + 0}" />
+                                                    <c:choose>
+                                                        <c:when test="${currentPage <= 3}">
+                                                            <c:set var="startPage" value="1" />
+                                                            <c:set var="endPageShow" value="${endP < 5 ? endP : 5}" />
+                                                        </c:when>
+                                                        <c:when test="${currentPage >= endP - 2}">
+                                                            <c:set var="startPage"
+                                                                value="${endP - 4 > 1 ? endP - 4 : 1}" />
+                                                            <c:set var="endPageShow" value="${endP}" />
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <c:set var="startPage" value="${currentPage - 2}" />
+                                                            <c:set var="endPageShow" value="${currentPage + 2}" />
+                                                        </c:otherwise>
+                                                    </c:choose>
 
-                                                    <!-- Previous Button -->
                                                     <c:choose>
                                                         <c:when test="${currentPage > 1}">
                                                             <a href="shop?index=${currentPage - 1}&cid=${cid}&price=${priceTag}&sort=${sortTag}"
@@ -370,9 +384,17 @@
                                                         </c:otherwise>
                                                     </c:choose>
 
-                                                    <!-- Page Numbers -->
                                                     <div class="pagination-pages">
-                                                        <c:forEach begin="1" end="${endP}" var="i">
+                                                        <c:if test="${startPage > 1}">
+                                                            <a href="shop?index=1&cid=${cid}&price=${priceTag}&sort=${sortTag}"
+                                                                class="page-number">1</a>
+                                                        </c:if>
+
+                                                        <c:if test="${startPage > 2}">
+                                                            <span class="page-ellipsis">...</span>
+                                                        </c:if>
+
+                                                        <c:forEach begin="${startPage}" end="${endPageShow}" var="i">
                                                             <c:choose>
                                                                 <c:when test="${i == currentPage}">
                                                                     <span class="page-number active">${i}</span>
@@ -383,9 +405,17 @@
                                                                 </c:otherwise>
                                                             </c:choose>
                                                         </c:forEach>
+
+                                                        <c:if test="${endPageShow < endP - 1}">
+                                                            <span class="page-ellipsis">...</span>
+                                                        </c:if>
+
+                                                        <c:if test="${endPageShow < endP}">
+                                                            <a href="shop?index=${endP}&cid=${cid}&price=${priceTag}&sort=${sortTag}"
+                                                                class="page-number">${endP}</a>
+                                                        </c:if>
                                                     </div>
 
-                                                    <!-- Next Button -->
                                                     <c:choose>
                                                         <c:when test="${currentPage < endP}">
                                                             <a href="shop?index=${currentPage + 1}&cid=${cid}&price=${priceTag}&sort=${sortTag}"

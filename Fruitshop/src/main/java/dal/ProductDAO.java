@@ -362,12 +362,12 @@ public class ProductDAO {
 
     public List<Product> getDiscountProducts(int limit) {
         String sql = "SELECT p.id, p.name, p.price, p.sale_price AS salePrice, p.quantity, p.short_description AS description, p.image, p.category_id AS categoryId, "
-            + "COALESCE(rv.avg_rating, 0) AS averageRating, COALESCE(rv.review_count, 0) AS reviewCount "
-            + "FROM products p "
-            + "LEFT JOIN (SELECT product_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count FROM reviews WHERE status = 'approved' GROUP BY product_id) rv ON p.id = rv.product_id "
-            + "WHERE p.status = 1 AND p.sale_price > 0 AND p.sale_price < p.price "
-            + "ORDER BY (p.price - p.sale_price) / p.price DESC "
-                "LIMIT ?";
+                + "COALESCE(rv.avg_rating, 0) AS averageRating, COALESCE(rv.review_count, 0) AS reviewCount "
+                + "FROM products p "
+                + "LEFT JOIN (SELECT product_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count FROM reviews WHERE status = 'approved' GROUP BY product_id) rv ON p.id = rv.product_id "
+                + "WHERE p.status = 1 AND p.sale_price > 0 AND p.sale_price < p.price "
+                + "ORDER BY (p.price - p.sale_price) / p.price DESC "
+                + "LIMIT ?";
 
         return DBContext.get().withHandle(handle -> handle.createQuery(sql)
                 .bind(0, limit)

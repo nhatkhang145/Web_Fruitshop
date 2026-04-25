@@ -23,6 +23,12 @@
         <li class="${param.activePage == 'orders' ? 'active' : ''}">
             <a href="${pageContext.request.contextPath}/admin/orders"><i class='bx bx-receipt'></i>Quản lý đơn hàng</a>
         </li>
+        <li class="${param.activePage == 'stock-imports' ? 'active' : ''}">
+            <a href="${pageContext.request.contextPath}/admin/stock-imports.jsp"><i class='bx bx-import'></i>Quản lý nhập kho</a>
+        </li>
+        <li class="${param.activePage == 'stock-exports' ? 'active' : ''}">
+            <a href="${pageContext.request.contextPath}/admin/stock-exports.jsp"><i class='bx bx-export'></i>Quản lý xuất kho</a>
+        </li>
         <li class="${param.activePage == 'users' ? 'active' : ''}">
             <a href="${pageContext.request.contextPath}/admin/users"><i class='bx bx-group'></i>Quản lý khách hàng</a>
         </li>
