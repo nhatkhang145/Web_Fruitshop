@@ -7,7 +7,7 @@
             <head>
                 <meta charset="UTF-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <title>Quản lý Nhập kho</title>
+                <title>Quản lý Xuất kho</title>
 
                 <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
                 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
@@ -22,7 +22,7 @@
 
             <body>
                 <jsp:include page="/admin/layout/sidebar.jsp">
-                    <jsp:param name="activePage" value="stock-imports" />
+                    <jsp:param name="activePage" value="stock-export" />
                 </jsp:include>
 
                 <div class="content">
@@ -31,16 +31,16 @@
                     <main>
                         <div class="header">
                             <div class="left">
-                                <h1>Quản lý nhập kho</h1>
+                                <h1>Quản lý xuất kho</h1>
                                 <ul class="breadcrumb">
                                     <li><a href="${pageContext.request.contextPath}/admin/dashboard">Quản lý</a></li>
                                     <li>/</li>
-                                    <li><a href="#" class="active">Nhập kho</a></li>
+                                    <li><a href="#" class="active">Xuất kho</a></li>
                                 </ul>
                             </div>
                             <a href="#" class="report">
                                 <i class="bx bx-plus"></i>
-                                <span>Tạo phiếu nhập</span>
+                                <span>Tạo phiếu xuất</span>
                             </a>
                         </div>
 
@@ -48,43 +48,43 @@
                             <li>
                                 <i class='bx bx-clipboard'></i>
                                 <span class="info">
-                                    <h3>128</h3>
-                                    <p>Tổng phiếu nhập</p>
+                                    <h3>96</h3>
+                                    <p>Tổng phiếu xuất</p>
                                 </span>
                             </li>
                             <li>
-                                <i class='bx bx-time-five'></i>
+                                <i class='bx bx-cart'></i>
                                 <span class="info">
-                                    <h3>9</h3>
-                                    <p>Phiếu chờ xác nhận</p>
+                                    <h3>62</h3>
+                                    <p>Phiếu bán hàng</p>
                                 </span>
                             </li>
                             <li>
                                 <i class='bx bx-package'></i>
                                 <span class="info">
-                                    <h3>2,486</h3>
-                                    <p>Tổng số lượng nhập</p>
+                                    <h3>1,732</h3>
+                                    <p>Tổng số lượng xuất</p>
                                 </span>
                             </li>
                             <li>
-                                <i class='bx bx-money'></i>
+                                <i class='bx bx-error'></i>
                                 <span class="info">
-                                    <h3>1.28 tỷ</h3>
-                                    <p>Tổng giá trị nhập</p>
+                                    <h3>3</h3>
+                                    <p>Phiếu chờ xử lý</p>
                                 </span>
                             </li>
                         </ul>
 
                         <form class="inventory-toolbar" action="#" method="get">
                             <div class="field">
-                                <input type="text" name="keyword" placeholder="Tìm theo mã phiếu nhập" />
+                                <input type="text" name="keyword" placeholder="Tìm mã phiếu xuất hoặc mã sản phẩm" />
                             </div>
                             <div class="field">
-                                <select name="supplier">
-                                    <option value="">Nhà cung cấp</option>
-                                    <option value="NCC001">NCC001 - Green Farm</option>
-                                    <option value="NCC002">NCC002 - Fresh Foods</option>
-                                    <option value="NCC003">NCC003 - Organic Hub</option>
+                                <select name="type">
+                                    <option value="">Loại xuất kho</option>
+                                    <option value="sales">Xuất bán hàng</option>
+                                    <option value="internal">Xuất nội bộ</option>
+                                    <option value="transfer">Xuất điều chuyển</option>
                                 </select>
                             </div>
                             <div class="field">
@@ -105,15 +105,15 @@
                         <div class="bottom-data">
                             <div class="orders">
                                 <div class="header">
-                                    <h3>Danh sách phiếu nhập kho</h3>
+                                    <h3>Danh sách phiếu xuất kho</h3>
                                 </div>
 
-                                <table id="importTable">
+                                <table id="exportTable">
                                     <thead>
                                         <tr>
                                             <th>Mã phiếu</th>
-                                            <th>Ngày nhập</th>
-                                            <th>Nhà cung cấp</th>
+                                            <th>Ngày xuất</th>
+                                            <th>Loại xuất</th>
                                             <th>Tổng SL</th>
                                             <th>Tổng tiền</th>
                                             <th>Người tạo</th>
@@ -123,48 +123,48 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>PNK-202604-001</td>
-                                            <td>25-04-2026 09:15</td>
-                                            <td>Green Farm</td>
-                                            <td>260</td>
-                                            <td>85,200,000 đ</td>
+                                            <td>PXK-202604-001</td>
+                                            <td>25-04-2026 11:20</td>
+                                            <td><span class="status sales">Bán hàng</span></td>
+                                            <td>85</td>
+                                            <td>41,350,000 đ</td>
                                             <td>admin01</td>
                                             <td><span class="status confirmed">Đã xác nhận</span></td>
                                             <td><a href="#" class="action-btn view"><i class="bx bx-show"></i></a></td>
                                         </tr>
                                         <tr>
-                                            <td>PNK-202604-002</td>
-                                            <td>25-04-2026 10:50</td>
-                                            <td>Fresh Foods</td>
-                                            <td>120</td>
-                                            <td>47,800,000 đ</td>
+                                            <td>PXK-202604-002</td>
+                                            <td>25-04-2026 14:05</td>
+                                            <td><span class="status internal">Nội bộ</span></td>
+                                            <td>40</td>
+                                            <td>18,700,000 đ</td>
                                             <td>admin02</td>
                                             <td><span class="status draft">Nháp</span></td>
                                             <td><a href="#" class="action-btn view"><i class="bx bx-show"></i></a></td>
                                         </tr>
                                         <tr>
-                                            <td>PNK-202604-003</td>
-                                            <td>24-04-2026 16:30</td>
-                                            <td>Organic Hub</td>
-                                            <td>300</td>
-                                            <td>96,400,000 đ</td>
-                                            <td>admin01</td>
+                                            <td>PXK-202604-003</td>
+                                            <td>24-04-2026 15:10</td>
+                                            <td><span class="status transfer">Điều chuyển</span></td>
+                                            <td>52</td>
+                                            <td>22,600,000 đ</td>
+                                            <td>admin03</td>
                                             <td><span class="status confirmed">Đã xác nhận</span></td>
                                             <td><a href="#" class="action-btn view"><i class="bx bx-show"></i></a></td>
                                         </tr>
                                         <tr>
-                                            <td>PNK-202604-004</td>
-                                            <td>23-04-2026 13:00</td>
-                                            <td>Green Farm</td>
-                                            <td>180</td>
-                                            <td>56,100,000 đ</td>
-                                            <td>admin03</td>
+                                            <td>PXK-202604-004</td>
+                                            <td>23-04-2026 09:40</td>
+                                            <td><span class="status sales">Bán hàng</span></td>
+                                            <td>30</td>
+                                            <td>15,050,000 đ</td>
+                                            <td>admin01</td>
                                             <td><span class="status cancelled">Đã hủy</span></td>
                                             <td><a href="#" class="action-btn view"><i class="bx bx-show"></i></a></td>
                                         </tr>
                                     </tbody>
                                 </table>
-                                <p class="meta-note">UI danh sách nhập kho, chưa kết nối dữ liệu backend.</p>
+                                <p class="meta-note">UI danh sách xuất kho, chưa kết nối dữ liệu backend.</p>
                             </div>
                         </div>
                     </main>
@@ -173,7 +173,7 @@
                 <script src="${pageContext.request.contextPath}/assets/js/admin/main.js"></script>
                 <script>
                     $(document).ready(function () {
-                        $('#importTable').DataTable({
+                        $('#exportTable').DataTable({
                             order: [[1, 'desc']],
                             pageLength: 10,
                             language: {
@@ -181,7 +181,7 @@
                                 lengthMenu: 'Hiển thị _MENU_ dòng',
                                 info: 'Trang _PAGE_ / _PAGES_',
                                 paginate: { first: '«', last: '»', next: '>', previous: '<' },
-                                zeroRecords: 'Không tìm thấy phiếu nhập kho'
+                                zeroRecords: 'Không tìm thấy phiếu xuất kho'
                             }
                         });
                     });
