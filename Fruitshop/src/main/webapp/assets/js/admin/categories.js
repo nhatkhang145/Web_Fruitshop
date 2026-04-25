@@ -2,6 +2,20 @@ const modal = document.getElementById("categoryModal");
 const modalTitle = document.getElementById("modalTitle");
 const formAction = document.getElementById("formAction");
 
+window.confirmDeleteCategory = function (linkElement) {
+    const count = Number(linkElement?.dataset?.productCount || 0);
+
+    if (count > 0) {
+        return confirm(
+            "Danh mục này đang chứa " + count + " sản phẩm. "
+            + "Nếu tiếp tục, hệ thống sẽ gỡ các sản phẩm này khỏi danh mục và xóa toàn bộ danh mục con. "
+            + "Bạn có chắc chắn muốn xóa không?"
+        );
+    }
+
+    return confirm("Bạn có chắc chắn muốn xóa danh mục này không?");
+};
+
 window.openModal = function (mode) {
     if (!modal || !modalTitle || !formAction) return;
 

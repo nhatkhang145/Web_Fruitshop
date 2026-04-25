@@ -59,10 +59,14 @@
                 <i class='bx bx-error-circle'></i>
                 <c:choose>
                     <c:when test="${errorCode == 'missing_name'}">Tên danh mục không được để trống.</c:when>
+                    <c:when test="${errorCode == 'duplicate_name'}">Tên danh mục đã tồn tại, vui lòng chọn tên khác.</c:when>
                     <c:when test="${errorCode == 'category_not_found'}">Danh mục không tồn tại hoặc đã bị xóa.</c:when>
+                    <c:when test="${errorCode == 'root_category_not_allowed'}">Danh mục gốc không thể chứa hoặc nhận sản phẩm.</c:when>
+                    <c:when test="${errorCode == 'root_to_child_not_allowed'}">Danh mục gốc không thể chuyển thành danh mục con.</c:when>
+                    <c:when test="${errorCode == 'child_to_root_not_allowed'}">Danh mục con không thể chuyển thành danh mục gốc.</c:when>
                     <c:when test="${errorCode == 'parent_not_found'}">Danh mục cha không hợp lệ.</c:when>
                     <c:when test="${errorCode == 'self_parent'}">Không thể chọn chính danh mục hiện tại làm danh mục cha.</c:when>
-                    <c:when test="${errorCode == 'invalid_hierarchy'}">Cấu trúc danh mục cha không hợp lệ .</c:when>
+                    <c:when test="${errorCode == 'invalid_hierarchy'}">Cấu trúc danh mục cha không hợp lệ.</c:when>
                     <c:otherwise>Có lỗi xảy ra, vui lòng thử lại.</c:otherwise>
                 </c:choose>
             </div>
@@ -74,7 +78,16 @@
                 <c:choose>
                     <c:when test="${successCode == 'added'}">Tạo danh mục mới thành công.</c:when>
                     <c:when test="${successCode == 'updated'}">Cập nhật danh mục thành công.</c:when>
-                    <c:when test="${successCode == 'deleted'}">Xóa danh mục thành công.</c:when>
+                    <c:when test="${successCode == 'deleted'}">
+                        <c:choose>
+                            <c:when test="${detachedCount > 0}">
+                                Xóa danh mục thành công. Đã gỡ ${detachedCount} sản phẩm khỏi danh mục bị xóa.
+                            </c:when>
+                            <c:otherwise>
+                                Xóa danh mục thành công.
+                            </c:otherwise>
+                        </c:choose>
+                    </c:when>
                     <c:otherwise>Thao tác thành công.</c:otherwise>
                 </c:choose>
             </div>
@@ -124,7 +137,8 @@
                                 title="Sửa">
                             <i class='bx bx-edit-alt'></i>
                         </button>
-                        <a href="${pageContext.request.contextPath}/admin/delete-category?id=${parent.id}" onclick="return confirm('Bạn chắc chắn muốn xóa?')"
+                                <a href="${pageContext.request.contextPath}/admin/delete-category?id=${parent.id}" onclick="return confirmDeleteCategory(this)"
+                                    data-product-count="${productCountMap[parent.id]}"
                            class="btn-icon delete" title="Xóa">
                             <i class='bx bx-trash'></i>
                         </a>
@@ -174,7 +188,8 @@
                                         title="Sửa">
                                     <i class='bx bx-edit-alt'></i>
                                 </button>
-                                <a href="${pageContext.request.contextPath}/admin/delete-category?id=${child.id}" onclick="return confirm('Bạn chắc chắn muốn xóa?')"
+                                          <a href="${pageContext.request.contextPath}/admin/delete-category?id=${child.id}" onclick="return confirmDeleteCategory(this)"
+                                              data-product-count="${productCountMap[child.id]}"
                                    class="btn-icon delete" title="Xóa">
                                     <i class='bx bx-trash'></i>
                                 </a>
