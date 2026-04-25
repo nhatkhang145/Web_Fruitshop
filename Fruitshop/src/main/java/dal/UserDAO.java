@@ -24,6 +24,7 @@ public class UserDAO {
         user.setLoginType(rs.getString("login_type"));
         user.setSocialId(rs.getString("social_id"));
         user.setCreatedAt(rs.getTimestamp("created_at"));
+        user.setNameChanged(rs.getBoolean("name_changed"));
         return user;
     };
 
@@ -97,7 +98,8 @@ public class UserDAO {
                     .bind(2, user.getGender())
                     .bind(3, user.getBirthDate())
                     .bind(4, user.getAvatar())
-                    .bind(5, user.getId())
+                    .bind(5, user.isNameChanged())
+                    .bind(6, user.getId())
                     .execute());
             return rows > 0;
         } catch (Exception e) {

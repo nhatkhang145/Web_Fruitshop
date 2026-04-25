@@ -96,10 +96,27 @@
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label>Họ và tên</label>
-                                <input type="text" name="fullname" class="form-input" value="<c:out value='${sessionScope.account.fullName}'/>"
-                                       required />
+                            <div class="form-group"> <label for="fullname">Họ và tên</label>
+                                <input type="text"
+                                       id="fullname"
+                                       name="fullname"
+                                       value="${sessionScope.account.fullName}"
+                                       class="form-control"
+                                       required
+                                       ${sessionScope.account.nameChanged ? 'readonly style="background-color: #e9ecef; cursor: not-allowed;"' : ''} />
+
+                                <c:choose>
+                                    <c:when test="${sessionScope.account.nameChanged}">
+                                        <small style="color: #dc3545; font-style: italic; display: block; margin-top: 5px;">
+                                             Tên của bạn đã được thay đổi trước đó và không thể đổi lại.
+                                        </small>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <small style="color: #fd7e14; font-style: italic; display: block; margin-top: 5px;">
+                                             Lưu ý: Bạn chỉ được phép thay đổi tên 1 lần duy nhất.
+                                        </small>
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
 
                             <div class="form-group">
