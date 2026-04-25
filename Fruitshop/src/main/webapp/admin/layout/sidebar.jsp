@@ -29,8 +29,8 @@
                         hàng</a>
                 </li>
                 <li class="${param.activePage == 'stock-imports' ? 'active' : ''}">
-                    <a href="${pageContext.request.contextPath}/admin/stock-imports"><i
-                            class='bx bx-import'></i>Quản lý nhập kho</a>
+                    <a href="${pageContext.request.contextPath}/admin/stock-imports"><i class='bx bx-import'></i>Quản lý
+                        nhập kho</a>
                 </li>
                 <li class="${param.activePage == 'stock-export' ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/stock-export.jsp"><i class='bx bx-export'></i>Quản

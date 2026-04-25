@@ -48,28 +48,36 @@
                             <li>
                                 <i class='bx bx-clipboard'></i>
                                 <span class="info">
-                                    <h3><c:out value="${totalReceipts}" /></h3>
+                                    <h3>
+                                        <c:out value="${totalReceipts}" />
+                                    </h3>
                                     <p>Tổng phiếu nhập</p>
                                 </span>
                             </li>
                             <li>
                                 <i class='bx bx-time-five'></i>
                                 <span class="info">
-                                    <h3><c:out value="${pendingCount}" /></h3>
+                                    <h3>
+                                        <c:out value="${pendingCount}" />
+                                    </h3>
                                     <p>Phiếu chờ xác nhận</p>
                                 </span>
                             </li>
                             <li>
                                 <i class='bx bx-package'></i>
                                 <span class="info">
-                                    <h3><fmt:formatNumber value="${totalQuantity}" pattern="#,###" /></h3>
+                                    <h3>
+                                        <fmt:formatNumber value="${totalQuantity}" pattern="#,###" />
+                                    </h3>
                                     <p>Tổng số lượng nhập</p>
                                 </span>
                             </li>
                             <li>
                                 <i class='bx bx-money'></i>
                                 <span class="info">
-                                    <h3><fmt:formatNumber value="${totalAmount}" pattern="#,###" /> đ</h3>
+                                    <h3>
+                                        <fmt:formatNumber value="${totalAmount}" pattern="#,###" /> đ
+                                    </h3>
                                     <p>Tổng giá trị nhập</p>
                                 </span>
                             </li>
@@ -83,16 +91,16 @@
                             </div>
                             <div class="field">
                                 <select name="supplier">
-                                    <option value="" ${empty supplier ? 'selected' : ''}>Nhà cung cấp</option>
+                                    <option value="" ${empty supplier ? 'selected' : '' }>Nhà cung cấp</option>
                                     <c:forEach items="${suppliers}" var="sp">
-                                        <option value="${sp}" ${supplier == sp ? 'selected' : ''}>${sp}</option>
+                                        <option value="${sp}" ${supplier==sp ? 'selected' : '' }>${sp}</option>
                                     </c:forEach>
                                 </select>
                             </div>
                             <div class="field">
                                 <select name="sort">
-                                    <option value="newest" ${sort == 'newest' ? 'selected' : ''}>Mới nhất</option>
-                                    <option value="oldest" ${sort == 'oldest' ? 'selected' : ''}>Cũ nhất</option>
+                                    <option value="newest" ${sort=='newest' ? 'selected' : '' }>Mới nhất</option>
+                                    <option value="oldest" ${sort=='oldest' ? 'selected' : '' }>Cũ nhất</option>
                                 </select>
                             </div>
                             <div class="field">
@@ -124,47 +132,50 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <c:choose>
-                                            <c:when test="${not empty imports}">
-                                                <c:forEach items="${imports}" var="it">
-                                                    <tr>
-                                                        <td><c:out value="${it.importCode}" /></td>
-                                                        <td>
-                                                            <c:choose>
-                                                                <c:when test="${it.createdAt != null}">
-                                                                    <fmt:formatDate value="${it.createdAt}"
-                                                                        pattern="dd-MM-yyyy HH:mm" />
-                                                                </c:when>
-                                                                <c:otherwise>-</c:otherwise>
-                                                            </c:choose>
-                                                        </td>
-                                                        <td><c:out value="${it.supplierName}" /></td>
-                                                        <td><fmt:formatNumber value="${it.totalQuantity}" pattern="#,###" /></td>
-                                                        <td><fmt:formatNumber value="${it.totalAmount}" pattern="#,###" /> đ</td>
-                                                        <td><c:out value="${it.createdBy}" /></td>
-                                                        <td>
-                                                            <c:choose>
-                                                                <c:when test="${it.status == 'confirmed' || it.status == 'completed'}">
-                                                                    <span class="status confirmed">Đã xác nhận</span>
-                                                                </c:when>
-                                                                <c:when test="${it.status == 'cancelled'}">
-                                                                    <span class="status cancelled">Đã hủy</span>
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    <span class="status draft">Nháp</span>
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                        </td>
-                                                        <td><a href="#" class="action-btn view"><i class="bx bx-show"></i></a></td>
-                                                    </tr>
-                                                </c:forEach>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <tr>
-                                                    <td colspan="8" style="text-align:center;">Không có dữ liệu phiếu nhập kho</td>
-                                                </tr>
-                                            </c:otherwise>
-                                        </c:choose>
+                                        <c:forEach items="${imports}" var="it">
+                                            <tr>
+                                                <td>
+                                                    <c:out value="${it.importCode}" />
+                                                </td>
+                                                <td>
+                                                    <c:choose>
+                                                        <c:when test="${it.createdAt != null}">
+                                                            <fmt:formatDate value="${it.createdAt}"
+                                                                pattern="dd-MM-yyyy HH:mm" />
+                                                        </c:when>
+                                                        <c:otherwise>-</c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td>
+                                                    <c:out value="${it.supplierName}" />
+                                                </td>
+                                                <td>
+                                                    <fmt:formatNumber value="${it.totalQuantity}" pattern="#,###" />
+                                                </td>
+                                                <td>
+                                                    <fmt:formatNumber value="${it.totalAmount}" pattern="#,###" /> đ
+                                                </td>
+                                                <td>
+                                                    <c:out value="${it.createdBy}" />
+                                                </td>
+                                                <td>
+                                                    <c:choose>
+                                                        <c:when
+                                                            test="${it.status == 'confirmed' || it.status == 'completed'}">
+                                                            <span class="status confirmed">Đã xác nhận</span>
+                                                        </c:when>
+                                                        <c:when test="${it.status == 'cancelled'}">
+                                                            <span class="status cancelled">Đã hủy</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="status draft">Nháp</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td><a href="#" class="action-btn view"><i class="bx bx-show"></i></a>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
                                     </tbody>
                                 </table>
                             </div>
@@ -183,6 +194,7 @@
                                 lengthMenu: 'Hiển thị _MENU_ dòng',
                                 info: 'Trang _PAGE_ / _PAGES_',
                                 paginate: { first: '«', last: '»', next: '>', previous: '<' },
+                                emptyTable: 'Không có dữ liệu phiếu nhập kho',
                                 zeroRecords: 'Không tìm thấy phiếu nhập kho'
                             }
                         });
