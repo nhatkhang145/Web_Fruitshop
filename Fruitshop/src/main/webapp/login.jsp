@@ -86,7 +86,7 @@
                                 <p style="text-align: center; margin: 15px 0; color: #666;">Hoặc đăng nhập bằng
                                 </p>
                                 <div style="display: flex; gap: 10px; justify-content: center;">
-                                    <a href="#" class="btn-social facebook"
+                                    <a href="${pageContext.request.contextPath}/login-facebook-redirect" class="btn-social facebook"
                                        style="background: #3b5998; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">
                                         <i class="fa-brands fa-facebook-f"></i> Facebook
                                     </a>
@@ -203,6 +203,10 @@
         <c:if test="${not empty registerError}">
         registerTab.click();
         </c:if>
+
+        if (window.location.hash === '#register') {
+                    registerTab.click();
+        }
     </script>
 </div>
 <jsp:include page="footer.jsp"></jsp:include>
