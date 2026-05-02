@@ -74,7 +74,7 @@ public class AdminCategoryDAO {
     }
 
     public void deleteCategoryAndChildren(int rootId) {
-        DBContext.get().useTransaction(handle -> deleteCategoryTree(handle, rootId));
+        DBContext.get().useTransaction(handle -> deleteCategoryTree(handle, rootId, new HashSet<>()));
     }
 
     public int countProductsInCategoryTree(int rootId) {
@@ -95,7 +95,11 @@ public class AdminCategoryDAO {
         });
     }
 
-    private void deleteCategoryTree(Handle handle, int categoryId) {
+    private void deleteCategoryTree(Handle handle, int categoryId, Set<Integer> visiting) {
+        if (!visiting.add(categoryId)) {
+            return;
+        }
+
         String childQuery = "SELECT id FROM Categories WHERE parent_id = ?";
         List<Integer> childIds = handle.createQuery(childQuery)
                 .bind(0, categoryId)
@@ -103,7 +107,7 @@ public class AdminCategoryDAO {
                 .list();
 
         for (Integer childId : childIds) {
-            deleteCategoryTree(handle, childId);
+            deleteCategoryTree(handle, childId, visiting);
         }
 
         String detachProductsQuery = "UPDATE products SET category_id = NULL WHERE category_id = ?";
@@ -115,9 +119,19 @@ public class AdminCategoryDAO {
         handle.createUpdate(deleteQuery)
                 .bind(0, categoryId)
                 .execute();
+
+        visiting.remove(categoryId);
     }
 
     private int countProductsInCategoryTree(Handle handle, int categoryId) {
+        return countProductsInCategoryTree(handle, categoryId, new HashSet<>());
+    }
+
+    private int countProductsInCategoryTree(Handle handle, int categoryId, Set<Integer> visiting) {
+        if (!visiting.add(categoryId)) {
+            return 0;
+        }
+
         String childQuery = "SELECT id FROM Categories WHERE parent_id = ?";
         List<Integer> childIds = handle.createQuery(childQuery)
                 .bind(0, categoryId)
@@ -131,9 +145,10 @@ public class AdminCategoryDAO {
                 .one();
 
         for (Integer childId : childIds) {
-            total += countProductsInCategoryTree(handle, childId);
+            total += countProductsInCategoryTree(handle, childId, visiting);
         }
 
+        visiting.remove(categoryId);
         return total;
     }
 

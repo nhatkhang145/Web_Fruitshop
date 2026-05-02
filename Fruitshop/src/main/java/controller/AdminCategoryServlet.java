@@ -11,8 +11,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 @WebServlet(name = "AdminCategoryServlet", urlPatterns = { "/admin/categories", "/admin/category-servlet",
@@ -198,8 +200,9 @@ public class AdminCategoryServlet extends HttpServlet {
         }
 
         Map<Integer, Integer> memo = new HashMap<>();
+        Set<Integer> visiting = new HashSet<>();
         for (Category category : categories) {
-            countProductsRecursively(category.getId(), directCounts, childrenByParent, memo);
+            countProductsRecursively(category.getId(), directCounts, childrenByParent, memo, visiting);
         }
         return memo;
     }
@@ -207,18 +210,24 @@ public class AdminCategoryServlet extends HttpServlet {
     private int countProductsRecursively(int categoryId,
                                          Map<Integer, Integer> directCounts,
                                          Map<Integer, List<Integer>> childrenByParent,
-                                         Map<Integer, Integer> memo) {
+                                         Map<Integer, Integer> memo,
+                                         Set<Integer> visiting) {
         Integer cached = memo.get(categoryId);
         if (cached != null) {
             return cached;
         }
 
+        if (!visiting.add(categoryId)) {
+            return 0;
+        }
+
         int total = directCounts.getOrDefault(categoryId, 0);
         List<Integer> children = childrenByParent.getOrDefault(categoryId, List.of());
         for (Integer childId : children) {
-            total += countProductsRecursively(childId, directCounts, childrenByParent, memo);
+            total += countProductsRecursively(childId, directCounts, childrenByParent, memo, visiting);
         }
 
+        visiting.remove(categoryId);
         memo.put(categoryId, total);
         return total;
     }
