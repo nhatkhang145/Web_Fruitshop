@@ -73,7 +73,16 @@ public class ProfileServlet extends HttpServlet {
             return;
         }
 
-        user.setFullName(fullName);
+        if (fullName != null && !fullName.trim().isEmpty() && !fullName.equals(user.getFullName())) {
+
+            if (user.isNameChanged()) {
+                forwardWithError(request, response, "Bạn chỉ được phép thay đổi tên người dùng 1 lần duy nhất!");
+                return;
+            } else {
+                user.setFullName(fullName);
+                user.setNameChanged(true);
+            }
+        }
         user.setPhone(phone);
         user.setGender(gender);
 

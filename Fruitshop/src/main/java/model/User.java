@@ -16,11 +16,12 @@ public class User {
     private String loginType;
     private String socialId;
     private Timestamp createdAt;
+    private boolean nameChanged;
 
     public User(){
     }
 
-    public User(int id, String fullName, String email, String password, String phone, int role, String avatar, String gender, Date birthDate, int status, String loginType, String socialId, Timestamp createdAt) {
+    public User(int id, String fullName, String email, String password, String phone, int role, String avatar, String gender, Date birthDate, int status, String loginType, String socialId, Timestamp createdAt, boolean nameChanged) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
@@ -34,6 +35,7 @@ public class User {
         this.loginType = loginType;
         this.socialId = socialId;
         this.createdAt = createdAt;
+        this.nameChanged = nameChanged;
     }
 
     public int getId() {
@@ -138,5 +140,13 @@ public class User {
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public boolean isNameChanged() {
+        return nameChanged;
+    }
+
+    public void setNameChanged(boolean nameChanged) {
+        this.nameChanged = nameChanged;
     }
 }

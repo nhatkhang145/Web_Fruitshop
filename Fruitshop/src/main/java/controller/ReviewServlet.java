@@ -84,25 +84,12 @@ public class ReviewServlet extends HttpServlet {
             return;
         }
 
-        // BẢO MẬT CỰC KỲ QUAN TRỌNG:
-        // Phải kiểm tra xem User có phải là Admin (hoặc người tạo ra review đó) không
-        // Giả sử role == 1 là Admin (bạn hãy sửa lại theo logic role của hệ thống bạn)
-        /*
-        if (user.getRole() != 1) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền thực hiện chức năng này!");
-            return;
-        }
-        */
-
         int id = Integer.parseInt(request.getParameter("id"));
         reviewDAO.deleteReview(id);
 
         response.sendRedirect(request.getContextPath() + "/admin/reviews.jsp");
     }
 
-    /**
-     * Hàm phụ trợ lấy User từ Session
-     */
     private User getUserFromSession(HttpServletRequest request) {
         HttpSession session = request.getSession();
         return (User) session.getAttribute("account");
@@ -111,7 +98,6 @@ public class ReviewServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // KHÔNG cho phép Thêm/Xóa qua phương thức GET để tránh lỗi bảo mật CSRF
         response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Phương thức GET không được hỗ trợ cho chức năng này.");
     }
 }
