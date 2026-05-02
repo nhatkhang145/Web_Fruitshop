@@ -317,22 +317,22 @@ public class AdminInventoryServlet extends HttpServlet {
     private void handleViewDetailPage(int receiptId, HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         try {
-            Optional<InventoryReceipt> receipt = inventoryDAO.getReceiptById(receiptId);
+            Optional<AdminInventoryDAO.ReceiptDetailDTO> receiptDetail = inventoryDAO.getReceiptDetail(receiptId);
             
-            if (receipt.isEmpty()) {
+            if (receiptDetail.isEmpty()) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Không tìm thấy phiếu");
                 return;
             }
 
-            List<InventoryReceiptItem> items = inventoryDAO.getReceiptItemsByReceiptId(receiptId);
+            List<AdminInventoryDAO.ReceiptItemDetailDTO> items = inventoryDAO.getReceiptItemsDetail(receiptId);
 
-          
-            request.setAttribute("receipt", receipt.get());
+            // Set attributes cho JSP
+            request.setAttribute("receipt", receiptDetail.get());
             request.setAttribute("items", items);
             request.setAttribute("itemCount", items.size());
 
-         
-            request.getRequestDispatcher("/inventory-receipt-detail.jsp").forward(request, response);
+            // Forward tới JSP
+            request.getRequestDispatcher("/admin/inventory-receipt-detail.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();

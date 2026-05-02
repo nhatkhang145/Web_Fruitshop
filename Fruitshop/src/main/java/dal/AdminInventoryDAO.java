@@ -220,4 +220,137 @@ public class AdminInventoryDAO {
                     .findFirst()
         );
     }
+
+    
+     // Lấy chi tiết phiếu nhập kho với tên nhà cung cấp
+    
+    public Optional<ReceiptDetailDTO> getReceiptDetail(int receiptId) {
+        return DBContext.get().withHandle(handle ->
+            handle.createQuery("""
+                SELECT r.id, r.code, r.supplier_id, r.receipt_date, r.total_amount, r.status, 
+                       r.note, r.created_by, r.created_at, r.updated_at, s.name as supplier_name
+                FROM inventory_receipts r
+                LEFT JOIN suppliers s ON r.supplier_id = s.id
+                WHERE r.id = ?
+                """)
+                    .bind(0, receiptId)
+                    .map((rs, ctx) -> new ReceiptDetailDTO(
+                        rs.getInt("id"),
+                        rs.getString("code"),
+                        rs.getInt("supplier_id"),
+                        rs.getString("supplier_name"),
+                        rs.getObject("receipt_date", LocalDateTime.class),
+                        rs.getDouble("total_amount"),
+                        rs.getString("status"),
+                        rs.getString("note"),
+                        rs.getInt("created_by"),
+                        rs.getObject("created_at", LocalDateTime.class),
+                        rs.getObject("updated_at", LocalDateTime.class)
+                    ))
+                    .findFirst()
+        );
+    }
+
+    
+     // Lấy danh sách dòng hàng của phiếu với tên sản phẩm
+    
+    public List<ReceiptItemDetailDTO> getReceiptItemsDetail(int receiptId) {
+        return DBContext.get().withHandle(handle ->
+            handle.createQuery("""
+                SELECT i.id, i.receipt_id, i.product_id, i.quantity, i.unit_price, 
+                       i.total_price, p.product_name
+                FROM inventory_receipt_items i
+                LEFT JOIN products p ON i.product_id = p.id
+                WHERE i.receipt_id = ?
+                """)
+                    .bind(0, receiptId)
+                    .map((rs, ctx) -> new ReceiptItemDetailDTO(
+                        rs.getInt("id"),
+                        rs.getInt("receipt_id"),
+                        rs.getInt("product_id"),
+                        rs.getString("product_name"),
+                        rs.getInt("quantity"),
+                        rs.getDouble("unit_price"),
+                        rs.getDouble("total_price")
+                    ))
+                    .list()
+        );
+    }
+
+    
+     
+     
+    public static class ReceiptDetailDTO {
+        private int id;
+        private String code;
+        private int supplierId;
+        private String supplierName;
+        private LocalDateTime receiptDate;
+        private double totalAmount;
+        private String status;
+        private String note;
+        private int createdBy;
+        private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
+
+        public ReceiptDetailDTO(int id, String code, int supplierId, String supplierName, 
+                                LocalDateTime receiptDate, double totalAmount, String status, 
+                                String note, int createdBy, LocalDateTime createdAt, LocalDateTime updatedAt) {
+            this.id = id;
+            this.code = code;
+            this.supplierId = supplierId;
+            this.supplierName = supplierName;
+            this.receiptDate = receiptDate;
+            this.totalAmount = totalAmount;
+            this.status = status;
+            this.note = note;
+            this.createdBy = createdBy;
+            this.createdAt = createdAt;
+            this.updatedAt = updatedAt;
+        }
+
+        public int getId() { return id; }
+        public String getCode() { return code; }
+        public int getSupplierId() { return supplierId; }
+        public String getSupplierName() { return supplierName; }
+        public LocalDateTime getReceiptDate() { return receiptDate; }
+        public double getTotalAmount() { return totalAmount; }
+        public String getStatus() { return status; }
+        public String getNote() { return note; }
+        public int getCreatedBy() { return createdBy; }
+        public LocalDateTime getCreatedAt() { return createdAt; }
+        public LocalDateTime getUpdatedAt() { return updatedAt; }
+    }
+
+    
+     
+     
+    public static class ReceiptItemDetailDTO {
+        private int id;
+        private int receiptId;
+        private int productId;
+        private String productName;
+        private int quantity;
+        private double unitPrice;
+        private double totalPrice;
+
+        public ReceiptItemDetailDTO(int id, int receiptId, int productId, String productName,
+                                    int quantity, double unitPrice, double totalPrice) {
+            this.id = id;
+            this.receiptId = receiptId;
+            this.productId = productId;
+            this.productName = productName;
+            this.quantity = quantity;
+            this.unitPrice = unitPrice;
+            this.totalPrice = totalPrice;
+        }
+
+        public int getId() { return id; }
+        public int getReceiptId() { return receiptId; }
+        public int getProductId() { return productId; }
+        public String getProductName() { return productName; }
+        public int getQuantity() { return quantity; }
+        public double getUnitPrice() { return unitPrice; }
+        public double getTotalPrice() { return totalPrice; }
+    }
 }
