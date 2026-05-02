@@ -11,13 +11,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 
-@WebServlet({"/admin/inventory-management", "/admin/inventory-receipt-detail"})
+@WebServlet({"/admin/inventory-management", "/admin/inventory-receipt-detail", "/admin/inventory-receipt-create"})
 public class AdminInventoryServlet extends HttpServlet {
     private AdminInventoryDAO inventoryDAO;
 
@@ -50,6 +51,149 @@ public class AdminInventoryServlet extends HttpServlet {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi: " + e.getMessage());
         }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        String path = request.getServletPath();
+
+        if (!isAdmin(request)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"success\":false,\"message\":\"Không có quyền\"}");
+            return;
+        }
+
+        try {
+            if ("/admin/inventory-receipt-create".equals(path)) {
+                handleCreateReceipt(request, response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"success\":false,\"message\":\"Lỗi: " + e.getMessage() + "\"}");
+        }
+    }
+
+    
+     // Tạo phiếu nhập kho mới
+    private void handleCreateReceipt(HttpServletRequest request, HttpServletResponse response) 
+            throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        Gson gson = new Gson();
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            int supplierId = Integer.parseInt(request.getParameter("supplier_id") != null ? 
+                    request.getParameter("supplier_id") : "0");
+            String receiptDate = request.getParameter("receipt_date");
+            String note = request.getParameter("note");
+            String itemsJson = request.getParameter("items");
+
+            if (supplierId <= 0) {
+                result.put("success", false);
+                result.put("message", "Nhà cung cấp không hợp lệ");
+                response.getWriter().write(gson.toJson(result));
+                return;
+            }
+
+            if (!inventoryDAO.supplierExists(supplierId)) {
+                result.put("success", false);
+                result.put("message", "Nhà cung cấp không tồn tại");
+                response.getWriter().write(gson.toJson(result));
+                return;
+            }
+
+            if (receiptDate == null || receiptDate.isEmpty()) {
+                result.put("success", false);
+                result.put("message", "Ngày nhập không hợp lệ");
+                response.getWriter().write(gson.toJson(result));
+                return;
+            }
+
+            if (itemsJson == null || itemsJson.isEmpty()) {
+                result.put("success", false);
+                result.put("message", "Phiếu phải có ít nhất 1 dòng hàng");
+                response.getWriter().write(gson.toJson(result));
+                return;
+            }
+
+        
+            InventoryReceiptItem[] itemsArray = gson.fromJson(itemsJson, InventoryReceiptItem[].class);
+            if (itemsArray == null || itemsArray.length == 0) {
+                result.put("success", false);
+                result.put("message", "Phiếu phải có ít nhất 1 dòng hàng");
+                response.getWriter().write(gson.toJson(result));
+                return;
+            }
+
+          
+            double totalAmount = 0;
+            for (InventoryReceiptItem item : itemsArray) {
+                if (item.getProductId() <= 0) {
+                    result.put("success", false);
+                    result.put("message", "Sản phẩm không hợp lệ");
+                    response.getWriter().write(gson.toJson(result));
+                    return;
+                }
+
+                if (!inventoryDAO.productExists(item.getProductId())) {
+                    result.put("success", false);
+                    result.put("message", "Sản phẩm ID " + item.getProductId() + " không tồn tại");
+                    response.getWriter().write(gson.toJson(result));
+                    return;
+                }
+
+                if (item.getQuantity() <= 0) {
+                    result.put("success", false);
+                    result.put("message", "Số lượng phải lớn hơn 0");
+                    response.getWriter().write(gson.toJson(result));
+                    return;
+                }
+
+                if (item.getUnitPrice() <= 0) {
+                    result.put("success", false);
+                    result.put("message", "Giá đơn vị phải lớn hơn 0");
+                    response.getWriter().write(gson.toJson(result));
+                    return;
+                }
+
+                totalAmount += item.getQuantity() * item.getUnitPrice();
+            }
+
+          
+            String receiptCode = inventoryDAO.generateReceiptCode();
+
+           
+            InventoryReceipt receipt = new InventoryReceipt();
+            receipt.setCode(receiptCode);
+            receipt.setSupplierId(supplierId);
+            receipt.setReceiptDate(java.time.LocalDateTime.parse(receiptDate + "T00:00:00"));
+            receipt.setTotalAmount(totalAmount);
+            receipt.setStatus("PENDING");
+            receipt.setNote(note);
+            receipt.setCreatedBy(getUserId(request));
+
+            int receiptId = inventoryDAO.insertReceipt(receipt);
+
+          
+            inventoryDAO.insertReceiptItems(receiptId, java.util.Arrays.asList(itemsArray));
+
+            result.put("success", true);
+            result.put("message", "Thêm phiếu thành công");
+            result.put("receipt_id", receiptId);
+            result.put("receipt_code", receiptCode);
+
+        } catch (NumberFormatException e) {
+            result.put("success", false);
+            result.put("message", "Dữ liệu không hợp lệ");
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("success", false);
+            result.put("message", "Lỗi: " + e.getMessage());
+        }
+
+        response.getWriter().write(gson.toJson(result));
     }
 
     
@@ -147,6 +291,14 @@ public class AdminInventoryServlet extends HttpServlet {
     }
 
     
+    /**
+     * Lấy ID người dùng hiện tại từ session
+     */
+    private int getUserId(HttpServletRequest request) {
+        Object userId = request.getSession().getAttribute("userId");
+        return userId != null ? Integer.parseInt(userId.toString()) : 0;
+    }
+
     private boolean isAdmin(HttpServletRequest request) { 
         Object user = request.getSession().getAttribute("user");
         return user != null; 
