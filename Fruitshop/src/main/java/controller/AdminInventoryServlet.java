@@ -247,22 +247,48 @@ public class AdminInventoryServlet extends HttpServlet {
     
      //  Lấy chi tiết phiếu nhập kho theo id
     private void handleGetDetail(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        String format = request.getParameter("format");
+        String receiptIdStr = request.getParameter("id");
+
+       
+        if (receiptIdStr == null || receiptIdStr.isEmpty()) {
+            if ("json".equals(format)) {
+                response.setContentType("application/json;charset=UTF-8");
+                response.getWriter().write("{\"success\":false,\"message\":\"ID phiếu không hợp lệ\"}");
+            } else {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID phiếu không hợp lệ");
+            }
+            return;
+        }
+
+        try {
+            int receiptId = Integer.parseInt(receiptIdStr);
+
+            if ("json".equals(format)) {
+                handleGetDetailJSON(receiptId, response);
+            } else {
+                
+                handleViewDetailPage(receiptId, request, response);
+            }
+
+        } catch (NumberFormatException e) {
+            if ("json".equals(format)) {
+                response.setContentType("application/json;charset=UTF-8");
+                response.getWriter().write("{\"success\":false,\"message\":\"ID không hợp lệ\"}");
+            } else {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID không hợp lệ");
+            }
+        }
+    }
+
+    private void handleGetDetailJSON(int receiptId, HttpServletResponse response) 
             throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         Gson gson = new Gson();
         Map<String, Object> result = new HashMap<>();
 
         try {
-            String receiptIdStr = request.getParameter("id");
-            if (receiptIdStr == null || receiptIdStr.isEmpty()) {
-                result.put("success", false);
-                result.put("message", "ID phiếu không hợp lệ");
-                response.getWriter().write(gson.toJson(result));
-                return;
-            }
-
-            int receiptId = Integer.parseInt(receiptIdStr);
-            
             Optional<InventoryReceipt> receipt = inventoryDAO.getReceiptById(receiptId);
             
             if (receipt.isEmpty()) {
@@ -278,9 +304,6 @@ public class AdminInventoryServlet extends HttpServlet {
             result.put("items", items);
             result.put("itemCount", items.size());
             
-        } catch (NumberFormatException e) {
-            result.put("success", false);
-            result.put("message", "ID không hợp lệ");
         } catch (Exception e) {
             e.printStackTrace();
             result.put("success", false);
@@ -290,10 +313,35 @@ public class AdminInventoryServlet extends HttpServlet {
         response.getWriter().write(gson.toJson(result));
     }
 
+   
+    private void handleViewDetailPage(int receiptId, HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        try {
+            Optional<InventoryReceipt> receipt = inventoryDAO.getReceiptById(receiptId);
+            
+            if (receipt.isEmpty()) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Không tìm thấy phiếu");
+                return;
+            }
+
+            List<InventoryReceiptItem> items = inventoryDAO.getReceiptItemsByReceiptId(receiptId);
+
+          
+            request.setAttribute("receipt", receipt.get());
+            request.setAttribute("items", items);
+            request.setAttribute("itemCount", items.size());
+
+         
+            request.getRequestDispatcher("/inventory-receipt-detail.jsp").forward(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi: " + e.getMessage());
+        }
+    }
+
     
-    /**
-     * Lấy ID người dùng hiện tại từ session
-     */
+  
     private int getUserId(HttpServletRequest request) {
         Object userId = request.getSession().getAttribute("userId");
         return userId != null ? Integer.parseInt(userId.toString()) : 0;
