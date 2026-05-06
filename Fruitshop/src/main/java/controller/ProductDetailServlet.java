@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(name = "ProductDetailServlet", urlPatterns = {"/product-detail"})
+@WebServlet(name = "ProductDetailServlet", urlPatterns = { "/product-detail" })
 public class ProductDetailServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -35,21 +35,23 @@ public class ProductDetailServlet extends HttpServlet {
             int id = Integer.parseInt(idRaw);
 
             Product p = pDao.getProductByID(id);
-            if(p == null) {
+            if (p == null) {
                 response.sendRedirect("index.jsp");
                 return;
             }
+
+            int soldCount = pDao.getSoldQuantityByProductId(id);
+            request.setAttribute("soldCount", soldCount);
 
             WeekendDeal activeDeal = wdDao.getActiveDealByProductId(id);
             if (activeDeal != null) {
                 request.setAttribute("weekendDeal", activeDeal);
             }
 
-            List<Product> relatedP = pDao.getProductsByCategoryID(p.getCategoryId());
+            List<Product> relatedP = pDao.getRelatedProducts(p.getCategoryId(), p.getId(), 8);
 
             List<Category> listC = cDao.getAllCategories();
             request.setAttribute("listC", listC);
-
 
             List<Review> listR = new ArrayList<>();
             try {

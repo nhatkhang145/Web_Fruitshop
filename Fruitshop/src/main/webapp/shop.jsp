@@ -190,9 +190,11 @@
                                             <c:forEach items="${listP}" var="p">
                                                 <c:set var="weekendDeal" value="${weekendDealMap[p.id]}" />
                                                 <div class="grid__column-2-4">
-                                                    <div class="product-card">
+                                                    <div class="product-card"
+                                                        data-href="${pageContext.request.contextPath}/product-detail?pid=${p.id}">
                                                         <div class="product-image">
-                                                            <a href="product-detail?pid=${p.id}">
+                                                            <a
+                                                                href="${pageContext.request.contextPath}/product-detail?pid=${p.id}">
                                                                 <img src="${p.image}" alt="${p.name}" loading="lazy" />
                                                             </a>
 
@@ -234,14 +236,14 @@
                                                                             style="${isLiked ? 'color: red;' : ''}"></i>
                                                                     </a>
 
-                                                                    <a href="product-detail?pid=${p.id}"
+                                                                    <a href="${pageContext.request.contextPath}/product-detail?pid=${p.id}"
                                                                         class="action-btn" title="Xem nhanh">
                                                                         <i class="far fa-eye"></i>
                                                                     </a>
 
                                                                     <c:choose>
                                                                         <c:when test="${p.quantity == 0}">
-                                                                            <a href="product-detail?pid=${p.id}"
+                                                                            <a href="${pageContext.request.contextPath}/product-detail?pid=${p.id}"
                                                                                 class="action-btn"
                                                                                 style="opacity: 0.5; cursor: not-allowed;"
                                                                                 title="Hết hàng">
@@ -262,18 +264,30 @@
                                                             <div class="category">Trái cây nhập khẩu</div>
 
                                                             <h3>
-                                                                <a href="product-detail?pid=${p.id}"
+                                                                <a href="${pageContext.request.contextPath}/product-detail?pid=${p.id}"
                                                                     title="${p.name}">${p.name}</a>
                                                             </h3>
 
                                                             <div class="rating"
                                                                 style="color: #ffc107; font-size: 0.8rem; margin-bottom: 5px;">
-                                                                <i class="fas fa-star"></i>
-                                                                <i class="fas fa-star"></i>
-                                                                <i class="fas fa-star"></i>
-                                                                <i class="fas fa-star"></i>
-                                                                <i class="fas fa-star-half-alt"></i>
-                                                                <span style="color: #999;">(15)</span>
+                                                                <c:forEach begin="1" end="5" var="i">
+                                                                    <c:choose>
+                                                                        <c:when test="${i <= p.averageRating}">
+                                                                            <i class="fas fa-star"></i>
+                                                                        </c:when>
+                                                                        <c:when test="${i - p.averageRating <= 0.5}">
+                                                                            <i class="fas fa-star-half-alt"></i>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <i class="far fa-star"></i>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </c:forEach>
+                                                                <span style="color: #999;">
+                                                                    <fmt:formatNumber value="${p.averageRating}"
+                                                                        minFractionDigits="1" maxFractionDigits="1" />/5
+                                                                    (${p.reviewCount})
+                                                                </span>
                                                             </div>
 
                                                             <div class="price">
@@ -337,9 +351,23 @@
                                             <div class="pagination-wrapper">
                                                 <c:if test="${endP > 1}">
                                                     <c:set var="currentPage"
-                                                        value="${empty param.index ? 1 : param.index}" />
+                                                        value="${empty param.index ? 1 : param.index + 0}" />
+                                                    <c:choose>
+                                                        <c:when test="${currentPage <= 3}">
+                                                            <c:set var="startPage" value="1" />
+                                                            <c:set var="endPageShow" value="${endP < 5 ? endP : 5}" />
+                                                        </c:when>
+                                                        <c:when test="${currentPage >= endP - 2}">
+                                                            <c:set var="startPage"
+                                                                value="${endP - 4 > 1 ? endP - 4 : 1}" />
+                                                            <c:set var="endPageShow" value="${endP}" />
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <c:set var="startPage" value="${currentPage - 2}" />
+                                                            <c:set var="endPageShow" value="${currentPage + 2}" />
+                                                        </c:otherwise>
+                                                    </c:choose>
 
-                                                    <!-- Previous Button -->
                                                     <c:choose>
                                                         <c:when test="${currentPage > 1}">
                                                             <a href="shop?index=${currentPage - 1}&cid=${cid}&price=${priceTag}&sort=${sortTag}"
@@ -356,9 +384,17 @@
                                                         </c:otherwise>
                                                     </c:choose>
 
-                                                    <!-- Page Numbers -->
                                                     <div class="pagination-pages">
-                                                        <c:forEach begin="1" end="${endP}" var="i">
+                                                        <c:if test="${startPage > 1}">
+                                                            <a href="shop?index=1&cid=${cid}&price=${priceTag}&sort=${sortTag}"
+                                                                class="page-number">1</a>
+                                                        </c:if>
+
+                                                        <c:if test="${startPage > 2}">
+                                                            <span class="page-ellipsis">...</span>
+                                                        </c:if>
+
+                                                        <c:forEach begin="${startPage}" end="${endPageShow}" var="i">
                                                             <c:choose>
                                                                 <c:when test="${i == currentPage}">
                                                                     <span class="page-number active">${i}</span>
@@ -369,9 +405,17 @@
                                                                 </c:otherwise>
                                                             </c:choose>
                                                         </c:forEach>
+
+                                                        <c:if test="${endPageShow < endP - 1}">
+                                                            <span class="page-ellipsis">...</span>
+                                                        </c:if>
+
+                                                        <c:if test="${endPageShow < endP}">
+                                                            <a href="shop?index=${endP}&cid=${cid}&price=${priceTag}&sort=${sortTag}"
+                                                                class="page-number">${endP}</a>
+                                                        </c:if>
                                                     </div>
 
-                                                    <!-- Next Button -->
                                                     <c:choose>
                                                         <c:when test="${currentPage < endP}">
                                                             <a href="shop?index=${currentPage + 1}&cid=${cid}&price=${priceTag}&sort=${sortTag}"
@@ -569,6 +613,43 @@
                         } else {
                             toggle.textContent = '+';
                         }
+                    }
+
+                    function bindProductCardNavigation() {
+                        const cards = document.querySelectorAll('.product-card[data-href]');
+                        cards.forEach(function (card) {
+                            card.style.cursor = 'pointer';
+                            card.onclick = null;
+                            card.addEventListener('click', function (e) {
+                                if (e.target.closest('a, button, input, textarea, select, label')) {
+                                    return;
+                                }
+                                const href = card.getAttribute('data-href');
+                                if (href) {
+                                    window.location.assign(href);
+                                }
+                            });
+                        });
+
+                        document.addEventListener('click', function (e) {
+                            const card = e.target.closest('.product-card[data-href]');
+                            if (!card) {
+                                return;
+                            }
+                            if (e.target.closest('a, button, input, textarea, select, label')) {
+                                return;
+                            }
+                            const href = card.getAttribute('data-href');
+                            if (href) {
+                                window.location.assign(href);
+                            }
+                        });
+                    }
+
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', bindProductCardNavigation);
+                    } else {
+                        bindProductCardNavigation();
                     }
                 </script>
                 </div>

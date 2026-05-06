@@ -205,12 +205,28 @@
 
                                                                     <div class="rating"
                                                                         style="color: #ffc107; font-size: 0.8rem; margin-bottom: 5px;">
-                                                                        <i class="fas fa-star"></i>
-                                                                        <i class="fas fa-star"></i>
-                                                                        <i class="fas fa-star"></i>
-                                                                        <i class="fas fa-star"></i>
-                                                                        <i class="fas fa-star-half-alt"></i>
-                                                                        <span style="color: #999;">(0)</span>
+                                                                        <c:forEach begin="1" end="5" var="i">
+                                                                            <c:choose>
+                                                                                <c:when
+                                                                                    test="${i <= product.averageRating}">
+                                                                                    <i class="fas fa-star"></i>
+                                                                                </c:when>
+                                                                                <c:when
+                                                                                    test="${i - product.averageRating <= 0.5}">
+                                                                                    <i class="fas fa-star-half-alt"></i>
+                                                                                </c:when>
+                                                                                <c:otherwise>
+                                                                                    <i class="far fa-star"></i>
+                                                                                </c:otherwise>
+                                                                            </c:choose>
+                                                                        </c:forEach>
+                                                                        <span style="color: #999;">
+                                                                            <fmt:formatNumber
+                                                                                value="${product.averageRating}"
+                                                                                minFractionDigits="1"
+                                                                                maxFractionDigits="1" />/5
+                                                                            (${product.reviewCount})
+                                                                        </span>
                                                                     </div>
 
                                                                     <div class="price">
@@ -538,12 +554,28 @@
 
                                                                 <div class="rating"
                                                                     style="color: #ffc107; font-size: 0.8rem; margin-bottom: 5px;">
-                                                                    <i class="fas fa-star"></i>
-                                                                    <i class="fas fa-star"></i>
-                                                                    <i class="fas fa-star"></i>
-                                                                    <i class="fas fa-star"></i>
-                                                                    <i class="fas fa-star-half-alt"></i>
-                                                                    <span style="color: #999;">(0)</span>
+                                                                    <c:forEach begin="1" end="5" var="i">
+                                                                        <c:choose>
+                                                                            <c:when
+                                                                                test="${i <= product.averageRating}">
+                                                                                <i class="fas fa-star"></i>
+                                                                            </c:when>
+                                                                            <c:when
+                                                                                test="${i - product.averageRating <= 0.5}">
+                                                                                <i class="fas fa-star-half-alt"></i>
+                                                                            </c:when>
+                                                                            <c:otherwise>
+                                                                                <i class="far fa-star"></i>
+                                                                            </c:otherwise>
+                                                                        </c:choose>
+                                                                    </c:forEach>
+                                                                    <span style="color: #999;">
+                                                                        <fmt:formatNumber
+                                                                            value="${product.averageRating}"
+                                                                            minFractionDigits="1"
+                                                                            maxFractionDigits="1" />/5
+                                                                        (${product.reviewCount})
+                                                                    </span>
                                                                 </div>
 
                                                                 <div class="price">
