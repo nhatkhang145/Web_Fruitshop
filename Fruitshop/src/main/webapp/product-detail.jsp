@@ -225,8 +225,8 @@
                                 <div id="desc" class="tab-content">
                                     <div class="content-inner">
                                         <h3>Thông tin chi tiết</h3>
-                                        <p>
-                                            <c:out value="${detail.description}" escapeXml="false" />
+                                        <p style="white-space: pre-line;">
+                                            <c:out value="${detail.description}" />
                                         </p>
                                         <p><strong>Lưu ý:</strong> Bảo quản nơi khô ráo, thoáng mát.</p>
                                     </div>
