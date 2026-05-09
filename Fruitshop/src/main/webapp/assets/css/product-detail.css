@@ -5,6 +5,8 @@
 
 .product-detail__top {
     display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    align-items: start;
     gap: 40px;
     margin-top: 30px;
     margin-bottom: 50px;
@@ -13,23 +15,26 @@
 .product-gallery {
     display: flex;
     gap: 15px;
+    align-items: flex-start;
+    min-width: 0;
 }
 
 .product-gallery__thumbs {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    width: 80px;
+    width: 88px;
+    flex: 0 0 88px;
 }
 
 .thumb-item {
-    width: 80px;
-    height: 80px;
+    width: 88px;
+    height: 88px;
     border: 1px solid #e0e0e0;
     border-radius: 6px;
     cursor: pointer;
     overflow: hidden;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s ease;
 }
 
 .thumb-item img {
@@ -46,11 +51,12 @@
 
 .product-gallery__main {
     flex: 1;
+    min-width: 0;
     position: relative;
     border: 1px solid #f0f0f0;
     border-radius: 10px;
     overflow: hidden;
-    height: 450px;
+    height: 520px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -68,6 +74,11 @@
 
 .zoomable-thumb {
     cursor: zoom-in;
+}
+
+.product-info {
+    min-width: 0;
+    padding-top: 6px;
 }
 
 .product-badge.sale {
@@ -94,6 +105,7 @@
     font-size: 1.3rem;
     color: #666;
     margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
 .product-rating {
@@ -122,6 +134,7 @@
     align-items: flex-end;
     gap: 15px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
 .current-price {
@@ -181,7 +194,6 @@
     border-color: var(--primary-color);
 }
 
-
 .product-actions-wrapper {
     display: flex;
     gap: 20px;
@@ -218,6 +230,7 @@
     text-align: center;
     font-weight: 600;
     outline: none;
+    appearance: textfield;
     -moz-appearance: textfield;
 }
 
@@ -274,6 +287,8 @@
     padding: 15px;
     border-radius: 6px;
     background: #fdfdfd;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 .policy-item {
@@ -315,6 +330,7 @@
     display: flex;
     border-bottom: 1px solid #ddd;
     margin-bottom: 25px;
+    overflow-x: auto;
 }
 
 .tab-btn {
@@ -327,6 +343,7 @@
     color: #666;
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .tab-btn:hover {
@@ -348,73 +365,6 @@
 
 .content-inner p {
     margin-bottom: 15px;
-}
-
-.review-item {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 15px;
-}
-
-.review-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-}
-
-.review-header strong {
-    font-size: 1.4rem;
-}
-
-.review-header .stars {
-    color: #ffc107;
-    font-size: 1.2rem;
-}
-
-.review-date {
-    color: #999;
-    font-size: 1.2rem;
-}
-
-
-@media (max-width: 992px) {
-    .product-detail__top {
-        grid-template-columns: 1fr;
-        gap: 30px;
-    }
-
-    .product-gallery {
-        flex-direction: column-reverse;
-    }
-
-    .product-gallery__thumbs {
-        flex-direction: row;
-        width: 100%;
-        overflow-x: auto;
-    }
-
-    .product-gallery__main {
-        height: auto;
-        aspect-ratio: 1/1;
-    }
-}
-
-@media (max-width: 768px) {
-    .product-actions-wrapper {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .qty-wrapper {
-        justify-content: center;
-        margin-bottom: 15px;
-        width: 150px;
-    }
-
-    .product-policies {
-        flex-direction: column;
-        gap: 10px;
-    }
 }
 
 .review-form-wrapper {
@@ -484,4 +434,71 @@
     border-radius: 50%;
     object-fit: cover;
     border: 1px solid #eee;
+}
+
+.related-products-section {
+    margin-top: 40px;
+}
+
+.section-title {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.trending-grid {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 992px) {
+    .product-detail__top {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .product-gallery {
+        flex-direction: column-reverse;
+    }
+
+    .product-gallery__thumbs {
+        flex-direction: row;
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .product-gallery__main {
+        height: auto;
+        aspect-ratio: 1 / 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .product-actions-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .qty-wrapper {
+        justify-content: center;
+        margin-bottom: 15px;
+        width: 150px;
+    }
+
+    .product-policies {
+        flex-direction: column;
+        gap: 10px;
+    }
 }

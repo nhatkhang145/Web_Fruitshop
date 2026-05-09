@@ -472,12 +472,6 @@
                                 }
                             });
 
-                            mainImageWrap.addEventListener('wheel', function (e) {
-                                e.preventDefault();
-                                const step = e.deltaY > 0 ? -0.2 : 0.2;
-                                setInlineZoom(inlineZoom + step);
-                            }, { passive: false });
-
                             mainImageWrap.addEventListener('mousemove', function (e) {
                                 if (inlineZoom <= 1) {
                                     return;
