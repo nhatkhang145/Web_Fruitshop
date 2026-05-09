@@ -121,7 +121,22 @@ public class AddressServlet extends HttpServlet {
     }
 
     private void handleAddAction(HttpServletRequest request, HttpServletResponse response, User user) throws IOException {
-        request.setAttribute("message", "Thêm địa chỉ thành công!");
+        String receiverName  = request.getParameter("receiverName");
+        String phoneNumber   = request.getParameter("phoneNumber");
+        String addressDetail = request.getParameter("address");
+        String city          = request.getParameter("city");
+        boolean isDefault    = "on".equals(request.getParameter("isDefault"))
+                || "1".equals(request.getParameter("isDefault"));
+
+        Address address = new Address(0, user.getId(), receiverName, phoneNumber, addressDetail, city, isDefault);
+        boolean success = addressDAO.addAddress(address);
+
+        if (success) {
+            request.setAttribute("message", "Thêm địa chỉ thành công!");
+        } else {
+            request.setAttribute("error", "Thêm địa chỉ thất bại, vui lòng thử lại!");
+        }
+
         if (Boolean.TRUE.equals(request.getSession().getAttribute("returnToCheckout"))) {
             request.getSession().removeAttribute("returnToCheckout");
             response.sendRedirect("checkout");
