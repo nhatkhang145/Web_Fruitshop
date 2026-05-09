@@ -179,7 +179,7 @@
 
                                                     <button type="submit" name="btAction" value="buy"
                                                         class="btn btn-buy-now">
-                                                        Mua ngay
+                                                        <i class="fa-solid fa-bolt"></i> Thanh toán ngay
                                                     </button>
                                                 </div>
                                             </form>
@@ -225,8 +225,8 @@
                                 <div id="desc" class="tab-content">
                                     <div class="content-inner">
                                         <h3>Thông tin chi tiết</h3>
-                                        <p>
-                                            <c:out value="${detail.description}" escapeXml="false" />
+                                        <p style="white-space: pre-line;">
+                                            <c:out value="${detail.description}" />
                                         </p>
                                         <p><strong>Lưu ý:</strong> Bảo quản nơi khô ráo, thoáng mát.</p>
                                     </div>
@@ -471,12 +471,6 @@
                                     setInlineZoom(2);
                                 }
                             });
-
-                            mainImageWrap.addEventListener('wheel', function (e) {
-                                e.preventDefault();
-                                const step = e.deltaY > 0 ? -0.2 : 0.2;
-                                setInlineZoom(inlineZoom + step);
-                            }, { passive: false });
 
                             mainImageWrap.addEventListener('mousemove', function (e) {
                                 if (inlineZoom <= 1) {

@@ -350,7 +350,7 @@
                                         <div class="col-12">
                                             <div class="pagination-wrapper">
                                                 <c:if test="${endP > 1}">
-                                                    <c:set var="currentPage"
+                                                        <c:set var="currentPage"
                                                         value="${empty param.index ? 1 : param.index + 0}" />
                                                     <c:choose>
                                                         <c:when test="${currentPage <= 3}">

@@ -7,7 +7,6 @@ import org.jdbi.v3.core.mapper.RowMapper;
 import java.util.List;
 import java.util.Optional;
 
-
 public class UserDAO {
     private final RowMapper<User> userMapper = (rs, ctx) -> {
         User user = new User();
@@ -41,7 +40,7 @@ public class UserDAO {
     };
 
     // Kiểm tra Email tồn tại
-    public boolean checkExist(String email){
+    public boolean checkExist(String email) {
         try {
             String query = "SELECT COUNT(*) FROM users WHERE email = ?";
             return DBContext.get().withHandle(handle -> handle.createQuery(query)
@@ -75,13 +74,11 @@ public class UserDAO {
     public Optional<User> checkLogin(String email, String password) {
         try {
             String query = "SELECT * FROM users WHERE email = ? AND password = ? AND status = 1";
-            return DBContext.get().withHandle(handle ->
-                    handle.createQuery(query)
-                            .bind(0, email)
-                            .bind(1, password)
-                            .map(userMapper)
-                            .findFirst()
-            );
+            return DBContext.get().withHandle(handle -> handle.createQuery(query)
+                    .bind(0, email)
+                    .bind(1, password)
+                    .map(userMapper)
+                    .findFirst());
         } catch (Exception e) {
             System.err.println("Error during login: " + e.getMessage());
             return Optional.empty();
@@ -91,7 +88,7 @@ public class UserDAO {
     // Cập nhật thông tin người dùng
     public boolean updateProfile(User user) {
         try {
-            String query = "UPDATE users SET fullname = ?, phone = ?, gender = ?, birthdate = ?, avatar = ? WHERE id = ?";
+            String query = "UPDATE users SET fullname = ?, phone = ?, gender = ?, birthdate = ?, avatar = ?, name_changed = ? WHERE id = ?";
             int rows = DBContext.get().withHandle(handle -> handle.createUpdate(query)
                     .bind(0, user.getFullName())
                     .bind(1, user.getPhone())
@@ -169,8 +166,8 @@ public class UserDAO {
     public boolean changePassword(int id, String newPassword) {
         try {
             String query = "UPDATE users SET password = ? WHERE id = ?";
-            int rows = DBContext.get().withHandle(handle ->
-                    handle.createUpdate(query).bind(0, newPassword).bind(1, id).execute());
+            int rows = DBContext.get()
+                    .withHandle(handle -> handle.createUpdate(query).bind(0, newPassword).bind(1, id).execute());
             return rows > 0;
         } catch (Exception e) {
             System.err.println("Error changing password: " + e.getMessage());
@@ -182,8 +179,8 @@ public class UserDAO {
     public boolean updatePasswordByEmail(String email, String newPassword) {
         try {
             String query = "UPDATE users SET password = ? WHERE email = ?";
-            int rows = DBContext.get().withHandle(handle ->
-                    handle.createUpdate(query).bind(0, newPassword).bind(1, email).execute());
+            int rows = DBContext.get()
+                    .withHandle(handle -> handle.createUpdate(query).bind(0, newPassword).bind(1, email).execute());
             return rows > 0;
         } catch (Exception e) {
             System.err.println("Error updating password by email: " + e.getMessage());
@@ -299,7 +296,5 @@ public class UserDAO {
             return 0;
         }
     }
-
-
 
 }

@@ -14,12 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-@WebServlet(name = "ProfileServlet", urlPatterns = {"/profile"})
-@MultipartConfig(
-        fileSizeThreshold = 1024 * 1024 * 1,
-        maxFileSize = 1024 * 1024 * 10,
-        maxRequestSize = 1024 * 1024 * 15
-)
+@WebServlet(name = "ProfileServlet", urlPatterns = { "/profile" })
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 1, maxFileSize = 1024 * 1024 * 10, maxRequestSize = 1024 * 1024 * 15)
 public class ProfileServlet extends HttpServlet {
 
     private final UserDAO userDAO = new UserDAO();
@@ -71,6 +67,35 @@ public class ProfileServlet extends HttpServlet {
             e.printStackTrace();
             forwardWithError(request, response, "Lỗi khi tải ảnh lên: " + e.getMessage());
             return;
+        }
+
+        if (fullName != null) {
+            fullName = fullName.trim();
+        }
+        if (phone != null) {
+            phone = phone.trim();
+        }
+
+        if (fullName == null || fullName.isEmpty()) {
+            forwardWithError(request, response, "Họ và tên không được để trống.");
+            return;
+        }
+
+        if (fullName.length() > 50) {
+            forwardWithError(request, response, "Họ và tên tối đa 50 ký tự.");
+            return;
+        }
+
+        if (phone != null && !phone.isEmpty()) {
+            if (!phone.matches("\\d+")) {
+                forwardWithError(request, response, "Số điện thoại chỉ được nhập số.");
+                return;
+            }
+
+            if (phone.length() > 11) {
+                forwardWithError(request, response, "Số điện thoại tối đa 11 ký tự số.");
+                return;
+            }
         }
 
         if (fullName != null && !fullName.trim().isEmpty() && !fullName.equals(user.getFullName())) {
@@ -132,7 +157,8 @@ public class ProfileServlet extends HttpServlet {
 
             String newFileName = "avatar_" + user.getId() + "_" + System.currentTimeMillis() + extension;
 
-            String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads" + File.separator + "avatars";
+            String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads" + File.separator
+                    + "avatars";
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();
