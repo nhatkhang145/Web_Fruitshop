@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(name = "CheckoutServlet", urlPatterns = {"/checkout"})
+@WebServlet(name = "CheckoutServlet", urlPatterns = { "/checkout" })
 public class CheckoutServlet extends HttpServlet {
 
     private OrderDAO orderDAO = new OrderDAO();
@@ -72,6 +72,16 @@ public class CheckoutServlet extends HttpServlet {
         double shippingFee = 30000;
         double discount = 0;
         double finalAmount = totalProducts + shippingFee - discount;
+
+        for (CartItem item : cart) {
+            Product product = item.getProduct();
+            if (product != null && (product.getImage() == null || product.getImage().trim().isEmpty())
+                    && product.getProductImages() != null && !product.getProductImages().isEmpty()
+                    && product.getProductImages().get(0).getImageUrl() != null
+                    && !product.getProductImages().get(0).getImageUrl().trim().isEmpty()) {
+                product.setImage(product.getProductImages().get(0).getImageUrl());
+            }
+        }
 
         System.out.println("=== CHECKOUT DEBUG ===");
         System.out.println("Total Products (after discount): " + totalProducts);
@@ -211,8 +221,7 @@ public class CheckoutServlet extends HttpServlet {
                             "order",
                             "Đơn hàng mới #" + orderId,
                             "Khách hàng " + fullname + " vừa đặt hàng.",
-                            notifLink
-                    );
+                            notifLink);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
