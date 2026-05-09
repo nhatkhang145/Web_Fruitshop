@@ -179,7 +179,7 @@
 
                                                     <button type="submit" name="btAction" value="buy"
                                                         class="btn btn-buy-now">
-                                                        Mua ngay
+                                                        <i class="fa-solid fa-bolt"></i> Thanh toán ngay
                                                     </button>
                                                 </div>
                                             </form>

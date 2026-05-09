@@ -6,6 +6,7 @@ import model.Address;
 import model.CartItem;
 import model.Order;
 import model.OrderItem;
+import model.Product;
 import model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,13 +16,102 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @WebServlet(name = "CheckoutServlet", urlPatterns = { "/checkout" })
 public class CheckoutServlet extends HttpServlet {
 
     private OrderDAO orderDAO = new OrderDAO();
     private AddressDAO addressDAO = new AddressDAO();
+
+    private List<CartItem> resolveCheckoutCart(HttpServletRequest req, HttpSession session) {
+        List<CartItem> buyNowCart = (List<CartItem>) session.getAttribute("buyNowCart");
+        Boolean isBuyNow = (Boolean) session.getAttribute("isBuyNow");
+
+        if (isBuyNow != null && isBuyNow && buyNowCart != null && !buyNowCart.isEmpty()) {
+            return buyNowCart;
+        }
+
+        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+        String[] selectedPids = req.getParameterValues("selectedPids");
+
+        if (selectedPids == null || selectedPids.length == 0) {
+            List<CartItem> checkoutCart = (List<CartItem>) session.getAttribute("checkoutCart");
+            if (checkoutCart != null && !checkoutCart.isEmpty()) {
+                return checkoutCart;
+            }
+            session.removeAttribute("checkoutCart");
+            return cart;
+        }
+
+        Set<Integer> selectedIds = new HashSet<>();
+        for (String selectedPid : selectedPids) {
+            try {
+                selectedIds.add(Integer.parseInt(selectedPid));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        List<CartItem> selectedItems = new ArrayList<>();
+        if (cart != null) {
+            for (CartItem item : cart) {
+                Product product = item.getProduct();
+                if (product != null && selectedIds.contains(product.getId())) {
+                    selectedItems.add(item);
+                }
+            }
+        }
+
+        session.setAttribute("checkoutCart", selectedItems);
+        return selectedItems;
+    }
+
+    private void syncCheckoutCartImages(List<CartItem> cart) {
+        for (CartItem item : cart) {
+            Product product = item.getProduct();
+            if (product != null && (product.getImage() == null || product.getImage().trim().isEmpty())
+                    && product.getProductImages() != null && !product.getProductImages().isEmpty()
+                    && product.getProductImages().get(0).getImageUrl() != null
+                    && !product.getProductImages().get(0).getImageUrl().trim().isEmpty()) {
+                product.setImage(product.getProductImages().get(0).getImageUrl());
+            }
+        }
+    }
+
+    private void removePurchasedItemsFromCart(HttpSession session, List<CartItem> purchasedItems) {
+        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+        if (cart == null || cart.isEmpty() || purchasedItems == null || purchasedItems.isEmpty()) {
+            return;
+        }
+
+        Set<Integer> purchasedIds = new HashSet<>();
+        for (CartItem item : purchasedItems) {
+            if (item.getProduct() != null) {
+                purchasedIds.add(item.getProduct().getId());
+            }
+        }
+
+        cart.removeIf(item -> item.getProduct() != null && purchasedIds.contains(item.getProduct().getId()));
+
+        double totalMoney = 0;
+        int totalQuantity = 0;
+        for (CartItem item : cart) {
+            totalMoney += item.getTotalPrice().doubleValue();
+            totalQuantity += item.getQuantity();
+        }
+
+        if (cart.isEmpty()) {
+            session.removeAttribute("cart");
+            session.removeAttribute("size");
+            session.removeAttribute("totalMoney");
+        } else {
+            session.setAttribute("cart", cart);
+            session.setAttribute("size", cart.size());
+            session.setAttribute("totalMoney", totalMoney);
+        }
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -33,23 +123,15 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
-        List<CartItem> cart;
-        Boolean isBuyNow = (Boolean) session.getAttribute("isBuyNow");
-        List<CartItem> buyNowCart = (List<CartItem>) session.getAttribute("buyNowCart");
-
-        if (isBuyNow != null && isBuyNow && buyNowCart != null && !buyNowCart.isEmpty()) {
-            cart = buyNowCart;
-        } else {
-            // Nếu không có buyNowCart hợp lệ, clear flags và dùng cart thông thường
-            session.removeAttribute("isBuyNow");
-            session.removeAttribute("buyNowCart");
-            cart = (List<CartItem>) session.getAttribute("cart");
-        }
+        List<CartItem> cart = resolveCheckoutCart(req, session);
 
         if (cart == null || cart.isEmpty()) {
             resp.sendRedirect(req.getContextPath() + "/cart.jsp");
             return;
         }
+
+        syncCheckoutCartImages(cart);
+        session.setAttribute("checkoutCart", cart);
 
         List<Address> addresses = addressDAO.getAddressesByUserId(user.getId());
 
@@ -72,16 +154,6 @@ public class CheckoutServlet extends HttpServlet {
         double shippingFee = 30000;
         double discount = 0;
         double finalAmount = totalProducts + shippingFee - discount;
-
-        for (CartItem item : cart) {
-            Product product = item.getProduct();
-            if (product != null && (product.getImage() == null || product.getImage().trim().isEmpty())
-                    && product.getProductImages() != null && !product.getProductImages().isEmpty()
-                    && product.getProductImages().get(0).getImageUrl() != null
-                    && !product.getProductImages().get(0).getImageUrl().trim().isEmpty()) {
-                product.setImage(product.getProductImages().get(0).getImageUrl());
-            }
-        }
 
         System.out.println("=== CHECKOUT DEBUG ===");
         System.out.println("Total Products (after discount): " + totalProducts);
@@ -149,23 +221,14 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
-        List<CartItem> cart;
-        Boolean isBuyNow = (Boolean) session.getAttribute("isBuyNow");
-
-        List<CartItem> buyNowCart = (List<CartItem>) session.getAttribute("buyNowCart");
-
-        if (isBuyNow != null && isBuyNow && buyNowCart != null && !buyNowCart.isEmpty()) {
-            cart = buyNowCart;
-        } else {
-            session.removeAttribute("isBuyNow");
-            session.removeAttribute("buyNowCart");
-            cart = (List<CartItem>) session.getAttribute("cart");
-        }
+        List<CartItem> cart = resolveCheckoutCart(req, session);
 
         if (cart == null || cart.isEmpty()) {
             resp.sendRedirect(req.getContextPath() + "/cart.jsp");
             return;
         }
+
+        syncCheckoutCartImages(cart);
 
         try {
             double totalProducts = 0;
@@ -226,12 +289,15 @@ public class CheckoutServlet extends HttpServlet {
                     e.printStackTrace();
                 }
 
+                Boolean isBuyNow = (Boolean) session.getAttribute("isBuyNow");
                 if (isBuyNow != null && isBuyNow) {
                     session.removeAttribute("buyNowCart");
                     session.removeAttribute("isBuyNow");
                 } else {
-                    session.removeAttribute("cart");
+                    removePurchasedItemsFromCart(session, cart);
                 }
+
+                session.removeAttribute("checkoutCart");
 
                 session.removeAttribute("size");
                 session.removeAttribute("totalMoney");

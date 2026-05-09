@@ -18,8 +18,17 @@
             <body>
                 <jsp:include page="header.jsp"></jsp:include>
 
-                <c:set var="checkoutCart"
-                    value="${sessionScope.isBuyNow ? sessionScope.buyNowCart : sessionScope.cart}" />
+                <c:choose>
+                    <c:when test="${not empty sessionScope.checkoutCart}">
+                        <c:set var="checkoutCart" value="${sessionScope.checkoutCart}" />
+                    </c:when>
+                    <c:when test="${sessionScope.isBuyNow and not empty sessionScope.buyNowCart}">
+                        <c:set var="checkoutCart" value="${sessionScope.buyNowCart}" />
+                    </c:when>
+                    <c:otherwise>
+                        <c:set var="checkoutCart" value="${sessionScope.cart}" />
+                    </c:otherwise>
+                </c:choose>
 
                 <div class="breadcrumb">
                     <div class="grid">
