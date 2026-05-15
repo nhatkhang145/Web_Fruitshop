@@ -1,0 +1,101 @@
+.inventory-toolbar {
+    margin-top: 24px;
+    margin-bottom: 24px;
+    padding: 16px;
+    border-radius: 14px;
+    background: var(--light);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.inventory-toolbar .field {
+    min-width: 180px;
+    flex: 1;
+}
+
+.inventory-toolbar input,
+.inventory-toolbar select {
+    width: 100%;
+    height: 40px;
+    border: 1px solid var(--grey);
+    border-radius: 8px;
+    background: var(--grey);
+    color: var(--dark);
+    font-size: 14px;
+    padding: 0 12px;
+    outline: none;
+}
+
+.inventory-toolbar .btn-submit {
+    height: 40px;
+    border-radius: 8px;
+    padding: 0 16px;
+}
+
+.content main .insights li:nth-child(1) .bx {
+    background: #e0f2fe;
+    color: #0ea5e9;
+}
+
+.content main .insights li:nth-child(2) .bx {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.content main .insights li:nth-child(3) .bx {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.content main .insights li:nth-child(4) .bx {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.status.draft {
+    background: #e5e7eb;
+    color: #4b5563;
+}
+
+.status.confirmed {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.status.cancelled {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.status.sales {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.status.internal {
+    background: #f3e8ff;
+    color: #7e22ce;
+}
+
+.status.transfer {
+    background: #fef9c3;
+    color: #a16207;
+}
+
+.meta-note {
+    color: var(--dark-grey);
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+    .inventory-toolbar {
+        padding: 12px;
+    }
+
+    .inventory-toolbar .field {
+        min-width: 100%;
+    }
+}
