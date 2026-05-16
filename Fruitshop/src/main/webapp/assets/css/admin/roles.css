@@ -1,0 +1,194 @@
+.roles-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+@media (max-width: 992px) {
+    .roles-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.role-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.role-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    background-color: var(--card-bg, #ffffff);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.role-card:hover {
+    border-color: var(--primary-color, #4f46e5);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.role-card.active {
+    border-color: var(--primary-color, #4f46e5);
+    background-color: rgba(79, 70, 229, 0.05);
+}
+
+.role-info h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text-color, #1f2937);
+}
+
+.role-info p {
+    margin: 0.25rem 0 0;
+    font-size: 0.875rem;
+    color: var(--text-muted, #6b7280);
+}
+
+.role-users {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--text-muted, #6b7280);
+    background-color: var(--bg-color, #f3f4f6);
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+}
+
+.highlight-role {
+    color: var(--primary-color, #4f46e5);
+}
+
+.matrix-wrap {
+    margin-top: 1rem;
+    overflow-x: auto;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+}
+
+.matrix-table {
+    width: 100%;
+    min-width: 600px;
+    border-collapse: collapse;
+}
+
+.matrix-table th, .matrix-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.matrix-table th {
+    background-color: var(--bg-color, #f9fafb);
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-color, #374151);
+    white-space: nowrap;
+}
+
+.matrix-table tbody tr:hover {
+    background-color: var(--bg-color, #f9fafb);
+}
+
+.matrix-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.action-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color, #e5e7eb);
+}
+
+.custom-checkbox {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding-left: 24px;
+    font-size: 0.875rem;
+    color: var(--text-color, #374151);
+}
+
+.custom-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    height: 18px;
+    width: 18px;
+    background-color: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.custom-checkbox:hover input ~ .checkmark {
+    border-color: var(--primary-color, #4f46e5);
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+    background-color: var(--primary-color, #4f46e5);
+    border-color: var(--primary-color, #4f46e5);
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.custom-checkbox input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.custom-checkbox .checkmark:after {
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.custom-checkbox input:disabled ~ .checkmark {
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
+    cursor: not-allowed;
+}
+
+.custom-checkbox input:disabled ~ .checkmark.disabled {
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.custom-checkbox input:disabled ~ .checkmark:after {
+    border-color: #9ca3af;
+}
+
+.custom-checkbox input:disabled {
+    cursor: not-allowed;
+}

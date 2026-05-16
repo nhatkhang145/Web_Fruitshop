@@ -60,6 +60,11 @@ public class AdminCategoryProductServlet extends HttpServlet {
             return;
         }
 
+        if (category.getParentId() == 0) {
+            resp.sendRedirect(req.getContextPath() + "/admin/categories?error=root_category_not_allowed");
+            return;
+        }
+
         List<Product> productsInCategory = productDAO.getProductsByCategoryId(categoryId);
         List<Product> unassignedProducts = productDAO.getProductsWithoutCategory();
 
@@ -79,6 +84,12 @@ public class AdminCategoryProductServlet extends HttpServlet {
             return;
         }
 
+        Category category = categoryDAO.getCategoryById(categoryId);
+        if (category == null || category.getParentId() == 0) {
+            resp.sendRedirect(req.getContextPath() + "/admin/categories?error=root_category_not_allowed");
+            return;
+        }
+
         productDAO.assignProductToCategory(productId, categoryId);
         resp.sendRedirect(req.getContextPath() + "/admin/category-products?categoryId=" + categoryId + "&success=assigned");
     }
@@ -89,6 +100,12 @@ public class AdminCategoryProductServlet extends HttpServlet {
 
         if (categoryId == null || productId == null) {
             resp.sendRedirect(req.getContextPath() + "/admin/categories?error=invalid-request");
+            return;
+        }
+
+        Category category = categoryDAO.getCategoryById(categoryId);
+        if (category == null || category.getParentId() == 0) {
+            resp.sendRedirect(req.getContextPath() + "/admin/categories?error=root_category_not_allowed");
             return;
         }
 

@@ -16,10 +16,6 @@
                     <a href="${pageContext.request.contextPath}/admin/products"><i class='bx bx-basket'></i>Quản lý sản
                         phẩm</a>
                 </li>
-                <li class="${param.activePage == 'weekend-deals' ? 'active' : ''}">
-                    <a href="${pageContext.request.contextPath}/admin/weekend-deals"><i
-                            class='bx bxs-discount'></i>Weekend Deals</a>
-                </li>
                 <li class="${param.activePage == 'categories' ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/categories"><i class='bx bx-category'></i>Quản lý
                         danh mục</a>
@@ -28,17 +24,25 @@
                     <a href="${pageContext.request.contextPath}/admin/orders"><i class='bx bx-receipt'></i>Quản lý đơn
                         hàng</a>
                 </li>
-                <li class="${param.activePage == 'stock-imports' ? 'active' : ''}">
-                    <a href="${pageContext.request.contextPath}/admin/stock-imports"><i class='bx bx-import'></i>Quản lý
-                        nhập kho</a>
+                <li class="${param.activePage == 'inventory' ? 'active' : ''}">
+                    <a href="${pageContext.request.contextPath}/admin/inventory-management"><i
+                            class='bx bx-archive-in'></i>Quản lý nhập kho</a>
                 </li>
                 <li class="${param.activePage == 'stock-export' ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/stock-export.jsp"><i class='bx bx-export'></i>Quản
                         lý xuất kho</a>
                 </li>
+                <li class="${param.activePage == 'weekend-deals' ? 'active' : ''}">
+                    <a href="${pageContext.request.contextPath}/admin/weekend-deals"><i
+                            class='bx bxs-discount'></i>Weekend Deals</a>
+                </li>
                 <li class="${param.activePage == 'users' ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/users"><i class='bx bx-group'></i>Quản lý khách
                         hàng</a>
+                </li>
+                <li class="${param.activePage == 'roles' ? 'active' : ''}">
+                    <a href="${pageContext.request.contextPath}/admin/roles.jsp"><i
+                            class='bx bx-shield-quarter'></i>Phân quyền</a>
                 </li>
                 <li class="${param.activePage == 'banners' ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/banners"><i class='bx bx-images'></i>Quản lý
