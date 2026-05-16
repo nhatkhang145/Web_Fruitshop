@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(name = "AddressServlet", urlPatterns = {"/addresses"})
+@WebServlet(name = "AddressServlet", urlPatterns = { "/addresses" })
 public class AddressServlet extends HttpServlet {
 
     private final AddressDAO addressDAO = new AddressDAO();
@@ -21,7 +21,8 @@ public class AddressServlet extends HttpServlet {
             throws ServletException, IOException {
 
         User user = getUserFromSession(request, response);
-        if (user == null) return;
+        if (user == null)
+            return;
 
         loadAddressesToRequest(request, user.getId());
         request.getRequestDispatcher("addresses.jsp").forward(request, response);
@@ -33,7 +34,8 @@ public class AddressServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         User user = getUserFromSession(request, response);
-        if (user == null) return;
+        if (user == null)
+            return;
 
         String action = request.getParameter("action");
 
@@ -41,7 +43,8 @@ public class AddressServlet extends HttpServlet {
             switch (action != null ? action : "") {
                 case "add":
                     handleAddAction(request, response, user);
-                    if (response.isCommitted()) return;
+                    if (response.isCommitted())
+                        return;
                     break;
                 case "update":
                     updateAddress(request, user);
@@ -82,7 +85,16 @@ public class AddressServlet extends HttpServlet {
         String city = request.getParameter("city");
         boolean isDefault = "on".equals(request.getParameter("isDefault"));
 
-        Address address = new Address(addressId, user.getId(), receiverName, phoneNumber, addressDetail, city, isDefault);
+        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+            throw new RuntimeException("Số điện thoại không được để trống!");
+        }
+
+        if (!validateVietnamesePhone(phoneNumber.trim())) {
+            throw new RuntimeException("Số điện thoại không hợp lệ. Yêu cầu: 10 chữ số. Ví dụ: 0912345678");
+        }
+
+        Address address = new Address(addressId, user.getId(), receiverName, phoneNumber, addressDetail, city,
+                isDefault);
         addressDAO.updateAddress(address);
     }
 
@@ -120,13 +132,25 @@ public class AddressServlet extends HttpServlet {
         request.setAttribute("addresses", addresses);
     }
 
-    private void handleAddAction(HttpServletRequest request, HttpServletResponse response, User user) throws IOException {
-        String receiverName  = request.getParameter("receiverName");
-        String phoneNumber   = request.getParameter("phoneNumber");
+    private void handleAddAction(HttpServletRequest request, HttpServletResponse response, User user)
+            throws IOException {
+        String receiverName = request.getParameter("receiverName");
+        String phoneNumber = request.getParameter("phoneNumber");
         String addressDetail = request.getParameter("address");
-        String city          = request.getParameter("city");
-        boolean isDefault    = "on".equals(request.getParameter("isDefault"))
+        String city = request.getParameter("city");
+        boolean isDefault = "on".equals(request.getParameter("isDefault"))
                 || "1".equals(request.getParameter("isDefault"));
+
+        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+            request.setAttribute("error", "Số điện thoại không được để trống!");
+            return;
+        }
+
+        if (!validateVietnamesePhone(phoneNumber.trim())) {
+            request.setAttribute("error",
+                    "Số điện thoại không hợp lệ. Yêu cầu: 10 chữ số, bắt đầu từ 03, 05, 07, 08 hoặc 09. Ví dụ: 0912345678");
+            return;
+        }
 
         Address address = new Address(0, user.getId(), receiverName, phoneNumber, addressDetail, city, isDefault);
         boolean success = addressDAO.addAddress(address);
@@ -141,5 +165,9 @@ public class AddressServlet extends HttpServlet {
             request.getSession().removeAttribute("returnToCheckout");
             response.sendRedirect("checkout");
         }
+    }
+
+    private boolean validateVietnamesePhone(String phone) {
+        return phone != null && phone.matches("0[3578][0-9]{8}");
     }
 }

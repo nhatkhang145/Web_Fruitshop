@@ -139,8 +139,13 @@
                                                 <label for="phone">Số điện thoại</label>
                                                 <input type="text" id="phone" name="phone" class="form-input"
                                                     value="<c:out value='${sessionScope.account.phone}'/>"
-                                                    maxlength="11" inputmode="numeric" pattern="[0-9]*"
-                                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);" />
+                                                    maxlength="10" inputmode="numeric" pattern="0[3578][0-9]{8}"
+                                                    placeholder="0912345678"
+                                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" />
+                                                <small
+                                                    style="color: #fd7e14; font-style: italic; display: block; margin-top: 5px;">
+                                                    Số điện thoại gồm 10 chữ số. Ví dụ: 0912345678
+                                                </small>
                                             </div>
 
 
@@ -278,6 +283,23 @@
                 </div>
 
                 <script>
+                    function validateVietnamesePhone(phone) {
+                        const phoneRegex = /^0[3578][0-9]{8}$/;
+                        return phoneRegex.test(phone);
+                    }
+
+                    document.querySelector('.profile-form').addEventListener('submit', function (e) {
+                        const phoneInput = document.getElementById('phone');
+                        const phoneValue = phoneInput.value.trim();
+
+                        if (phoneValue && !validateVietnamesePhone(phoneValue)) {
+                            e.preventDefault();
+                            alert('Số điện thoại không hợp lệ.\n\nYêu cầu: 10 chữ số, bắt đầu từ 03, 05, 07, 08 hoặc 09.\nVí dụ: 0912345678');
+                            phoneInput.focus();
+                            return false;
+                        }
+                    });
+
                     // Preview ảnh khi chọn file
                     document.getElementById('avatarFile').addEventListener('change', function (e) {
                         const file = e.target.files[0];

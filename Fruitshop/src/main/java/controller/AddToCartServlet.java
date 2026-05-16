@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(name = "AddToCartServlet", urlPatterns = {"/add-to-cart"})
+@WebServlet(name = "AddToCartServlet", urlPatterns = { "/add-to-cart" })
 public class AddToCartServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -31,7 +31,8 @@ public class AddToCartServlet extends HttpServlet {
         try {
             if (quantityRaw != null && !quantityRaw.isEmpty()) {
                 quantity = Integer.parseInt(quantityRaw);
-                if(quantity < 1) quantity = 1;
+                if (quantity < 1)
+                    quantity = 1;
             }
 
             int pid = Integer.parseInt(pidRaw);
@@ -52,8 +53,7 @@ public class AddToCartServlet extends HttpServlet {
                     dealId = weekendDeal.getId();
                     finalPrice = java.math.BigDecimal.valueOf(weekendDeal.getDiscountedPrice());
                     discountAmount = originalPrice.subtract(finalPrice);
-                }
-                else if (product.getSalePrice() > 0) {
+                } else if (product.getSalePrice() > 0) {
                     dealType = "sale";
                     finalPrice = java.math.BigDecimal.valueOf(product.getSalePrice());
                     discountAmount = originalPrice.subtract(finalPrice);
@@ -137,11 +137,13 @@ public class AddToCartServlet extends HttpServlet {
         if ("XMLHttpRequest".equals(ajaxHeader)) {
             HttpSession session = request.getSession();
             Integer cartSize = (Integer) session.getAttribute("size");
-            if (cartSize == null) cartSize = 0;
+            if (cartSize == null)
+                cartSize = 0;
 
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("{\"success\": true, \"message\": \"Đã thêm vào giỏ hàng\", \"size\": " + cartSize + "}");
+            response.getWriter()
+                    .write("{\"success\": true, \"message\": \"Đã thêm vào giỏ hàng\", \"size\": " + cartSize + "}");
             return;
         }
 
