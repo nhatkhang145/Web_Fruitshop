@@ -15,7 +15,7 @@ public class PasswordUtils {
      * - Có ít nhất 1 ký tự đặc biệt
      */
     public static boolean isValidPassword(String password) {
-        if (password == null || password.length() < 8) {
+        if (password == null || password.length() < 8 || password.length() > 16) {
             return false;
         }
 
@@ -50,7 +50,7 @@ public class PasswordUtils {
             return "Mật khẩu không được để trống!";
         }
 
-        if (password.length() < 8) {
+        if (password.length() < 8 || password.length() > 16) {
             return "Mật khẩu phải có ít nhất 8 ký tự!";
         }
 
