@@ -19,6 +19,16 @@ import java.util.List;
 @WebServlet(name = "AddToCartServlet", urlPatterns = { "/add-to-cart" })
 public class AddToCartServlet extends HttpServlet {
 
+    private int limitQuantityStock(int requestedQuantity, int stockQuantity) {
+        if (stockQuantity <= 0) {
+            return 0;
+        }
+        if (requestedQuantity < 1) {
+            return 1;
+        }
+        return Math.min(requestedQuantity, stockQuantity);
+    }
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -42,6 +52,15 @@ public class AddToCartServlet extends HttpServlet {
             Product product = pDao.getProductByID(pid);
 
             if (product != null) {
+                int stockQuantity = product.getQuantity();
+                quantity = limitQuantityStock(quantity, stockQuantity);
+                if (quantity <= 0) {
+                    HttpSession session = request.getSession();
+                    session.setAttribute("cartError", "Sản phẩm hiện đã hết hàng.");
+                    response.sendRedirect("cart.jsp");
+                    return;
+                }
+
                 BigDecimal originalPrice = BigDecimal.valueOf(product.getPrice());
                 BigDecimal finalPrice = originalPrice;
                 BigDecimal discountAmount = BigDecimal.ZERO;
@@ -88,13 +107,14 @@ public class AddToCartServlet extends HttpServlet {
 
                 List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
                 if (cart == null) {
-                    cart = new ArrayList<>(); // Nếu chưa có thì tạo mới
+                    cart = new ArrayList<>();
                 }
 
                 boolean found = false;
                 for (CartItem item : cart) {
                     if (item.getProduct().getId() == pid) {
-                        item.setQuantity(item.getQuantity() + quantity);
+                        int updatedQuantity = limitQuantityStock(item.getQuantity() + quantity, stockQuantity);
+                        item.setQuantity(updatedQuantity);
                         found = true;
                         break;
                     }
@@ -114,6 +134,7 @@ public class AddToCartServlet extends HttpServlet {
                 BigDecimal totalMoney = BigDecimal.ZERO;
                 int totalQuantity = 0;
                 for (CartItem item : cart) {
+                    item.setQuantity(limitQuantityStock(item.getQuantity(), item.getProduct().getQuantity()));
                     totalMoney = totalMoney.add(item.getTotalPrice());
                     totalQuantity += item.getQuantity();
                 }

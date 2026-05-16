@@ -165,8 +165,8 @@
                                                 <div class="qty-wrapper">
                                                     <button type="button" class="qty-btn"
                                                         onclick="decreaseQty()">-</button>
-                                                    <input type="number" name="quantity" value="1" min="1" id="qtyInput"
-                                                        class="qty-input">
+                                                    <input type="number" name="quantity" value="1" min="1"
+                                                        max="${detail.quantity}" id="qtyInput" class="qty-input">
                                                     <button type="button" class="qty-btn"
                                                         onclick="increaseQty()">+</button>
                                                 </div>
@@ -401,13 +401,28 @@
                     }
 
                     const qtyInput = document.getElementById('qtyInput');
+                    const maxQty = parseInt(qtyInput ? qtyInput.max : '1', 10) || 1;
+
+                    function syncQtyState() {
+                        if (!qtyInput) return;
+                        const currentValue = Math.max(1, Math.min(parseInt(qtyInput.value, 10) || 1, maxQty));
+                        qtyInput.value = currentValue;
+                    }
+
                     function increaseQty() {
-                        qtyInput.value = parseInt(qtyInput.value) + 1;
+                        if (!qtyInput) return;
+                        const currentValue = parseInt(qtyInput.value, 10) || 1;
+                        if (currentValue < maxQty) {
+                            qtyInput.value = currentValue + 1;
+                        }
+                        syncQtyState();
                     }
                     function decreaseQty() {
+                        if (!qtyInput) return;
                         if (parseInt(qtyInput.value) > 1) {
                             qtyInput.value = parseInt(qtyInput.value) - 1;
                         }
+                        syncQtyState();
                     }
 
                     function openTab(evt, tabName) {
@@ -429,6 +444,11 @@
                     }
 
                     document.addEventListener("DOMContentLoaded", function () {
+                        syncQtyState();
+                        if (qtyInput) {
+                            qtyInput.addEventListener('input', syncQtyState);
+                        }
+
                         document.querySelectorAll(".tab-content").forEach(tab => {
                             tab.style.display = "none";
                         });
