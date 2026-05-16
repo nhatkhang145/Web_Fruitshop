@@ -87,24 +87,37 @@ public class AdminInventoryServlet extends HttpServlet {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            int supplierId = Integer.parseInt(request.getParameter("supplier_id") != null ? 
-                    request.getParameter("supplier_id") : "0");
+            String supplierIdParam = request.getParameter("supplier_id");
+            int supplierId = 0;
+            if (supplierIdParam != null && !supplierIdParam.isEmpty()) {
+                supplierId = Integer.parseInt(supplierIdParam);
+            }
+            String supplierName = request.getParameter("supplier_name");
             String receiptDate = request.getParameter("receipt_date");
             String note = request.getParameter("note");
             String itemsJson = request.getParameter("items");
 
-            if (supplierId <= 0) {
-                result.put("success", false);
-                result.put("message", "Nhà cung cấp không hợp lệ");
-                response.getWriter().write(gson.toJson(result));
-                return;
-            }
+            if (supplierId > 0) {
+                if (!inventoryDAO.supplierExists(supplierId)) {
+                    result.put("success", false);
+                    result.put("message", "Nhà cung cấp không tồn tại");
+                    response.getWriter().write(gson.toJson(result));
+                    return;
+                }
+            } else {
+                if (supplierName == null || supplierName.trim().isEmpty()) {
+                    result.put("success", false);
+                    result.put("message", "Nhà cung cấp không hợp lệ");
+                    response.getWriter().write(gson.toJson(result));
+                    return;
+                }
 
-            if (!inventoryDAO.supplierExists(supplierId)) {
-                result.put("success", false);
-                result.put("message", "Nhà cung cấp không tồn tại");
-                response.getWriter().write(gson.toJson(result));
-                return;
+                Optional<Integer> existingSupplierId = inventoryDAO.getSupplierIdByName(supplierName.trim());
+                if (existingSupplierId.isPresent()) {
+                    supplierId = existingSupplierId.get();
+                } else {
+                    supplierId = inventoryDAO.insertSupplier(supplierName.trim());
+                }
             }
 
             if (receiptDate == null || receiptDate.isEmpty()) {

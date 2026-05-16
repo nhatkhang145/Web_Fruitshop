@@ -247,9 +247,25 @@
                         <label for="inputCreator">Người lập phiếu <span class="required">*</span></label>
                         <input type="text" id="inputCreator" name="creator_name" value="${sessionScope.account.fullName}" data-default="${sessionScope.account.fullName}" placeholder="Tên người lập" required />
                     </div>
-                    <div class="form-group">
-                        <label for="inputSupplierId">Nhà cung cấp <span class="required">*</span></label>
-                        <input type="text" id="inputSupplierId" name="supplier_id" placeholder="Nhập mã nhà cung cấp" required />
+                    <div class="form-group form-group-full">
+                        <label for="inputSupplierSelect">Nhà cung cấp <span class="required">*</span></label>
+                        <div class="supplier-picker">
+                            <div class="supplier-picker__col">
+                                <span class="supplier-picker__label">Chọn từ danh sách</span>
+                                <select id="inputSupplierSelect" name="supplier_select">
+                                    <option value="">-- Chọn nhà cung cấp --</option>
+                                    <c:forEach var="s" items="${suppliers}">
+                                        <option value="${s.id}">${s.name}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                            <div class="supplier-picker__col">
+                                <span class="supplier-picker__label">Hoặc nhập mới</span>
+                                <input type="text" id="inputSupplierName" name="supplier_name" placeholder="Nhập nhà cung cấp mới" />
+                            </div>
+                        </div>
+                        <input type="hidden" id="inputSupplierId" name="supplier_id" />
+                        <small class="field-hint">Chọn nhà cung cấp có sẵn hoặc nhập tên mới để thêm ngay trong phiếu.</small>
                     </div>
                     <div class="form-group form-group-full">
                         <label for="inputNote">Ghi chú <span class="required">*</span></label>
@@ -277,7 +293,12 @@
                     </div>
                     <div id="lineItemsContainer">
                         <div class="line-item js-line-item">
-                            <input type="text" class="line-product-input" name="product_id" placeholder="Nhập mã sản phẩm" inputmode="numeric" required />
+                            <select class="line-product-select" name="product_id" required>
+                                <option value="">-- Chọn mã sản phẩm --</option>
+                                <c:forEach var="p" items="${products}">
+                                    <option value="${p.id}">${p.id} - ${p.name}</option>
+                                </c:forEach>
+                            </select>
                             <input type="number" class="line-qty" name="quantity" placeholder="0" min="1" required />
                             <input type="number" class="line-price" name="price" placeholder="0" min="1" required />
                             <input type="text" class="line-total" placeholder="Tự tính" disabled />
