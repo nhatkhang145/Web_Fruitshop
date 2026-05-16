@@ -139,8 +139,13 @@
                                                 <label for="phone">Số điện thoại</label>
                                                 <input type="text" id="phone" name="phone" class="form-input"
                                                     value="<c:out value='${sessionScope.account.phone}'/>"
-                                                    maxlength="11" inputmode="numeric" pattern="[0-9]*"
-                                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);" />
+                                                    maxlength="10" inputmode="numeric" pattern="0[3578][0-9]{8}"
+                                                    placeholder="0912345678"
+                                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" />
+                                                <small
+                                                    style="color: #fd7e14; font-style: italic; display: block; margin-top: 5px;">
+                                                    Số điện thoại gồm 10 chữ số. Ví dụ: 0912345678
+                                                </small>
                                             </div>
 
 
@@ -278,7 +283,23 @@
                 </div>
 
                 <script>
-                    // Preview ảnh khi chọn file
+                    function validateVietnamesePhone(phone) {
+                        const phoneRegex = /^0[3578][0-9]{8}$/;
+                        return phoneRegex.test(phone);
+                    }
+
+                    document.querySelector('.profile-form').addEventListener('submit', function (e) {
+                        const phoneInput = document.getElementById('phone');
+                        const phoneValue = phoneInput.value.trim();
+
+                        if (phoneValue && !validateVietnamesePhone(phoneValue)) {
+                            e.preventDefault();
+                            alert('Số điện thoại không hợp lệ.\n\nYêu cầu: 10 chữ số, bắt đầu từ 03, 05, 07, 08 hoặc 09.\nVí dụ: 0912345678');
+                            phoneInput.focus();
+                            return false;
+                        }
+                    });
+
                     document.getElementById('avatarFile').addEventListener('change', function (e) {
                         const file = e.target.files[0];
                         if (file) {
@@ -291,13 +312,9 @@
                         }
                     });
 
-                    // Custom Dropdown cho Ngày sinh - Style Shopee
                     document.addEventListener('DOMContentLoaded', function () {
-                        // Dropdown Ngày
                         setupDropdown('dayTrigger', 'dayMenu', 'birthDayInput', 'dayLabel', false);
-                        // Dropdown Tháng
                         setupDropdown('monthTrigger', 'monthMenu', 'birthMonthInput', 'monthLabel', true);
-                        // Dropdown Năm
                         setupDropdown('yearTrigger', 'yearMenu', 'birthYearInput', 'yearLabel', false);
 
                         function setupDropdown(triggerId, menuId, inputId, labelId, isMonth) {
@@ -308,28 +325,21 @@
 
                             if (!trigger || !menu) return;
 
-                            // Toggle dropdown
                             trigger.addEventListener('click', function (e) {
                                 e.stopPropagation();
-                                // Đóng tất cả dropdown khác
                                 document.querySelectorAll('.dropdown-menu').forEach(m => {
                                     if (m !== menu) m.classList.remove('show');
                                 });
                                 document.querySelectorAll('.dropdown-trigger').forEach(t => {
                                     if (t !== trigger) t.classList.remove('active');
                                 });
-                                // Toggle current
                                 menu.classList.toggle('show');
                                 trigger.classList.toggle('active');
 
-                                // Scroll tới item đang selected
                                 const selected = menu.querySelector('.selected');
-                                if (selected) {
-                                    selected.scrollIntoView({ block: 'center' });
-                                }
+                                if (selected) selected.scrollIntoView({ block: 'center' });
                             });
 
-                            // Chọn item
                             menu.querySelectorAll('.dropdown-item').forEach(item => {
                                 item.addEventListener('click', function () {
                                     const value = this.dataset.value;
@@ -341,22 +351,67 @@
                                         label.textContent = value;
                                     }
 
-                                    // Update selected state
                                     menu.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('selected'));
                                     this.classList.add('selected');
 
-                                    // Đóng dropdown
                                     menu.classList.remove('show');
                                     trigger.classList.remove('active');
+
+                                    try { input.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) { }
                                 });
                             });
                         }
 
-                        // Đóng dropdown khi click ra ngoài
                         document.addEventListener('click', function () {
                             document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
                             document.querySelectorAll('.dropdown-trigger').forEach(t => t.classList.remove('active'));
                         });
+
+                        const dayMenu = document.getElementById('dayMenu');
+                        const monthInput = document.getElementById('birthMonthInput');
+                        const yearInput = document.getElementById('birthYearInput');
+                        const dayInput = document.getElementById('birthDayInput');
+                        const dayTrigger = document.getElementById('dayTrigger');
+                        const dayLabel = document.getElementById('dayLabel');
+
+                        function daysInMonth(month, year) {
+                            const m = parseInt(month, 10);
+                            const y = parseInt(year, 10) || new Date().getFullYear();
+                            if (isNaN(m) || m < 1 || m > 12) return 31;
+                            return new Date(y, m, 0).getDate();
+                        }
+
+                        function DayMenu() {
+                            if (!dayMenu) return;
+                            const month = monthInput ? monthInput.value : '';
+                            const year = yearInput ? yearInput.value : '';
+                            const maxDay = daysInMonth(month, year);
+                            const prevSelected = parseInt(dayInput ? dayInput.value : '', 10) || null;
+
+                            let html = '';
+                            for (let d = 1; d <= maxDay; d++) {
+                                const selectedClass = (prevSelected === d) ? ' selected' : '';
+                                html += '<div class="dropdown-item' + selectedClass + '" data-value="' + d + '">' + d + '</div>';
+                            }
+                            dayMenu.innerHTML = html;
+
+                            dayMenu.querySelectorAll('.dropdown-item').forEach(item => {
+                                item.addEventListener('click', function () {
+                                    const value = this.dataset.value;
+                                    if (dayInput) dayInput.value = value;
+                                    if (dayLabel) dayLabel.textContent = value;
+                                    dayMenu.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('selected'));
+                                    this.classList.add('selected');
+                                    dayMenu.classList.remove('show');
+                                    if (dayTrigger) dayTrigger.classList.remove('active');
+                                });
+                            });
+                        }
+
+                        if (monthInput) monthInput.addEventListener('input', DayMenu);
+                        if (yearInput) yearInput.addEventListener('input', DayMenu);
+
+                        DayMenu();
                     });
                 </script>
             </body>

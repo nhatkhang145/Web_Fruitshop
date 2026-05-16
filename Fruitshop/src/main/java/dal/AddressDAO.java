@@ -5,6 +5,7 @@ import org.jdbi.v3.core.mapper.RowMapper;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Collections;
 
 public class AddressDAO {
     private final RowMapper<Address> addressMapper = (rs, ctx) -> {
@@ -18,21 +19,20 @@ public class AddressDAO {
         addr.setDefault(rs.getInt("is_default") == 1);
         return addr;
     };
+
     // 1. Lấy danh sách địa chỉ theo userId
     public List<Address> getAddressesByUserId(int userId) {
         try {
             String query = "SELECT id, user_id, receiver_name, phone_number, address, city, is_default " +
                     "FROM user_addresses WHERE user_id = ? ORDER BY is_default DESC, id DESC";
 
-            return DBContext.get().withHandle(handle ->
-                    handle.createQuery(query)
-                            .bind(0, userId)
-                            .map(addressMapper)
-                            .list()
-            );
+            return DBContext.get().withHandle(handle -> handle.createQuery(query)
+                    .bind(0, userId)
+                    .map(addressMapper)
+                    .list());
         } catch (Exception e) {
             System.err.println("Error getting addresses by user ID: " + e.getMessage());
-            return List.of();
+            return Collections.emptyList();
         }
     }
 
@@ -42,12 +42,10 @@ public class AddressDAO {
             String query = "SELECT id, user_id, receiver_name, phone_number, address, city, is_default " +
                     "FROM user_addresses WHERE id = ?";
 
-            return DBContext.get().withHandle(handle ->
-                    handle.createQuery(query)
-                            .bind(0, addressId)
-                            .map(addressMapper)
-                            .findFirst()
-            );
+            return DBContext.get().withHandle(handle -> handle.createQuery(query)
+                    .bind(0, addressId)
+                    .map(addressMapper)
+                    .findFirst());
         } catch (Exception e) {
             System.err.println("Error getting address by ID: " + e.getMessage());
             return Optional.empty();
@@ -64,7 +62,8 @@ public class AddressDAO {
                             .execute();
                 }
 
-                String query = "INSERT INTO user_addresses (user_id, receiver_name, phone_number, address, city, is_default) " +
+                String query = "INSERT INTO user_addresses (user_id, receiver_name, phone_number, address, city, is_default) "
+                        +
                         "VALUES (?, ?, ?, ?, ?, ?)";
                 handle.createUpdate(query)
                         .bind(0, address.getUserId())
@@ -93,7 +92,8 @@ public class AddressDAO {
                             .execute();
                 }
 
-                String query = "UPDATE user_addresses SET receiver_name = ?, phone_number = ?, address = ?, city = ?, is_default = ? " +
+                String query = "UPDATE user_addresses SET receiver_name = ?, phone_number = ?, address = ?, city = ?, is_default = ? "
+                        +
                         "WHERE id = ?";
                 handle.createUpdate(query)
                         .bind(0, address.getReceiverName())
@@ -116,11 +116,9 @@ public class AddressDAO {
         try {
             String query = "DELETE FROM user_addresses WHERE id = ?";
 
-            int rows = DBContext.get().withHandle(handle ->
-                    handle.createUpdate(query)
-                            .bind(0, addressId)
-                            .execute()
-            );
+            int rows = DBContext.get().withHandle(handle -> handle.createUpdate(query)
+                    .bind(0, addressId)
+                    .execute());
             return rows > 0;
         } catch (Exception e) {
             System.err.println("Error deleting address: " + e.getMessage());
@@ -153,12 +151,10 @@ public class AddressDAO {
             String query = "SELECT id, user_id, receiver_name, phone_number, address, city, is_default " +
                     "FROM user_addresses WHERE user_id = ? AND is_default = 1 LIMIT 1";
 
-            return DBContext.get().withHandle(handle ->
-                    handle.createQuery(query)
-                            .bind(0, userId)
-                            .map(addressMapper)
-                            .findFirst()
-            );
+            return DBContext.get().withHandle(handle -> handle.createQuery(query)
+                    .bind(0, userId)
+                    .map(addressMapper)
+                    .findFirst());
         } catch (Exception e) {
             System.err.println("Error getting default address: " + e.getMessage());
             return Optional.empty();
@@ -170,12 +166,10 @@ public class AddressDAO {
         try {
             String query = "SELECT COUNT(*) FROM user_addresses WHERE user_id = ?";
 
-            return DBContext.get().withHandle(handle ->
-                    handle.createQuery(query)
-                            .bind(0, userId)
-                            .mapTo(Integer.class)
-                            .one()
-            );
+            return DBContext.get().withHandle(handle -> handle.createQuery(query)
+                    .bind(0, userId)
+                    .mapTo(Integer.class)
+                    .one());
         } catch (Exception e) {
             System.err.println("Error counting addresses: " + e.getMessage());
             return 0;
