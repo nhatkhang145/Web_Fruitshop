@@ -22,67 +22,153 @@
 <div class="content">
     <jsp:include page="/admin/layout/header.jsp" />
 
-    <main>
-        <div class="page-hero">
+    <main class="roles-page">
+        <section class="page-hero roles-hero">
             <div class="hero-copy">
-                <div class="eyebrow">Role management</div>
-                <h1>Quản lý phân quyền</h1>
-                <p>Thiết lập và quản lý quyền hạn truy cập của các nhóm tài khoản trong hệ thống.</p>
+                <div class="eyebrow">Access control</div>
+                <h1>Phân quyền hệ thống</h1>
+                <p>Thiết kế vai trò, quản lý quyền truy cập và theo dõi thay đổi trong từng nhóm tài khoản.</p>
+                <div class="hero-meta">
+                    <div class="hero-chip"><i class='bx bx-shield-quarter'></i> 3 vai trò</div>
+                    <div class="hero-chip"><i class='bx bx-grid-alt'></i> 18 module</div>
+                    <div class="hero-chip"><i class='bx bx-history'></i> Cập nhật 2 giờ trước</div>
+                </div>
             </div>
             <div class="hero-actions">
                 <button type="button" class="btn btn-primary" id="openCreateRoleBtn">
                     <i class='bx bx-plus-circle'></i>
                     <span>Thêm vai trò mới</span>
                 </button>
+                <button type="button" class="btn btn-ghost">
+                    <i class='bx bx-download'></i>
+                    <span>Xuất báo cáo</span>
+                </button>
             </div>
-        </div>
+        </section>
 
-        <div class="roles-layout">
-            <section class="panel role-list-panel">
-                <div class="panel-header">
+        <section class="roles-overview">
+            <article class="role-metric accent-teal">
+                <div class="metric-icon"><i class='bx bx-user-check'></i></div>
+                <div>
+                    <span class="metric-label">Tổng vai trò</span>
+                    <strong class="metric-value">3</strong>
+                    <span class="metric-trend">+1 vai trò mới trong tháng</span>
+                </div>
+            </article>
+            <article class="role-metric accent-amber">
+                <div class="metric-icon"><i class='bx bx-lock-open'></i></div>
+                <div>
+                    <span class="metric-label">Quyền đang mở</span>
+                    <strong class="metric-value">42</strong>
+                    <span class="metric-trend">12 quyền cần rà soát</span>
+                </div>
+            </article>
+            <article class="role-metric accent-slate">
+                <div class="metric-icon"><i class='bx bx-user'></i></div>
+                <div>
+                    <span class="metric-label">Tài khoản áp dụng</span>
+                    <strong class="metric-value">15</strong>
+                    <span class="metric-trend">Đang hoạt động</span>
+                </div>
+            </article>
+        </section>
+
+        <div class="roles-shell">
+            <aside class="panel role-list-panel">
+                <div class="panel-header role-list-header">
                     <div>
-                        <h2>Nhóm quyền (Roles)</h2>
+                        <h2>Danh sách vai trò</h2>
+                        <p>Chọn vai trò để điều chỉnh quyền truy cập.</p>
                     </div>
+                    <button type="button" class="btn btn-ghost btn-sm">
+                        <i class='bx bx-filter-alt'></i>
+                        <span>Lọc</span>
+                    </button>
+                </div>
+                <div class="role-search">
+                    <i class='bx bx-search'></i>
+                    <input type="text" placeholder="Tìm vai trò hoặc mô tả..." />
                 </div>
                 <div class="role-list">
                     <div class="role-card active">
                         <div class="role-info">
                             <h3>Admin</h3>
-                            <p>Toàn quyền hệ thống</p>
+                            <p>Toàn quyền hệ thống, quản trị cấu hình.</p>
+                            <div class="role-meta">
+                                <span class="role-chip">System</span>
+                                <span class="role-chip muted">Cố định</span>
+                            </div>
                         </div>
-                        <div class="role-users">
-                            <i class='bx bx-user'></i> 2
+                        <div class="role-stats">
+                            <div class="role-users">
+                                <i class='bx bx-user'></i> 2
+                            </div>
+                            <span class="role-badge">Full access</span>
                         </div>
                     </div>
                     <div class="role-card">
                         <div class="role-info">
                             <h3>Nhân viên kho</h3>
-                            <p>Quản lý nhập xuất, tồn kho</p>
+                            <p>Quản lý nhập xuất, tồn kho và kiểm kê.</p>
+                            <div class="role-meta">
+                                <span class="role-chip">Warehouse</span>
+                                <span class="role-chip muted">Chuẩn</span>
+                            </div>
                         </div>
-                        <div class="role-users">
-                            <i class='bx bx-user'></i> 5
+                        <div class="role-stats">
+                            <div class="role-users">
+                                <i class='bx bx-user'></i> 5
+                            </div>
+                            <span class="role-badge ghost">18 quyền</span>
                         </div>
                     </div>
                     <div class="role-card">
                         <div class="role-info">
                             <h3>Chăm sóc khách hàng</h3>
-                            <p>Quản lý đơn hàng, khách hàng</p>
+                            <p>Quản lý đơn hàng, khách hàng và phản hồi.</p>
+                            <div class="role-meta">
+                                <span class="role-chip">Support</span>
+                            </div>
                         </div>
-                        <div class="role-users">
-                            <i class='bx bx-user'></i> 8
+                        <div class="role-stats">
+                            <div class="role-users">
+                                <i class='bx bx-user'></i> 8
+                            </div>
+                            <span class="role-badge ghost">12 quyền</span>
                         </div>
                     </div>
                 </div>
-            </section>
+            </aside>
 
             <section class="panel role-matrix-panel">
-                <div class="panel-header">
+                <div class="panel-header role-detail-header">
                     <div>
-                        <h2>Chi tiết phân quyền: <span class="highlight-role">Admin</span></h2>
-                        <p>Thiết lập quyền truy cập cho từng chức năng trong hệ thống.</p>
+                        <div class="role-title">
+                            <h2>Phân quyền: <span class="highlight-role">Admin</span></h2>
+                            <span class="role-badge solid">System</span>
+                        </div>
+                        <p>Thiết lập quyền truy cập cho từng module. Thay đổi sẽ áp dụng ngay sau khi lưu.</p>
+                    </div>
+                    <div class="role-actions">
+                        <button type="button" class="btn btn-ghost">Chỉ xem</button>
+                        <button type="button" class="btn btn-ghost">Toàn quyền</button>
+                        <button type="button" class="btn btn-primary">Lưu nhanh</button>
                     </div>
                 </div>
-                
+
+                <div class="matrix-toolbar">
+                    <div class="matrix-pills">
+                        <button type="button" class="pill active">Mặc định</button>
+                        <button type="button" class="pill">Kho</button>
+                        <button type="button" class="pill">Bán hàng</button>
+                        <button type="button" class="pill">Hệ thống</button>
+                    </div>
+                    <div class="matrix-summary">
+                        <span><strong>23</strong> quyền được bật</span>
+                        <span>Cập nhật gần nhất: 09:32</span>
+                    </div>
+                </div>
+
                 <div class="matrix-wrap">
                     <table class="matrix-table">
                         <thead>
@@ -300,10 +386,17 @@
                 </div>
 
                 <div class="action-bar">
-                    <button type="button" class="btn btn-primary" id="savePermissionsBtn">
-                        <i class='bx bx-save'></i>
-                        <span>Lưu thay đổi phân quyền</span>
-                    </button>
+                    <div class="action-note">
+                        <i class='bx bx-info-circle'></i>
+                        Các thay đổi sẽ ảnh hưởng đến 15 tài khoản đang hoạt động.
+                    </div>
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-ghost">Hoàn tác</button>
+                        <button type="button" class="btn btn-primary" id="savePermissionsBtn">
+                            <i class='bx bx-save'></i>
+                            <span>Lưu thay đổi phân quyền</span>
+                        </button>
+                    </div>
                 </div>
             </section>
         </div>
