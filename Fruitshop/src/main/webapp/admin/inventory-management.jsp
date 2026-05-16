@@ -201,8 +201,10 @@
 
             <div class="detail-lines">
                 <div class="detail-lines__header">
-                    <h3>Danh sách mặt hàng</h3>
-                    <span>Tham khảo để kiểm tra số lượng và loại hàng</span>
+                    <div class="detail-lines__heading">
+                        <h3>Danh sách mặt hàng</h3>
+                        <span>Tham khảo để kiểm tra số lượng và loại hàng</span>
+                    </div>
                 </div>
                 <ul id="detailLines"></ul>
             </div>
@@ -217,8 +219,8 @@
     </div>
 </div>
 
-<div class="modal" id="createReceiptModal" aria-hidden="true">
-    <div class="modal-content modal-xl">
+<div class="modal modal-fullscreen" id="createReceiptModal" aria-hidden="true">
+    <div class="modal-content modal-xl modal-full">
         <div class="modal-header">
             <div>
                 <p class="modal-kicker">Tạo phiếu nhập kho</p>
@@ -229,33 +231,45 @@
         <div class="modal-body">
             <div id="createReceiptMsg" class="form-msg is-hidden"></div>
             <form class="receipt-form" id="createReceiptForm">
-                <div class="form-grid">
+                <div class="form-grid form-grid--wide">
+                    <div class="form-group">
+                        <label for="inputReceiptCode">Mã phiếu nhập <span class="required">*</span></label>
+                        <input type="text" id="inputReceiptCode" name="receipt_code" placeholder="RCP-YYYYMMDD-0001" required />
+                    </div>
                     <div class="form-group">
                         <label for="inputReceiptDate">Ngày nhập <span class="required">*</span></label>
-                        <input type="date" id="inputReceiptDate" name="receipt_date" required />
+                        <div class="input-icon">
+                            <i class='bx bx-calendar'></i>
+                            <input type="date" id="inputReceiptDate" name="receipt_date" class="input-date" required />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputCreator">Người lập phiếu <span class="required">*</span></label>
+                        <input type="text" id="inputCreator" name="creator_name" value="${sessionScope.account.fullName}" data-default="${sessionScope.account.fullName}" placeholder="Tên người lập" required />
                     </div>
                     <div class="form-group">
                         <label for="inputSupplierId">Nhà cung cấp <span class="required">*</span></label>
-                        <select id="inputSupplierId" name="supplier_id" required>
-                            <option value="">-- Chọn nhà cung cấp --</option>
-                            <c:forEach var="s" items="${suppliers}">
-                                <option value="${s.id}">${s.name}</option>
-                            </c:forEach>
-                        </select>
+                        <input type="text" id="inputSupplierId" name="supplier_id" placeholder="Nhập mã nhà cung cấp" required />
                     </div>
                     <div class="form-group form-group-full">
-                        <label for="inputNote">Ghi chú</label>
-                        <textarea id="inputNote" name="note" rows="2" placeholder="Thông tin giao nhận, điều kiện, ghi chú kiểm hàng..."></textarea>
+                        <label for="inputNote">Ghi chú <span class="required">*</span></label>
+                        <textarea id="inputNote" name="note" rows="2" placeholder="Thông tin giao nhận, điều kiện, ghi chú kiểm hàng..." required></textarea>
                     </div>
                 </div>
 
                 <div class="line-items-card">
-                    <div class="detail-lines__header">
-                        <h3>Danh sách hàng nhập</h3>
-                        <span>Thêm từng dòng sản phẩm</span>
+                    <div class="detail-lines__header detail-lines__header--split">
+                        <div class="detail-lines__heading">
+                            <h3>Danh sách hàng nhập</h3>
+                            <span>Thêm từng dòng sản phẩm</span>
+                        </div>
+                        <button type="button" class="btn btn-dashed btn-dashed--compact" id="addLineItemBtn">
+                            <i class='bx bx-plus'></i>
+                            <span>Thêm dòng hàng</span>
+                        </button>
                     </div>
                     <div class="line-item row-head">
-                        <span>Sản phẩm</span>
+                        <span>Mã sản phẩm</span>
                         <span>Số lượng</span>
                         <span>Đơn giá (VND)</span>
                         <span>Thành tiền</span>
@@ -263,22 +277,13 @@
                     </div>
                     <div id="lineItemsContainer">
                         <div class="line-item js-line-item">
-                            <select class="line-product-select" name="product_id">
-                                <option value="">-- Chọn sản phẩm --</option>
-                                <c:forEach var="p" items="${products}">
-                                    <option value="${p.id}">${p.name}</option>
-                                </c:forEach>
-                            </select>
-                            <input type="number" class="line-qty" name="quantity" placeholder="0" min="1" />
-                            <input type="number" class="line-price" name="price" placeholder="0" min="1" />
+                            <input type="text" class="line-product-input" name="product_id" placeholder="Nhập mã sản phẩm" inputmode="numeric" required />
+                            <input type="number" class="line-qty" name="quantity" placeholder="0" min="1" required />
+                            <input type="number" class="line-price" name="price" placeholder="0" min="1" required />
                             <input type="text" class="line-total" placeholder="Tự tính" disabled />
                             <button type="button" class="line-remove-btn"><i class='bx bx-trash'></i></button>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-dashed" id="addLineItemBtn">
-                        <i class='bx bx-plus'></i>
-                        <span>Thêm dòng hàng</span>
-                    </button>
                 </div>
             </form>
         </div>

@@ -12,6 +12,8 @@
     const saveReceiptBtn = document.getElementById("saveReceiptBtn");
     const createReceiptForm = document.getElementById("createReceiptForm");
     const createMsg = document.getElementById("createReceiptMsg");
+    const receiptCodeInput = document.getElementById("inputReceiptCode");
+    const creatorInput = document.getElementById("inputCreator");
     const lineContainer = document.getElementById("lineItemsContainer");
     const addLineBtn = document.getElementById("addLineItemBtn");
     const detailCode = document.getElementById("detailCode");
@@ -72,13 +74,16 @@
     function resetCreateForm() {
         if (createReceiptForm) createReceiptForm.reset();
         if (createMsg) createMsg.className = "form-msg is-hidden";
+        if (creatorInput && creatorInput.dataset.default) {
+            creatorInput.value = creatorInput.dataset.default;
+        }
         if (lineContainer) {
             const rows = lineContainer.querySelectorAll(".js-line-item");
             rows.forEach(function (r, i) {
                 if (i > 0) r.remove();
             });
             if (rows[0]) {
-                rows[0].querySelector(".line-product-select").value = "";
+                rows[0].querySelector(".line-product-input").value = "";
                 rows[0].querySelector(".line-qty").value = "";
                 rows[0].querySelector(".line-price").value = "";
                 rows[0].querySelector(".line-total").value = "";
@@ -90,7 +95,7 @@
         const first = lineContainer?.querySelector(".js-line-item");
         if (!first) return null;
         const clone = first.cloneNode(true);
-        clone.querySelector(".line-product-select").value = "";
+        clone.querySelector(".line-product-input").value = "";
         clone.querySelector(".line-qty").value = "";
         clone.querySelector(".line-price").value = "";
         clone.querySelector(".line-total").value = "";
@@ -127,16 +132,31 @@
     });
 
     saveReceiptBtn?.addEventListener("click", function () {
-        const supplierId = document.getElementById("inputSupplierId")?.value?.trim();
+        const receiptCode = receiptCodeInput?.value?.trim();
+        const supplierIdValue = document.getElementById("inputSupplierId")?.value?.trim();
         const receiptDate = document.getElementById("inputReceiptDate")?.value?.trim();
+        const creatorName = creatorInput?.value?.trim();
         const note = document.getElementById("inputNote")?.value?.trim() || "";
 
-        if (!supplierId) {
-            showMsg("vui lòng chọn nhà cung cấp.", true);
+        if (!receiptCode) {
+            showMsg("Vui lòng nhập mã phiếu nhập.", true);
+            return;
+        }
+        if (!creatorName) {
+            showMsg("Vui lòng nhập người lập phiếu.", true);
+            return;
+        }
+        const supplierId = parseInt(supplierIdValue, 10);
+        if (!supplierIdValue || Number.isNaN(supplierId)) {
+            showMsg("Vui lòng nhập mã nhà cung cấp hợp lệ.", true);
             return;
         }
         if (!receiptDate) {
-            showMsg("vui lòng nhập ngày nhập kho.", true);
+            showMsg("Vui lòng nhập ngày nhập kho.", true);
+            return;
+        }
+        if (!note) {
+            showMsg("Vui lòng nhập ghi chú.", true);
             return;
         }
 
@@ -146,12 +166,13 @@
         let valid = true;
 
         lineRows.forEach(function (row, idx) {
-            const productId = row.querySelector(".line-product-select")?.value;
+            const productIdValue = row.querySelector(".line-product-input")?.value?.trim();
             const qty = parseInt(row.querySelector(".line-qty")?.value) || 0;
             const unitPrice = parseFloat(row.querySelector(".line-price")?.value) || 0;
+            const productId = parseInt(productIdValue, 10);
 
-            if (!productId || qty <= 0 || unitPrice <= 0) {
-                showMsg("Dòng hàng " + (idx + 1) + ": vui lòng chọn sản phẩm và nhập số lượng, đơn giá hợp lệ.", true);
+            if (!productIdValue || Number.isNaN(productId) || qty <= 0 || unitPrice <= 0) {
+                showMsg("Dòng hàng " + (idx + 1) + ": vui lòng nhập mã sản phẩm, số lượng và đơn giá hợp lệ.", true);
                 valid = false;
                 return;
             }
@@ -165,17 +186,19 @@
         }
 
         saveReceiptBtn.disabled = true;
-        saveReceiptBtn.querySelector("span").textContent = "Đang lưu";
+        saveReceiptBtn.querySelector("span").textContent = "Đang lưu...";
 
         const ctx = document.querySelector("meta[name='contextPath']")?.content || "";
         const url = ctx + "/admin/inventory-receipt-create";
 
         const body = new URLSearchParams();
+        body.append("receipt_code", receiptCode);
+        body.append("creator_name", creatorName);
         body.append("supplier_id", supplierId);
         body.append("receipt_date", receiptDate);
         body.append("note", note);
         body.append("items", JSON.stringify(items.map(function (i) {
-            return {product_id: i.productId, quantity: i.quantity, unit_price: i.unitPrice};
+            return {productId: i.productId, quantity: i.quantity, unitPrice: i.unitPrice};
         })));
 
         fetch(url, {
