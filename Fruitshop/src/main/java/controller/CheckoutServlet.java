@@ -136,13 +136,12 @@ public class CheckoutServlet extends HttpServlet {
         List<Address> addresses = addressDAO.getAddressesByUserId(user.getId());
 
         if (addresses == null || addresses.isEmpty()) {
-            session.setAttribute("checkoutMessage", "Vui lòng thêm địa chỉ giao hàng trước khi thanh toán.");
-            session.setAttribute("returnToCheckout", true); // Lưu flag để quay lại checkout sau khi thêm địa chỉ
-            resp.sendRedirect(req.getContextPath() + "/addresses");
-            return;
+            req.setAttribute("addresses", new ArrayList<Address>());
+            req.setAttribute("addressMissing", true);
+            req.setAttribute("addressMessage", "Bạn chưa có địa chỉ nhận hàng. Hãy thêm địa chỉ trước khi đặt hàng.");
+        } else {
+            req.setAttribute("addresses", addresses);
         }
-
-        req.setAttribute("addresses", addresses);
         req.setAttribute("user", user);
         double totalProducts = 0;
         double totalOriginalPrice = 0;

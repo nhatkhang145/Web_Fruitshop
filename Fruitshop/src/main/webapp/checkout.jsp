@@ -127,9 +127,30 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <c:if test="${addressMissing}">
+                                                <div class="alert alert-danger"
+                                                    style="margin-top: 15px; background: #fff3f3; color: #b42318; padding: 12px 14px; border: 1px solid #f2b8b5; border-radius: 8px;">
+                                                    <c:out value="${addressMessage}" />
+                                                    <div style="margin-top: 10px;">
+                                                        <a href="${pageContext.request.contextPath}/addresses"
+                                                            class="button button--primary"
+                                                            style="display: inline-block; text-decoration: none;">Thêm
+                                                            địa chỉ ngay</a>
+                                                    </div>
+                                                </div>
+                                            </c:if>
                                         </c:when>
                                         <c:otherwise>
-
+                                            <div class="alert alert-danger"
+                                                style="margin-top: 10px; background: #fff3f3; color: #b42318; padding: 12px 14px; border: 1px solid #f2b8b5; border-radius: 8px;">
+                                                Bạn chưa có địa chỉ nhận hàng. Hãy thêm địa chỉ để có thể đặt hàng.
+                                                <div style="margin-top: 10px;">
+                                                    <a href="${pageContext.request.contextPath}/addresses"
+                                                        class="button button--primary"
+                                                        style="display: inline-block; text-decoration: none;">Thêm địa
+                                                        chỉ ngay</a>
+                                                </div>
+                                            </div>
                                         </c:otherwise>
                                     </c:choose>
 
@@ -291,7 +312,8 @@
                                             nghiệm của bạn trên trang web này và cho các mục đích khác được mô tả trong
                                             chính sách riêng tư của chúng tôi.
                                         </p>
-                                        <button type="submit" class="button button--primary button--fullwidth">Đặt
+                                        <button type="submit" class="button button--primary button--fullwidth" <c:if
+                                            test="${addressMissing or empty addresses}">disabled</c:if>>Đặt
                                             hàng</button>
                                     </div>
                                 </div>
@@ -333,6 +355,14 @@
                             closeAddressModal();
                         }
                     }
+
+                    document.getElementById('checkoutForm').addEventListener('submit', function (event) {
+                        var hasAddress = ${ not empty addresses ?'true': 'false'};
+                        if (!hasAddress) {
+                            event.preventDefault();
+                            alert('Bạn chưa có địa chỉ nhận hàng. Hãy thêm địa chỉ trước khi đặt hàng.');
+                        }
+                    });
                 </script>
                 <style>
                     .address-card {
