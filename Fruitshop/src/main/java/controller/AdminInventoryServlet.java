@@ -3,6 +3,7 @@ package controller;
 import dal.AdminInventoryDAO;
 import model.InventoryReceipt;
 import model.InventoryReceiptItem;
+import model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
 
 
 @WebServlet({"/admin/inventory-management", "/admin/inventory-receipt-detail", "/admin/inventory-receipt-create"})
@@ -232,15 +235,61 @@ public class AdminInventoryServlet extends HttpServlet {
                 receipts = inventoryDAO.getAllReceipts();
             }
 
-       
-            request.setAttribute("receipts", receipts);
+            dal.UserDAO userDAO = new dal.UserDAO();
+            List<Map<String, Object>> receiptList = new ArrayList<>();
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+            for (InventoryReceipt r : receipts) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("code", r.getCode());
+                map.put("dateData", r.getReceiptDate() != null ? r.getReceiptDate().format(dateFormatter) : "");
+                map.put("dateDisplay", r.getReceiptDate() != null ? r.getReceiptDate().format(timeFormatter) : "");
+                map.put("totalValue", r.getTotalAmount());
+                
+                String statusDisplay = r.getStatus();
+                if ("PENDING".equalsIgnoreCase(r.getStatus())) statusDisplay = "Chờ duyệt";
+                else if ("APPROVED".equalsIgnoreCase(r.getStatus())) statusDisplay = "Đã duyệt";
+                else if ("DRAFT".equalsIgnoreCase(r.getStatus())) statusDisplay = "Tạm lưu";
+                
+                String statusClass = "draft";
+                if ("PENDING".equalsIgnoreCase(r.getStatus())) statusClass = "pending";
+                else if ("APPROVED".equalsIgnoreCase(r.getStatus())) statusClass = "approved";
+                
+                map.put("statusDisplay", statusDisplay);
+                map.put("statusClass", statusClass);
+                map.put("note", r.getNote() != null ? r.getNote() : "");
+
+                String supplierName = inventoryDAO.getSupplierName(r.getSupplierId()).orElse("Không rõ");
+                map.put("supplierName", supplierName);
+                
+                String creatorName = userDAO.getUserById(r.getCreatedBy()).map(User::getFullName).orElse("Admin");
+                map.put("creatorName", creatorName);
+
+                List<AdminInventoryDAO.ReceiptItemDetailDTO> items = inventoryDAO.getReceiptItemsDetail(r.getId());
+                map.put("totalItems", items.size());
+                
+                StringBuilder lines = new StringBuilder();
+                for (int i = 0; i < items.size(); i++) {
+                    lines.append(items.get(i).getProductName()).append(" x").append(items.get(i).getQuantity());
+                    if (i < items.size() - 1) lines.append(";");
+                }
+                map.put("lines", lines.toString());
+                
+                receiptList.add(map);
+            }
+
+            request.setAttribute("receiptList", receiptList);
+            request.setAttribute("totalReceipts", receipts.size());
             request.setAttribute("currentFilter", filter != null ? filter : "all");
-            request.getRequestDispatcher("/inventory-management.jsp").forward(request, response);
+            request.setAttribute("suppliers", inventoryDAO.getAllSuppliers());
+            request.setAttribute("products", inventoryDAO.getAllProducts());
+            request.getRequestDispatcher("/admin/inventory-management.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Lỗi khi lấy dữ liệu: " + e.getMessage());
-            request.getRequestDispatcher("/inventory-management.jsp").forward(request, response);
+            request.getRequestDispatcher("/admin/inventory-management.jsp").forward(request, response);
         }
     }
 
@@ -343,12 +392,18 @@ public class AdminInventoryServlet extends HttpServlet {
     
   
     private int getUserId(HttpServletRequest request) {
-        Object userId = request.getSession().getAttribute("userId");
-        return userId != null ? Integer.parseInt(userId.toString()) : 0;
+        Object accountObj = request.getSession().getAttribute("account");
+        if (accountObj instanceof User) {
+            return ((User) accountObj).getId();
+        }
+        return 0;
     }
 
     private boolean isAdmin(HttpServletRequest request) { 
-        Object user = request.getSession().getAttribute("user");
-        return user != null; 
+        Object accountObj = request.getSession().getAttribute("account");
+        if (accountObj instanceof User) {
+            return ((User) accountObj).getRole() == 1; // Assuming role 1 is Admin
+        }
+        return false; 
     }
 }

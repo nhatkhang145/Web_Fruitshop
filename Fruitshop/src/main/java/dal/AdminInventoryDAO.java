@@ -197,6 +197,25 @@ public class AdminInventoryDAO {
         return count != null && count > 0;
     }
 
+    // Lấy tất cả nhà cung cấp
+    public List<java.util.Map<String, Object>> getAllSuppliers() {
+        return DBContext.get().withHandle(handle ->
+            handle.createQuery("SELECT id, name FROM suppliers ORDER BY name")
+                    .mapToMap()
+                    .list()
+        );
+    }
+
+    // Lấy tất cả sản phẩm
+    public List<java.util.Map<String, Object>> getAllProducts() {
+        return DBContext.get().withHandle(handle ->
+            handle.createQuery("SELECT id, product_name as name FROM products ORDER BY product_name")
+                    .mapToMap()
+                    .list()
+        );
+    }
+
+
    
      // Lấy tên nhà cung cấp theo ID
      
