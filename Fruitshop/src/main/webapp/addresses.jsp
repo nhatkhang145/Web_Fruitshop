@@ -268,7 +268,6 @@
                 </div>
             </div>
 
-            <!-- FOOTER -->
             <jsp:include page="footer.jsp"></jsp:include>
 
             <script>
@@ -278,12 +277,10 @@
                 const btnClose = document.getElementsByClassName("close-modal-btn")[0];
                 const phoneInput = document.getElementById("phoneNumber");
 
-                // Validate input số điện thoại - chỉ cho phép số
                 phoneInput.addEventListener('input', function (e) {
                     this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
                 });
 
-                // Validate Vietnamese phone format on form submit
                 document.querySelector('.address-form').addEventListener('submit', function (e) {
                     const phoneValue = phoneInput.value.trim();
                     const phoneRegex = /^0[3578][0-9]{8}$/;
@@ -296,7 +293,6 @@
                     }
                 });
 
-                // Reset form
                 function resetForm() {
                     document.getElementById("modalTitle").textContent = "Địa chỉ mới";
                     document.getElementById("formAction").value = "add";
@@ -306,34 +302,23 @@
                     document.getElementById("city").value = "";
                     document.getElementById("address").value = "";
 
-                    // Chỉ reset checkbox nếu nó tồn tại
                     const isDefaultCheckbox = document.getElementById("isDefault");
-                    if (isDefaultCheckbox) {
-                        isDefaultCheckbox.checked = false;
-                    }
+                    if (isDefaultCheckbox) isDefaultCheckbox.checked = false;
                 }
 
-                // Mở modal thêm mới
                 btnAdd.onclick = function () {
                     resetForm();
                     modal.style.display = "flex";
                 };
 
-                // Đóng modal
-                const closeModal = () => {
-                    modal.style.display = "none";
-                };
+                const closeModal = () => { modal.style.display = "none"; };
                 spanClose.onclick = closeModal;
                 btnClose.onclick = closeModal;
 
-                // Click ra ngoài thì đóng
                 window.onclick = function (event) {
-                    if (event.target == modal) {
-                        closeModal();
-                    }
+                    if (event.target == modal) closeModal();
                 };
 
-                // Xử lý nút Cập nhật
                 document.querySelectorAll('.btn-edit').forEach(btn => {
                     btn.onclick = function () {
                         document.getElementById("modalTitle").textContent = "Cập nhật địa chỉ";
@@ -345,9 +330,7 @@
                         document.getElementById("address").value = this.dataset.address;
 
                         const isDefaultCheckbox = document.getElementById("isDefault");
-                        if (isDefaultCheckbox) {
-                            isDefaultCheckbox.checked = this.dataset.default === "true";
-                        }
+                        if (isDefaultCheckbox) isDefaultCheckbox.checked = this.dataset.default === "true";
 
                         modal.style.display = "flex";
                     };
