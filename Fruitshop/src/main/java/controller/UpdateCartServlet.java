@@ -13,6 +13,16 @@ import java.util.List;
 @WebServlet(name = "UpdateCartServlet", urlPatterns = {"/update-cart"})
 public class UpdateCartServlet extends HttpServlet {
 
+    private int limitQuantityStock(int quantity, int stockQuantity) {
+        if (stockQuantity <= 0) {
+            return 0;
+        }
+        if (quantity < 1) {
+            return 1;
+        }
+        return Math.min(quantity, stockQuantity);
+    }
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -28,15 +38,16 @@ public class UpdateCartServlet extends HttpServlet {
                 for (CartItem item : cart) {
                     if (item.getProduct().getId() == pid) {
                         int currentQty = item.getQuantity();
+                        int stockQty = item.getProduct().getQuantity();
 
                         if ("plus".equals(mode)) {
-                            item.setQuantity(currentQty + 1);
+                            item.setQuantity(limitQuantityStock(currentQty + 1, stockQty));
                         } else if ("minus".equals(mode)) {
                             if (currentQty > 1) {
-                                item.setQuantity(currentQty - 1);
-                            } else {
+                                item.setQuantity(limitQuantityStock(currentQty - 1, stockQty));
                             }
                         }
+                        item.setQuantity(limitQuantityStock(item.getQuantity(), stockQty));
                         break;
                     }
                 }

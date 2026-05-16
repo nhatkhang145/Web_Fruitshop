@@ -107,92 +107,95 @@
                                                                     onclick="location.href='update-cart?pid=${item.product.id}&mode=minus'">-</button>
 
                                                                 <input type="number" value="${item.quantity}" min="1"
-                                                                    readonly />
+                                                                    max="${item.product.quantity}" readonly />
 
                                                                 <button type="button" class="quantity-btn"
-                                                                    onclick="location.href='update-cart?pid=${item.product.id}&mode=plus'">+</button>
-                                                            </div>
-                                                        </td>
-                                                        <td class="subtotal-cell">
-                                                            <c:if test="${item.discountAmount > 0}">
-                                                                <div class="subtotal-group">
-                                                                    <span class="subtotal-original">
-                                                                        <fmt:formatNumber
-                                                                            value="${item.originalPrice * item.quantity}"
-                                                                            pattern="#,###" />đ
-                                                                    </span>
-                                                                    <strong class="subtotal-sale">
-                                                                        <fmt:formatNumber value="${item.totalPrice}"
-                                                                            pattern="#,###" />đ
-                                                                    </strong>
-                                                                </div>
-                                                            </c:if>
-                                                            <c:if test="${item.discountAmount <= 0}">
-                                                                <strong class="subtotal-normal">
-                                                                    <fmt:formatNumber value="${item.totalPrice}"
-                                                                        pattern="#,###" />đ
-                                                                </strong>
-                                                            </c:if>
-                                                        </td>
-                                                        <td>
-                                                            <a href="remove-cart?pid=${item.product.id}"
-                                                                class="remove-btn"
-                                                                onclick="return confirm('Bạn có chắc muốn xoá sản phẩm này?');">
-                                                                <i class="fa-solid fa-trash-can"></i>
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                </c:forEach>
-                                            </tbody>
-                                        </table>
-
-                                        <div class="cart-actions">
-                                            <a href="shop" class="update-cart-btn"
-                                                style="text-decoration: none; text-align: center;">TIẾP TỤC
-                                                MUA HÀNG</a>
+                                                                    data-pid="${item.product.id}"
+                                                                    data-stock="${item.product.quantity}"
+                                                                    data-qty="${item.quantity}" <c:if
+                                                                    test="${item.quantity >= item.product.quantity}">disabled
+                                    </c:if>
+                                    onclick="return increaseCartQty(this)">+</button>
+                                </div>
+                                <div style="font-size: 12px; color: #888; margin-top: 4px;">
+                                    Tồn kho:
+                                    <fmt:formatNumber value="${item.product.quantity}" pattern="#,###" />
+                                </div>
+                                </td>
+                                <td class="subtotal-cell">
+                                    <c:if test="${item.discountAmount > 0}">
+                                        <div class="subtotal-group">
+                                            <span class="subtotal-original">
+                                                <fmt:formatNumber value="${item.originalPrice * item.quantity}"
+                                                    pattern="#,###" />đ
+                                            </span>
+                                            <strong class="subtotal-sale">
+                                                <fmt:formatNumber value="${item.totalPrice}" pattern="#,###" />đ
+                                            </strong>
                                         </div>
                                     </c:if>
+                                    <c:if test="${item.discountAmount <= 0}">
+                                        <strong class="subtotal-normal">
+                                            <fmt:formatNumber value="${item.totalPrice}" pattern="#,###" />đ
+                                        </strong>
+                                    </c:if>
+                                </td>
+                                <td>
+                                    <a href="remove-cart?pid=${item.product.id}" class="remove-btn"
+                                        onclick="return confirm('Bạn có chắc muốn xoá sản phẩm này?');">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </a>
+                                </td>
+                                </tr>
+                                </c:forEach>
+                                </tbody>
+                                </table>
+
+                                <div class="cart-actions">
+                                    <a href="shop" class="update-cart-btn"
+                                        style="text-decoration: none; text-align: center;">TIẾP TỤC
+                                        MUA HÀNG</a>
+                                </div>
+                                </c:if>
+                    </div>
+
+                    <c:if test="${not empty sessionScope.cart}">
+                        <aside class="cart-sidebar">
+                            <div class="cart-totals">
+                                <h2>THÀNH TIỀN ĐÃ CHỌN</h2>
+
+                                <div class="totals-row">
+                                    <span>Tạm tính đã chọn</span>
+                                    <span>
+                                        <span id="selectedCartTotal">
+                                            <fmt:formatNumber value="${sessionScope.totalMoney}" pattern="#,###" />đ
+                                        </span>
+                                    </span>
                                 </div>
 
-                                <c:if test="${not empty sessionScope.cart}">
-                                    <aside class="cart-sidebar">
-                                        <div class="cart-totals">
-                                            <h2>THÀNH TIỀN ĐÃ CHỌN</h2>
+                                <div class="shipping-section">
 
-                                            <div class="totals-row">
-                                                <span>Tạm tính đã chọn</span>
-                                                <span>
-                                                    <span id="selectedCartTotal">
-                                                        <fmt:formatNumber value="${sessionScope.totalMoney}"
-                                                            pattern="#,###" />đ
-                                                    </span>
-                                                </span>
-                                            </div>
+                                    <p class="shipping-note">
+                                        Phí vận chuyển thực tế sẽ được tính tại trang thanh toán.
+                                    </p>
+                                </div>
 
-                                            <div class="shipping-section">
-
-                                                <p class="shipping-note">
-                                                    Phí vận chuyển thực tế sẽ được tính tại trang thanh toán.
-                                                </p>
-                                            </div>
-
-                                            <div class="totals-row final-total">
-                                                <span>Tổng cộng đã chọn</span>
-                                                <span>
-                                                    <span id="selectedCartFinal">
-                                                        <fmt:formatNumber value="${sessionScope.totalMoney}"
-                                                            pattern="#,###" />đ
-                                                    </span>
-                                                </span>
-                                            </div>
-                                            <button type="submit" class="checkout-btn" id="checkoutSelectedBtn">THANH
-                                                TOÁN ĐÃ CHỌN</button>
-                                        </div>
-                                    </aside>
-                                </c:if>
-                            </main>
-                        </form>
-                    </div>
+                                <div class="totals-row final-total">
+                                    <span>Tổng cộng đã chọn</span>
+                                    <span>
+                                        <span id="selectedCartFinal">
+                                            <fmt:formatNumber value="${sessionScope.totalMoney}" pattern="#,###" />đ
+                                        </span>
+                                    </span>
+                                </div>
+                                <button type="submit" class="checkout-btn" id="checkoutSelectedBtn">THANH
+                                    TOÁN ĐÃ CHỌN</button>
+                            </div>
+                        </aside>
+                    </c:if>
+                    </main>
+                    </form>
+                </div>
                 </div>
 
                 <jsp:include page="footer.jsp"></jsp:include>
@@ -209,6 +212,21 @@
                         if (!selectAll || checkboxes.length === 0) {
                             return;
                         }
+
+                        window.increaseCartQty = function (button) {
+                            const stock = parseInt(button.dataset.stock || '0', 10) || 0;
+                            const qty = parseInt(button.dataset.qty || '0', 10) || 0;
+
+                            if (button.disabled) {
+                                return false;
+                            }
+
+                            if (stock > 0 && qty < stock) {
+                                location.href = 'update-cart?pid=' + button.dataset.pid + '&mode=plus';
+                            }
+
+                            return false;
+                        };
 
                         function formatMoney(value) {
                             return new Intl.NumberFormat('vi-VN').format(value) + 'đ';
