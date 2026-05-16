@@ -395,7 +395,27 @@
 }
 
 .modal-xl {
-    width: min(1180px, 100%);
+    width: min(1500px, 98vw);
+}
+
+.modal-full {
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.modal-fullscreen {
+    padding: 0;
+}
+
+.modal-fullscreen .modal-content {
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
 }
 
 .modal-header {
@@ -506,6 +526,24 @@
     background: #fff;
 }
 
+.detail-lines__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.detail-lines__header--split {
+    align-items: center;
+}
+
+.detail-lines__heading {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
 .detail-lines__header h3 {
     margin: 0;
     color: #203038;
@@ -577,6 +615,13 @@
     color: #2f8087;
 }
 
+.btn-dashed--compact {
+    width: auto;
+    height: 40px;
+    padding: 0 16px;
+    white-space: nowrap;
+}
+
 .receipt-form {
     display: grid;
     gap: 18px;
@@ -586,6 +631,10 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
+}
+
+.form-grid--wide {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .form-group {
@@ -604,6 +653,33 @@
     font-weight: 700;
 }
 
+.input-icon {
+    position: relative;
+}
+
+.input-icon i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #7a8d93;
+    font-size: 18px;
+    pointer-events: none;
+}
+
+.input-icon input {
+    padding-left: 42px;
+}
+
+.input-date {
+    background: linear-gradient(180deg, #ffffff, #f7fbfb);
+}
+
+.input-date::-webkit-calendar-picker-indicator {
+    filter: invert(0.35) saturate(1.2);
+    cursor: pointer;
+}
+
 .receipt-form textarea {
     resize: vertical;
     min-height: 92px;
@@ -615,13 +691,16 @@
     border: 1px solid #dde8ea;
     border-radius: 18px;
     background: #fbfefe;
+    overflow-x: auto;
 }
 
 .line-item {
     display: grid;
-    grid-template-columns: 2fr 0.8fr 1fr 1fr 42px;
+    grid-template-columns: minmax(220px, 2.6fr) minmax(120px, 1fr) minmax(160px, 1.2fr) minmax(180px, 1.2fr) 48px;
     gap: 10px;
     margin-top: 10px;
+    align-items: center;
+    min-width: 880px;
 }
 
 .line-item.row-head {
@@ -633,9 +712,21 @@
     text-transform: uppercase;
 }
 
+.line-item.row-head span {
+    white-space: nowrap;
+}
+
 .line-item input {
     padding: 0 12px;
     height: 44px;
+    min-width: 0;
+}
+
+.line-item .line-qty,
+.line-item .line-price,
+.line-item .line-total {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
 }
 
 .line-remove-btn {
@@ -667,6 +758,10 @@
 
     .date-filter-group .filter-actions {
         grid-column: 1 / -1;
+    }
+
+    .form-grid--wide {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
@@ -724,7 +819,7 @@
 
 /* Select in form */
 .receipt-form select,
-.line-product-select {
+.line-product-input {
     height: 44px;
     padding: 0 12px;
     border: 1px solid #d6e4e6;
@@ -738,7 +833,7 @@
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .receipt-form select:focus,
-.line-product-select:focus {
+.line-product-input:focus {
     border-color: #69a9ad;
     box-shadow: 0 0 0 4px rgba(61, 139, 145, 0.12);
 }
