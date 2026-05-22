@@ -209,7 +209,7 @@ public class AdminInventoryDAO {
     // Lấy tất cả sản phẩm
     public List<java.util.Map<String, Object>> getAllProducts() {
         return DBContext.get().withHandle(handle ->
-            handle.createQuery("SELECT id, product_name as name FROM products ORDER BY product_name")
+            handle.createQuery("SELECT id, name FROM products ORDER BY name")
                     .mapToMap()
                     .list()
         );
@@ -228,12 +228,31 @@ public class AdminInventoryDAO {
         );
     }
 
+    public Optional<Integer> getSupplierIdByName(String name) {
+        return DBContext.get().withHandle(handle ->
+            handle.createQuery("SELECT id FROM suppliers WHERE LOWER(name) = LOWER(?)")
+                    .bind(0, name)
+                    .mapTo(Integer.class)
+                    .findFirst()
+        );
+    }
+
+    public int insertSupplier(String name) {
+        return DBContext.get().withHandle(handle ->
+            handle.createUpdate("INSERT INTO suppliers (name) VALUES (?)")
+                    .bind(0, name)
+                    .executeAndReturnGeneratedKeys()
+                    .mapTo(Integer.class)
+                    .first()
+        );
+    }
+
     
      // Lấy tên sản phẩm theo ID
      
     public Optional<String> getProductName(int productId) {
         return DBContext.get().withHandle(handle ->
-            handle.createQuery("SELECT product_name FROM products WHERE id = ?")
+            handle.createQuery("SELECT name FROM products WHERE id = ?")
                     .bind(0, productId)
                     .mapTo(String.class)
                     .findFirst()
@@ -277,7 +296,7 @@ public class AdminInventoryDAO {
         return DBContext.get().withHandle(handle ->
             handle.createQuery("""
                 SELECT i.id, i.receipt_id, i.product_id, i.quantity, i.unit_price, 
-                       i.total_price, p.product_name
+                       i.total_price, p.name as product_name
                 FROM inventory_receipt_items i
                 LEFT JOIN products p ON i.product_id = p.id
                 WHERE i.receipt_id = ?
