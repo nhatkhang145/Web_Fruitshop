@@ -21,17 +21,12 @@ Tài liệu này là quy định chính thức về cách nhóm phối hợp ph�
   - Nhận code từ nhánh cá nhân của 3 thành viên sau khi review.
   - Phục vụ để kiểm thử tích hợp trước khi merge lên main.
   
-- dev/khang, dev/thanh, dev/quan:
-  - Nhánh cá nhân của từng thành viên.
-  - Nơi để phát triển và test tính năng trước khi gửi PR vào develop.
-  - Có thể push code liên tục mà không cần lo xung đột với nhánh khác.
 
 ### Quy trình phân nhánh 
 
-1. Mỗi thành viên code trên nhánh cá nhân (dev/tên).
-2. Khi xong task hoặc chuẩn bị merge, tạo Pull Request từ dev/tên vào develop.
+1. Mỗi thành viên code trên nhánh cá nhân .
+2. Khi xong task hoặc chuẩn bị merge, tạo Pull Request từ nhánh cá nhân vào develop.
 3. Leader review và merge vào develop.
-4. Định kỳ (ví dụ: hàng tuần hoặc khi có milestone) merge develop lên main để release.
 
 ### Quy tắc bắt buộc
 
@@ -70,13 +65,11 @@ Nhánh cá nhân mỗi thành viên:
 - dev/quan (Nguyễn Trần Nhật Quân)
 
 Quy tắc:
-
 - Mỗi thành viên code trên nhánh cá nhân của mình.
 - Có thể tạo nhánh nhỏ từ nhánh cá nhân nếu muốn chia tách task (tùy chọn).
-  - Ví dụ: dev/khang/shopping-cart, dev/khang/payment - rồi merge vào dev/khang trước khi PR vào develop.
+- Ví dụ: dev/khang/shopping-cart, dev/khang/payment - rồi merge vào dev/khang trước khi PR vào develop.
 
 ### Conventional Commits
-
 Cấu trúc:
 
 ```text
@@ -92,7 +85,6 @@ Type sử dụng:
 - style: format code, không đổi logic.
 
 Ví dụ:
-
 ```text
 add(auth): them chuc nang dang nhap google vào login
 fix(cart): sua logic so luong san pham
