@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.time.format.DateTimeFormatter;
 
 
-@WebServlet({"/admin/inventory-management", "/admin/inventory-receipt-detail", "/admin/inventory-receipt-create"})
+@WebServlet({"/admin/inventory-management", "/admin/inventory-receipt-detail", "/admin/inventory-receipt-create", "/admin/inventory-receipt-approve", "/admin/inventory-receipt-new"})
 public class AdminInventoryServlet extends HttpServlet {
     private AdminInventoryDAO inventoryDAO;
 
@@ -47,6 +47,9 @@ public class AdminInventoryServlet extends HttpServlet {
             if ("/admin/inventory-management".equals(path)) {  
                 handleListPage(request, response);
             } 
+            else if ("/admin/inventory-receipt-new".equals(path)) {
+                handleCreatePage(request, response);
+            }
             else if ("/admin/inventory-receipt-detail".equals(path)) {
                 handleGetDetail(request, response);
             }
@@ -70,6 +73,8 @@ public class AdminInventoryServlet extends HttpServlet {
         try {
             if ("/admin/inventory-receipt-create".equals(path)) {
                 handleCreateReceipt(request, response);
+            } else if ("/admin/inventory-receipt-approve".equals(path)) {
+                handleApproveReceipt(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -190,10 +195,7 @@ public class AdminInventoryServlet extends HttpServlet {
             receipt.setNote(note);
             receipt.setCreatedBy(getUserId(request));
 
-            int receiptId = inventoryDAO.insertReceipt(receipt);
-
-          
-            inventoryDAO.insertReceiptItems(receiptId, java.util.Arrays.asList(itemsArray));
+            int receiptId = inventoryDAO.createReceiptWithItems(receipt, java.util.Arrays.asList(itemsArray));
 
             result.put("success", true);
             result.put("message", "Thêm phiếu thành công");
@@ -207,6 +209,41 @@ public class AdminInventoryServlet extends HttpServlet {
             e.printStackTrace();
             result.put("success", false);
             result.put("message", "Lỗi: " + e.getMessage());
+        }
+
+        response.getWriter().write(gson.toJson(result));
+    }
+
+    private void handleApproveReceipt(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        Gson gson = new Gson();
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            String receiptIdParam = request.getParameter("receiptId");
+            if (receiptIdParam == null || receiptIdParam.isEmpty()) {
+                receiptIdParam = request.getParameter("id");
+            }
+            if (receiptIdParam == null || receiptIdParam.isEmpty()) {
+                result.put("success", false);
+                result.put("message", "ID phiếu không hợp lệ");
+                response.getWriter().write(gson.toJson(result));
+                return;
+            }
+
+            int receiptId = Integer.parseInt(receiptIdParam);
+            inventoryDAO.approveReceipt(receiptId);
+
+            result.put("success", true);
+            result.put("message", "Duyệt phiếu thành công");
+        } catch (NumberFormatException e) {
+            result.put("success", false);
+            result.put("message", "ID phiếu không hợp lệ");
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("success", false);
+            result.put("message", e.getMessage());
         }
 
         response.getWriter().write(gson.toJson(result));
@@ -294,15 +331,30 @@ public class AdminInventoryServlet extends HttpServlet {
 
             request.setAttribute("receiptList", receiptList);
             request.setAttribute("totalReceipts", receipts.size());
+            request.setAttribute("totalImportedItems", inventoryDAO.getTotalImportedQuantity());
+            request.setAttribute("totalImportedValueThisMonth", inventoryDAO.getTotalImportedValueThisMonth());
+            request.setAttribute("approvedReceipts", inventoryDAO.getReceiptCountByStatus("APPROVED"));
+            request.setAttribute("pendingReceipts", inventoryDAO.getReceiptCountByStatus("PENDING"));
             request.setAttribute("currentFilter", filter != null ? filter : "all");
-            request.setAttribute("suppliers", inventoryDAO.getAllSuppliers());
-            request.setAttribute("products", inventoryDAO.getAllProducts());
             request.getRequestDispatcher("/admin/inventory-management.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Lỗi khi lấy dữ liệu: " + e.getMessage());
             request.getRequestDispatcher("/admin/inventory-management.jsp").forward(request, response);
+        }
+    }
+
+    private void handleCreatePage(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            request.setAttribute("suppliers", inventoryDAO.getAllSuppliers());
+            request.setAttribute("products", inventoryDAO.getAllProducts());
+            request.getRequestDispatcher("/admin/inventory-receipt-create.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Lỗi khi tải dữ liệu: " + e.getMessage());
+            request.getRequestDispatcher("/admin/inventory-receipt-create.jsp").forward(request, response);
         }
     }
 
