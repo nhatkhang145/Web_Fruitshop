@@ -300,8 +300,12 @@ public class CheckoutServlet extends HttpServlet {
 
                 session.removeAttribute("size");
                 session.removeAttribute("totalMoney");
-                session.setAttribute("successMessage", "Đặt hàng thành công! Mã đơn hàng: #" + orderId);
-                resp.sendRedirect(req.getContextPath() + "/order-detail?id=" + orderId);
+                if ("vnpay".equals(paymentMethod) || "VNPay".equalsIgnoreCase(paymentMethod)) {
+                    resp.sendRedirect(req.getContextPath() + "/vnpay-payment?orderId=" + orderId + "&amount=" + (long)finalAmount);
+                } else {
+                    session.setAttribute("successMessage", "Đặt hàng thành công! Mã đơn hàng: #" + orderId);
+                    resp.sendRedirect(req.getContextPath() + "/order-detail?id=" + orderId);
+                }
             } else {
                 req.setAttribute("error", "Có lỗi xảy ra khi tạo đơn hàng!");
                 doGet(req, resp);

@@ -293,18 +293,16 @@
                                             <li class="payment__option">
                                                 <input class="payment__radio" type="radio" name="paymentMethod"
                                                     id="payment-cod" value="COD" checked>
-                                                <label class="payment__label" for="payment-cod">Trả tiền mặt khi nhận
-                                                    hàng (COD)</label>
-                                                <div class="payment__description">Thanh toán bằng tiền mặt khi giao
-                                                    hàng.</div>
+                                                <label class="payment__label" for="payment-cod">Trả tiền mặt khi nhận hàng (COD)</label>
+                                                <div class="payment__description">Thanh toán bằng tiền mặt khi giao hàng.</div>
                                             </li>
                                             <li class="payment__option">
-                                                <input class="payment__radio" type="radio" name="paymentMethod"
-                                                    id="payment-bank" value="bank_transfer">
-                                                <label class="payment__label" for="payment-bank">Chuyển khoản ngân
-                                                    hàng</label>
-                                                <div class="payment__description">Nội dung: [Tên] + [Mã đơn hàng] STK:
-                                                    123456789 Ngân hàng: Vietcombank</div>
+                                                <input type="radio" id="vnpay" name="paymentMethod" value="vnpay">
+                                                <label for="vnpay" style="display: inline-flex; align-items: center; cursor: pointer;">
+                                                    <img src="https://vnpay.vn/assets/images/logo-icon/logo-primary.svg"
+                                                         alt="VNPAY" style="height: 24px; margin-right: 8px;">
+                                                    Thanh toán qua Ví điện tử VNPAY
+                                                </label>
                                             </li>
                                         </ul>
                                         <p class="payment__privacy-text">
@@ -312,9 +310,8 @@
                                             nghiệm của bạn trên trang web này và cho các mục đích khác được mô tả trong
                                             chính sách riêng tư của chúng tôi.
                                         </p>
-                                        <button type="submit" class="button button--primary button--fullwidth" <c:if
-                                            test="${addressMissing or empty addresses}">disabled</c:if>>Đặt
-                                            hàng</button>
+                                        <button type="submit" class="button button--primary button--fullwidth"
+                                                <c:if test="${addressMissing or empty addresses}">disabled</c:if>>Đặt hàng</button>
                                     </div>
                                 </div>
                             </div>
