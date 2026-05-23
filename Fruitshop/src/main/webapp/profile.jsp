@@ -139,8 +139,8 @@
                                                 <label for="phone">Số điện thoại</label>
                                                 <input type="text" id="phone" name="phone" class="form-input"
                                                     value="<c:out value='${sessionScope.account.phone}'/>"
-                                                    maxlength="10" inputmode="numeric" pattern="0[3578][0-9]{8}"
-                                                    placeholder="0912345678"
+                                                    maxlength="12" inputmode="numeric"
+                                                    placeholder="0912 345 678"
                                                     oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" />
                                                 <small
                                                     style="color: #fd7e14; font-style: italic; display: block; margin-top: 5px;">
@@ -288,16 +288,38 @@
                         return phoneRegex.test(phone);
                     }
 
+                    const phoneInput = document.getElementById('phone');
+
+                    function formatPhoneNumber(value){
+                        let cleaned = ('' + value).replace(/\D/g, '');
+
+                        let match = cleaned.match(/^(\d{0,4})(\d{0,3})(\d{0,3})$/);
+                        if (match) {
+                            return !match[2] ? match[1] : match[1] + ' ' + match[2] + (match[3] ? ' ' + match[3] : '');
+                        }
+                        return cleaned;
+                    }
+
+                    if (phoneInput && phoneInput.value) {
+                        phoneInput.value = formatPhoneNumber(phoneInput.value);
+                    }
+
+                    if (phoneInput){
+                        phoneInput.addEventListener('input', function (e){
+                            this.value = formatPhoneNumber(this.value);
+                        });
+                    }
+
                     document.querySelector('.profile-form').addEventListener('submit', function (e) {
-                        const phoneInput = document.getElementById('phone');
-                        const phoneValue = phoneInput.value.trim();
+                        const phoneValue = phoneInput.value.replace(/\s/g, '');
 
                         if (phoneValue && !validateVietnamesePhone(phoneValue)) {
                             e.preventDefault();
-                            alert('Số điện thoại không hợp lệ.\n\nYêu cầu: 10 chữ số, bắt đầu từ 03, 05, 07, 08 hoặc 09.\nVí dụ: 0912345678');
+                            alert('Số điện thoại không hợp lệ.\n\nYêu cầu: 10 chữ số, bắt đầu từ 03, 05, 07, 08 hoặc 09.\nVí dụ: 0912 345 678');
                             phoneInput.focus();
                             return false;
                         }
+                        phoneInput.value = phoneValue;
                     });
 
                     document.getElementById('avatarFile').addEventListener('change', function (e) {
