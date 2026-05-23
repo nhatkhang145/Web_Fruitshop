@@ -81,9 +81,17 @@ public class AddressServlet extends HttpServlet {
 
         String receiverName = request.getParameter("receiverName");
         String phoneNumber = request.getParameter("phoneNumber");
-        String addressDetail = request.getParameter("address");
-        String city = request.getParameter("city");
+        String addressDetail = getParamTrim(request, "address");
+        String city = getParamTrim(request, "city");
         boolean isDefault = "on".equals(request.getParameter("isDefault"));
+
+        if (addressDetail.isEmpty()) {
+            throw new RuntimeException("Địa chỉ không được để trống!");
+        }
+
+        if (city.isEmpty()) {
+            city = inferCityFromAddress(addressDetail);
+        }
 
         if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
             throw new RuntimeException("Số điện thoại không được để trống!");
@@ -136,10 +144,19 @@ public class AddressServlet extends HttpServlet {
             throws IOException {
         String receiverName = request.getParameter("receiverName");
         String phoneNumber = request.getParameter("phoneNumber");
-        String addressDetail = request.getParameter("address");
-        String city = request.getParameter("city");
+        String addressDetail = getParamTrim(request, "address");
+        String city = getParamTrim(request, "city");
         boolean isDefault = "on".equals(request.getParameter("isDefault"))
                 || "1".equals(request.getParameter("isDefault"));
+
+        if (addressDetail.isEmpty()) {
+            request.setAttribute("error", "Địa chỉ không được để trống!");
+            return;
+        }
+
+        if (city.isEmpty()) {
+            city = inferCityFromAddress(addressDetail);
+        }
 
         if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
             request.setAttribute("error", "Số điện thoại không được để trống!");
@@ -169,5 +186,33 @@ public class AddressServlet extends HttpServlet {
 
     private boolean validateVietnamesePhone(String phone) {
         return phone != null && phone.matches("0[3578][0-9]{8}");
+    }
+
+    private String getParamTrim(HttpServletRequest request, String name) {
+        String value = request.getParameter(name);
+        return value == null ? "" : value.trim();
+    }
+
+    private String inferCityFromAddress(String addressDetail) {
+        if (addressDetail == null) {
+            return "";
+        }
+        String[] parts = addressDetail.split(",");
+        if (parts.length < 2) {
+            return "";
+        }
+        int start = Math.max(0, parts.length - 3);
+        StringBuilder sb = new StringBuilder();
+        for (int i = start; i < parts.length; i++) {
+            String part = parts[i].trim();
+            if (part.isEmpty()) {
+                continue;
+            }
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(part);
+        }
+        return sb.toString();
     }
 }
