@@ -50,8 +50,11 @@ public class PasswordUtils {
             return "Mật khẩu không được để trống!";
         }
 
-        if (password.length() < 8 || password.length() > 16) {
+        if (password.length() < 8) {
             return "Mật khẩu phải có ít nhất 8 ký tự!";
+        }
+        if (password.length() > 16) {
+            return "Mật khẩu chỉ được tối đa 16 ký tự!";
         }
 
         if (!Pattern.compile("[A-Z]").matcher(password).find()) {

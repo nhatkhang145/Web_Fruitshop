@@ -353,4 +353,14 @@ public class OrderDAO {
         return labels;
     }
 
+    // hàm cập nhật trạng thái thanh toán (0: Chưa thanh toán, 1: Đã thanh toán)
+    public boolean updatePaymentStatus(int orderId, int paymentStatus) {
+        String sql = "UPDATE orders SET payment_status = :paymentStatus WHERE id = :id";
+        return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
+                .bind("paymentStatus", paymentStatus)
+                .bind("id", orderId)
+                .execute() > 0
+        );
+    }
+
 }
