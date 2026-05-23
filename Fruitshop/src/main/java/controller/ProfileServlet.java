@@ -122,14 +122,21 @@ public class ProfileServlet extends HttpServlet {
         }
 
         try {
-            userDAO.updateProfile(user);
+            boolean isSuccess = userDAO.updateProfile(user);
 
-            if (address != null && !address.trim().isEmpty()) {
-                userDAO.updateAddress(user.getId(), address, city, fullName, phone);
+            if (isSuccess){
+                if (address != null && !address.trim().isEmpty()) {
+                    userDAO.updateAddress(user.getId(), address, city, fullName, phone);
+                }
+                session.setAttribute("account", user);
+                request.setAttribute("message", "Cập nhật hồ sơ thành công!");
+                request.setAttribute("userAddress", address);
+            } else {
+                request.setAttribute("error", "Cập nhật hồ sơ thất bại. Vui lòng thử lại!");
+
+                String currentAddress = userDAO.getUserAddress(user.getId());
+                request.setAttribute("userAddress", currentAddress);
             }
-            session.setAttribute("account", user);
-            request.setAttribute("message", "Cập nhật hồ sơ thành công!");
-            request.setAttribute("userAddress", address);
 
         } catch (Exception e) {
             e.printStackTrace();
