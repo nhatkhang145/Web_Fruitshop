@@ -96,7 +96,9 @@ public class GoogleCallbackServlet extends HttpServlet {
                             "Tài khoản của bạn đã được liên kết với Google thành công!");
 
                 } else if ("google".equals(user.getLoginType())) {
-                    user.setFullName(name);
+                    if (!user.isNameChanged()){
+                        user.setFullName(name);
+                    }
                     if (picture != null && (user.getAvatar() == null || user.getAvatar().contains("default-user"))) {
                         user.setAvatar(picture);
                     }

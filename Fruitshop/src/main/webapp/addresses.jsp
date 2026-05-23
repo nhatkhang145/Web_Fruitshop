@@ -47,7 +47,6 @@
         </head>
 
         <body>
-            <!-- HEADER -->
             <jsp:include page="header.jsp"></jsp:include>
             <div class="breadcrumb">
                 <div class="container">
@@ -104,8 +103,8 @@
                                         thích</a>
                                 </li>
                                 <li class="profile-menu-item">
-                                    <a href="<c:url value='/logout'/>" style="color: red;"><i
-                                            class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
+                                    <a href="<c:url value='/logout'/>"><i class="fa-solid fa-right-from-bracket"></i>
+                                        Đăng xuất</a>
                                 </li>
                             </ul>
                         </aside>
@@ -236,8 +235,18 @@
                                     required />
                             </div>
                             <div class="form-group">
-                                <input type="text" name="city" id="city" class="form-input"
-                                    placeholder="Tỉnh/Thành phố, Quận/Huyện, Phường/Xã" required />
+                                <div style="display: flex; gap: 8px;">
+                                    <select name="province" id="provinceSelect" class="form-input" style="flex:1">
+                                        <option value="">Chọn Tỉnh/Thành phố</option>
+                                    </select>
+                                    <select name="district" id="districtSelect" class="form-input" style="flex:1">
+                                        <option value="">Chọn Quận/Huyện</option>
+                                    </select>
+                                    <select name="ward" id="wardSelect" class="form-input" style="flex:1">
+                                        <option value="">Chọn Phường/Xã</option>
+                                    </select>
+                                </div>
+                                <input type="hidden" name="city" id="city" value="" />
                             </div>
                             <div class="form-group">
                                 <textarea name="address" id="address" class="form-input"
@@ -276,12 +285,137 @@
                 const spanClose = document.getElementsByClassName("close-modal")[0];
                 const btnClose = document.getElementsByClassName("close-modal-btn")[0];
                 const phoneInput = document.getElementById("phoneNumber");
+                const provinceSel = document.getElementById('provinceSelect');
+                const districtSel = document.getElementById('districtSelect');
+                const wardSel = document.getElementById('wardSelect');
+                const cityHidden = document.getElementById('city');
+                const addressInput = document.getElementById('address');
 
                 phoneInput.addEventListener('input', function (e) {
                     this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
                 });
 
+                let currentProvinceData = null;
+
+                function clearSelect(sel, placeholder) {
+                    sel.innerHTML = '';
+                    const opt = document.createElement('option');
+                    opt.value = '';
+                    opt.textContent = placeholder;
+                    sel.appendChild(opt);
+                }
+
+                async function loadProvinces() {
+                    if (!provinceSel) return;
+                    clearSelect(provinceSel, 'Chọn Tỉnh/Thành phố');
+                    try {
+                        const res = await fetch('https://provinces.open-api.vn/api/?depth=1');
+                        const data = await res.json();
+                        data.forEach(p => {
+                            const o = document.createElement('option');
+                            o.value = p.code;
+                            o.textContent = p.name;
+                            provinceSel.appendChild(o);
+                        });
+                        const cityVal = cityHidden?.value || '';
+                        if (cityVal) tryPrefillFromCity(cityVal);
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+
+                async function onProvinceChange() {
+                    clearSelect(districtSel, 'Chọn Quận/Huyện');
+                    clearSelect(wardSel, 'Chọn Phường/Xã');
+                    const code = provinceSel.value;
+                    currentProvinceData = null;
+                    if (!code) return;
+                    try {
+                        const res = await fetch('https://provinces.open-api.vn/api/p/' + code + '?depth=2');
+                        const data = await res.json();
+                        currentProvinceData = data;
+                        data.districts.forEach(d => {
+                            const o = document.createElement('option');
+                            o.value = d.code;
+                            o.textContent = d.name;
+                            districtSel.appendChild(o);
+                        });
+                        const cityVal = cityHidden?.value || '';
+                        if (cityVal) {
+                            const parts = cityVal.split(',').map(s => s.trim());
+                            if (parts[1]) {
+                                const match = Array.from(districtSel.options).find(o => o.text === parts[1]);
+                                if (match) {
+                                    districtSel.value = match.value;
+                                    onDistrictChange();
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+
+                function onDistrictChange() {
+                    clearSelect(wardSel, 'Chọn Phường/Xã');
+                    const dCode = districtSel.value;
+                    if (!dCode || !currentProvinceData) return;
+                    const district = currentProvinceData.districts.find(d => String(d.code) === String(dCode));
+                    if (!district) return;
+                    (district.wards || []).forEach(w => {
+                        const o = document.createElement('option');
+                        o.value = w.code;
+                        o.textContent = w.name;
+                        wardSel.appendChild(o);
+                    });
+                    const cityVal = cityHidden?.value || '';
+                    if (cityVal) {
+                        const parts = cityVal.split(',').map(s => s.trim());
+                        if (parts[2]) {
+                            const match = Array.from(wardSel.options).find(o => o.text === parts[2]);
+                            if (match) wardSel.value = match.value;
+                        }
+                    }
+                }
+
+                function tryPrefillFromCity(cityStr) {
+                    const parts = cityStr.split(',').map(s => s.trim());
+                    if (!parts.length) return;
+                    const provName = parts[0];
+                    const match = Array.from(provinceSel.options).find(o => o.text === provName);
+                    if (match) {
+                        provinceSel.value = match.value;
+                        onProvinceChange();
+                    }
+                }
+
+                provinceSel?.addEventListener('change', onProvinceChange);
+                districtSel?.addEventListener('change', onDistrictChange);
+
+                loadProvinces();
+
                 document.querySelector('.address-form').addEventListener('submit', function (e) {
+                    let locationText = '';
+
+                    if (provinceSel && provinceSel.value) {
+                        const provinceText = provinceSel.options[provinceSel.selectedIndex].text || '';
+                        const districtText = districtSel.options[districtSel.selectedIndex]?.text || '';
+                        const wardText = wardSel.options[wardSel.selectedIndex]?.text || '';
+                        cityHidden.value = [provinceText, districtText, wardText].filter(Boolean).join(', ');
+                        locationText = [wardText, districtText, provinceText].filter(Boolean).join(', ');
+                    } else if (cityHidden.value.trim()) {
+                        locationText = cityHidden.value.trim();
+                    } else {
+                        e.preventDefault();
+                        alert('Vui lòng chọn Tỉnh/Thành phố hoặc điền địa chỉ hợp lệ.');
+                        return false;
+                    }
+
+                    const detailText = addressInput.value.trim();
+                    if (locationText && !detailText.includes(locationText)) {
+                        addressInput.value = [detailText, locationText].filter(Boolean).join(', ');
+                    }
+
                     const phoneValue = phoneInput.value.trim();
                     const phoneRegex = /^0[3578][0-9]{8}$/;
 
@@ -299,7 +433,10 @@
                     document.getElementById("addressId").value = "";
                     document.getElementById("receiverName").value = "";
                     document.getElementById("phoneNumber").value = "";
-                    document.getElementById("city").value = "";
+                    if (provinceSel) provinceSel.value = "";
+                    if (districtSel) districtSel.value = "";
+                    if (wardSel) wardSel.value = "";
+                    if (cityHidden) cityHidden.value = "";
                     document.getElementById("address").value = "";
 
                     const isDefaultCheckbox = document.getElementById("isDefault");
@@ -326,11 +463,13 @@
                         document.getElementById("addressId").value = this.dataset.id;
                         document.getElementById("receiverName").value = this.dataset.name;
                         document.getElementById("phoneNumber").value = this.dataset.phone;
-                        document.getElementById("city").value = this.dataset.city;
+                        if (cityHidden) cityHidden.value = this.dataset.city;
                         document.getElementById("address").value = this.dataset.address;
 
                         const isDefaultCheckbox = document.getElementById("isDefault");
                         if (isDefaultCheckbox) isDefaultCheckbox.checked = this.dataset.default === "true";
+
+                        if (cityHidden.value) tryPrefillFromCity(cityHidden.value);
 
                         modal.style.display = "flex";
                     };

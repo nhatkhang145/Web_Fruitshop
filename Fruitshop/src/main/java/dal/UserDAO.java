@@ -99,7 +99,8 @@ public class UserDAO {
                     .bind(2, user.getGender())
                     .bind(3, user.getBirthDate())
                     .bind(4, user.getAvatar())
-                    .bind(5, user.getId())
+                    .bind(5, user.isNameChanged())
+                    .bind(6, user.getId())
                     .execute());
             return rows > 0;
         } catch (Exception e) {
