@@ -236,8 +236,18 @@
                                     required />
                             </div>
                             <div class="form-group">
-                                <input type="text" name="city" id="city" class="form-input"
-                                    placeholder="Tỉnh/Thành phố, Quận/Huyện, Phường/Xã" required />
+                                <div style="display: flex; gap: 8px;">
+                                    <select name="province" id="provinceSelect" class="form-input" style="flex:1">
+                                        <option value="">Chọn Tỉnh/Thành phố</option>
+                                    </select>
+                                    <select name="district" id="districtSelect" class="form-input" style="flex:1">
+                                        <option value="">Chọn Quận/Huyện</option>
+                                    </select>
+                                    <select name="ward" id="wardSelect" class="form-input" style="flex:1">
+                                        <option value="">Chọn Phường/Xã</option>
+                                    </select>
+                                </div>
+                                <input type="hidden" name="city" id="city" value="" />
                             </div>
                             <div class="form-group">
                                 <textarea name="address" id="address" class="form-input"
@@ -276,12 +286,29 @@
                 const spanClose = document.getElementsByClassName("close-modal")[0];
                 const btnClose = document.getElementsByClassName("close-modal-btn")[0];
                 const phoneInput = document.getElementById("phoneNumber");
+                const provinceSel = document.getElementById('provinceSelect');
+                const districtSel = document.getElementById('districtSelect');
+                const wardSel = document.getElementById('wardSelect');
+                const cityHidden = document.getElementById('city');
 
                 phoneInput.addEventListener('input', function (e) {
                     this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
                 });
 
                 document.querySelector('.address-form').addEventListener('submit', function (e) {
+                    if (provinceSel) {
+                        if (provinceSel.value) {
+                            const provinceText = provinceSel.options[provinceSel.selectedIndex].text || '';
+                            const districtText = districtSel.options[districtSel.selectedIndex]?.text || '';
+                            const wardText = wardSel.options[wardSel.selectedIndex]?.text || '';
+                            cityHidden.value = [provinceText, districtText, wardText].filter(Boolean).join(', ');
+                        } else if (!cityHidden.value.trim()) {
+                            e.preventDefault();
+                            alert('Vui lòng chọn Tỉnh/Thành phố hoặc điền địa chỉ hợp lệ.');
+                            return false;
+                        }
+                    }
+
                     const phoneValue = phoneInput.value.trim();
                     const phoneRegex = /^0[3578][0-9]{8}$/;
 
@@ -299,7 +326,10 @@
                     document.getElementById("addressId").value = "";
                     document.getElementById("receiverName").value = "";
                     document.getElementById("phoneNumber").value = "";
-                    document.getElementById("city").value = "";
+                    if (provinceSel) provinceSel.value = "";
+                    if (districtSel) districtSel.value = "";
+                    if (wardSel) wardSel.value = "";
+                    if (cityHidden) cityHidden.value = "";
                     document.getElementById("address").value = "";
 
                     const isDefaultCheckbox = document.getElementById("isDefault");
@@ -326,7 +356,8 @@
                         document.getElementById("addressId").value = this.dataset.id;
                         document.getElementById("receiverName").value = this.dataset.name;
                         document.getElementById("phoneNumber").value = this.dataset.phone;
-                        document.getElementById("city").value = this.dataset.city;
+                        if (provinceSel) { provinceSel.value = ""; districtSel.value = ""; wardSel.value = ""; }
+                        if (cityHidden) cityHidden.value = this.dataset.city;
                         document.getElementById("address").value = this.dataset.address;
 
                         const isDefaultCheckbox = document.getElementById("isDefault");
