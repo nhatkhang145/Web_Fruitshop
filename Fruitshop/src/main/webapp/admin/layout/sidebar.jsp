@@ -24,13 +24,13 @@
                     <a href="${pageContext.request.contextPath}/admin/orders"><i class='bx bx-receipt'></i>Quản lý đơn
                         hàng</a>
                 </li>
+                <li class="${param.activePage == 'stock-management' ? 'active' : ''}">
+                    <a href="${pageContext.request.contextPath}/admin/inventory-warehouse.jsp"><i
+                            class='bx bx-box'></i>Quản lý tồn kho</a>
+                </li>
                 <li class="${param.activePage == 'inventory' ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/inventory-management"><i
-                            class='bx bx-archive-in'></i>Quản lý nhập kho</a>
-                </li>
-                <li class="${param.activePage == 'stock-export' ? 'active' : ''}">
-                    <a href="${pageContext.request.contextPath}/admin/stock-export.jsp"><i class='bx bx-export'></i>Quản
-                        lý xuất kho</a>
+                            class='bx bx-archive-in'></i>Phiếu nhập/xuất kho</a>
                 </li>
                 <li class="${param.activePage == 'weekend-deals' ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/weekend-deals"><i
