@@ -1,6 +1,7 @@
 package controller;
 
 import dal.AddressDAO;
+import dal.CartDAO;
 import dal.OrderDAO;
 import model.Address;
 import model.CartItem;
@@ -25,6 +26,7 @@ public class CheckoutServlet extends HttpServlet {
 
     private OrderDAO orderDAO = new OrderDAO();
     private AddressDAO addressDAO = new AddressDAO();
+    private CartDAO cartDAO = new CartDAO();
 
     private List<CartItem> resolveCheckoutCart(HttpServletRequest req, HttpSession session) {
         List<CartItem> buyNowCart = (List<CartItem>) session.getAttribute("buyNowCart");
@@ -80,7 +82,7 @@ public class CheckoutServlet extends HttpServlet {
         }
     }
 
-    private void removePurchasedItemsFromCart(HttpSession session, List<CartItem> purchasedItems) {
+    private void removePurchasedItemsFromCart(HttpSession session, List<CartItem> purchasedItems, Integer userId) {
         List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
         if (cart == null || cart.isEmpty() || purchasedItems == null || purchasedItems.isEmpty()) {
             return;
@@ -110,6 +112,10 @@ public class CheckoutServlet extends HttpServlet {
             session.setAttribute("cart", cart);
             session.setAttribute("size", cart.size());
             session.setAttribute("totalMoney", totalMoney);
+        }
+
+        if (userId != null) {
+            cartDAO.replaceCartItems(userId, cart);
         }
     }
 
@@ -293,7 +299,7 @@ public class CheckoutServlet extends HttpServlet {
                     session.removeAttribute("buyNowCart");
                     session.removeAttribute("isBuyNow");
                 } else {
-                    removePurchasedItemsFromCart(session, cart);
+                    removePurchasedItemsFromCart(session, cart, user.getId());
                 }
 
                 session.removeAttribute("checkoutCart");
