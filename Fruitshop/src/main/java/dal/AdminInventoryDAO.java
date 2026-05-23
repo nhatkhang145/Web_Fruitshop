@@ -74,12 +74,52 @@ public class AdminInventoryDAO {
         );
     }
 
+    public int getReceiptCountByStatus(String status) {
+        Long count = DBContext.get().withHandle(handle ->
+            handle.createQuery("SELECT COUNT(*) FROM inventory_receipts WHERE status = ?")
+                    .bind(0, status)
+                    .mapTo(Long.class)
+                    .findFirst()
+                    .orElse(0L)
+        );
+        return count != null ? count.intValue() : 0;
+    }
+
+    public long getTotalImportedQuantity() {
+        Long total = DBContext.get().withHandle(handle ->
+            handle.createQuery(
+                "SELECT COALESCE(SUM(i.quantity), 0) " +
+                "FROM inventory_receipt_items i " +
+                "JOIN inventory_receipts r ON i.receipt_id = r.id " +
+                "WHERE r.status = 'APPROVED'")
+                    .mapTo(Long.class)
+                    .findFirst()
+                    .orElse(0L)
+        );
+        return total != null ? total : 0L;
+    }
+
+    public double getTotalImportedValueThisMonth() {
+        Double total = DBContext.get().withHandle(handle ->
+            handle.createQuery(
+                "SELECT COALESCE(SUM(r.total_amount), 0) " +
+                "FROM inventory_receipts r " +
+                "WHERE r.status = 'APPROVED' " +
+                "AND YEAR(r.receipt_date) = YEAR(CURRENT_DATE()) " +
+                "AND MONTH(r.receipt_date) = MONTH(CURRENT_DATE())")
+                    .mapTo(Double.class)
+                    .findFirst()
+                    .orElse(0.0)
+        );
+        return total != null ? total : 0.0;
+    }
+
    
 
-   // them phieu nhap kho moi
-    public int insertReceipt(InventoryReceipt receipt) {
-        return DBContext.get().withHandle(handle ->
-            handle.createUpdate(
+   // them phieu nhap kho moi va cac dong hang trong 1 transaction
+    public int createReceiptWithItems(InventoryReceipt receipt, List<InventoryReceiptItem> items) {
+        return DBContext.get().inTransaction(handle -> {
+            int receiptId = handle.createUpdate(
                     "INSERT INTO inventory_receipts (code, supplier_id, receipt_date, total_amount, status, note, created_by) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?)")
                     .bind(0, receipt.getCode())
@@ -89,44 +129,67 @@ public class AdminInventoryDAO {
                     .bind(4, receipt.getStatus())
                     .bind(5, receipt.getNote())
                     .bind(6, receipt.getCreatedBy())
-                    .executeAndReturnGeneratedKeys()
+                    .executeAndReturnGeneratedKeys("id")
                     .mapTo(Integer.class)
-                    .first()
-        );
-    }
+                    .one();
 
-    
-     // Thêm dòng hàng cho phiếu nhập kho
-     
-    public int insertReceiptItem(InventoryReceiptItem item) {
-        return DBContext.get().withHandle(handle ->
-            handle.createUpdate(
-                    "INSERT INTO inventory_receipt_items (receipt_id, product_id, quantity, unit_price) " +
-                    "VALUES (?, ?, ?, ?)")
-                    .bind(0, item.getReceiptId())
-                    .bind(1, item.getProductId())
-                    .bind(2, item.getQuantity())
-                    .bind(3, item.getUnitPrice())
-                    .execute()
-        );
-    }
-
-    
-     // Thêm nhiều dòng hàng cùng lúc
-     
-    public void insertReceiptItems(int receiptId, List<InventoryReceiptItem> items) {
-        DBContext.get().useTransaction(handle -> {
             for (InventoryReceiptItem item : items) {
-                item.setReceiptId(receiptId);
                 handle.createUpdate(
                         "INSERT INTO inventory_receipt_items (receipt_id, product_id, quantity, unit_price) " +
                         "VALUES (?, ?, ?, ?)")
-                        .bind(0, item.getReceiptId())
+                        .bind(0, receiptId)
                         .bind(1, item.getProductId())
                         .bind(2, item.getQuantity())
                         .bind(3, item.getUnitPrice())
                         .execute();
             }
+
+            return receiptId;
+        });
+    }
+
+    // Duyệt phiếu nhập kho va cap nhat ton kho
+    public void approveReceipt(int receiptId) {
+        DBContext.get().inTransaction(handle -> {
+            String currentStatus = handle.createQuery(
+                    "SELECT status FROM inventory_receipts WHERE id = ? FOR UPDATE")
+                    .bind(0, receiptId)
+                    .mapTo(String.class)
+                    .findFirst()
+                    .orElse(null);
+
+            if (currentStatus == null) {
+                throw new IllegalArgumentException("Không tìm thấy phiếu nhập kho");
+            }
+
+            if ("APPROVED".equalsIgnoreCase(currentStatus)) {
+                throw new IllegalStateException("Phiếu đã được duyệt trước đó");
+            }
+
+            handle.createUpdate(
+                    "UPDATE inventory_receipts SET status = 'APPROVED' WHERE id = ?")
+                    .bind(0, receiptId)
+                    .execute();
+
+            List<InventoryReceiptItem> items = handle.createQuery(
+                    "SELECT id, receipt_id, product_id, quantity, unit_price FROM inventory_receipt_items WHERE receipt_id = ?")
+                    .bind(0, receiptId)
+                    .mapToBean(InventoryReceiptItem.class)
+                    .list();
+
+            for (InventoryReceiptItem item : items) {
+                int updatedRows = handle.createUpdate(
+                        "UPDATE products SET stock = stock + ? WHERE id = ?")
+                        .bind(0, item.getQuantity())
+                        .bind(1, item.getProductId())
+                        .execute();
+
+                if (updatedRows == 0) {
+                    throw new IllegalStateException("Không tìm thấy sản phẩm ID " + item.getProductId());
+                }
+            }
+
+            return null;
         });
     }
 

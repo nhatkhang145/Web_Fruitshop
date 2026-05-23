@@ -27,15 +27,14 @@
     <main>
         <div class="page-hero">
             <div class="hero-copy">
-                <div class="eyebrow">Warehouse management</div>
                 <h1>Quản lý nhập kho</h1>
-                <p>Theo dõi phiếu nhập, xem nhanh chi tiết, lọc theo thời gian và tạo phiếu mới trong một giao diện thống nhất.</p>
+                <p>Theo dõi phiếu nhập, xem nhanh chi tiết, lọc theo thời gian và tạo phiếu mới.</p>
             </div>
             <div class="hero-actions">
-                <button type="button" class="btn btn-primary" id="openCreateReceiptBtn">
+                <a class="btn btn-primary" href="${pageContext.request.contextPath}/admin/inventory-receipt-new">
                     <i class='bx bx-plus-circle'></i>
                     <span>Tạo phiếu nhập kho</span>
-                </button>
+                </a>
             </div>
         </div>
 
@@ -44,7 +43,7 @@
                 <div class="stat-icon"><i class='bx bx-receipt'></i></div>
                 <div>
                     <span class="stat-label">Tổng phiếu nhập</span>
-                    <strong>${totalReceipts != null ? totalReceipts : 0}</strong>
+                    <strong><fmt:formatNumber value="${totalReceipts != null ? totalReceipts : 0}" type="number" groupingUsed="true"/></strong>
                     <small>Cập nhật liên tục</small>
                 </div>
             </article>
@@ -52,7 +51,7 @@
                 <div class="stat-icon"><i class='bx bx-package'></i></div>
                 <div>
                     <span class="stat-label">Sản phẩm đã nhập</span>
-                    <strong>3,482</strong>
+                    <strong><fmt:formatNumber value="${totalImportedItems != null ? totalImportedItems : 0}" type="number" groupingUsed="true"/></strong>
                     <small>Trên toàn hệ thống</small>
                 </div>
             </article>
@@ -60,7 +59,7 @@
                 <div class="stat-icon"><i class='bx bx-wallet'></i></div>
                 <div>
                     <span class="stat-label">Tổng giá trị nhập</span>
-                    <strong>1.28 tỷ</strong>
+                    <strong><fmt:formatNumber value="${totalImportedValueThisMonth != null ? totalImportedValueThisMonth : 0}" type="number" groupingUsed="true"/> VND</strong>
                     <small>Tạm tính tháng này</small>
                 </div>
             </article>
@@ -68,8 +67,8 @@
                 <div class="stat-icon"><i class='bx bx-check-shield'></i></div>
                 <div>
                     <span class="stat-label">Phiếu đã duyệt</span>
-                    <strong>114</strong>
-                    <small>Đang chờ duyệt: 14</small>
+                    <strong><fmt:formatNumber value="${approvedReceipts != null ? approvedReceipts : 0}" type="number" groupingUsed="true"/></strong>
+                    <small>Đang chờ duyệt: <fmt:formatNumber value="${pendingReceipts != null ? pendingReceipts : 0}" type="number" groupingUsed="true"/></small>
                 </div>
             </article>
         </section>
@@ -102,7 +101,7 @@
             <div class="panel-header">
                 <div>
                     <h2>Danh sách phiếu nhập kho</h2>
-                    <p>Click vào biểu tượng xem để mở chi tiết phiếu nhập.</p>
+                   
                 </div>
                 <div class="panel-chip">Hiển thị ${totalReceipts != null ? totalReceipts : 0} phiếu</div>
             </div>
@@ -211,109 +210,10 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-ghost" data-close-modal>Đóng</button>
-            <button type="button" class="btn btn-primary" id="openCreateFromDetailBtn">
+            <a class="btn btn-primary" href="${pageContext.request.contextPath}/admin/inventory-receipt-new">
                 <i class='bx bx-copy-alt'></i>
-                <span>Tạo phiếu tương tự</span>
-            </button>
-        </div>
-    </div>
-</div>
-
-<div class="modal modal-fullscreen" id="createReceiptModal" aria-hidden="true">
-    <div class="modal-content modal-xl modal-full">
-        <div class="modal-header">
-            <div>
-                <p class="modal-kicker">Tạo phiếu nhập kho</p>
-                <h2>Phiếu nhập mới</h2>
-            </div>
-            <button type="button" class="modal-close" data-close-modal>&times;</button>
-        </div>
-        <div class="modal-body">
-            <div id="createReceiptMsg" class="form-msg is-hidden"></div>
-            <form class="receipt-form" id="createReceiptForm">
-                <div class="form-grid form-grid--wide">
-                    <div class="form-group">
-                        <label for="inputReceiptCode">Mã phiếu nhập <span class="required">*</span></label>
-                        <input type="text" id="inputReceiptCode" name="receipt_code" placeholder="RCP-YYYYMMDD-0001" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="inputReceiptDate">Ngày nhập <span class="required">*</span></label>
-                        <div class="input-icon">
-                            <i class='bx bx-calendar'></i>
-                            <input type="date" id="inputReceiptDate" name="receipt_date" class="input-date" required />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="inputCreator">Người lập phiếu <span class="required">*</span></label>
-                        <input type="text" id="inputCreator" name="creator_name" value="${sessionScope.account.fullName}" data-default="${sessionScope.account.fullName}" placeholder="Tên người lập" required />
-                    </div>
-                    <div class="form-group form-group-full">
-                        <label for="inputSupplierSelect">Nhà cung cấp <span class="required">*</span></label>
-                        <div class="supplier-picker">
-                            <div class="supplier-picker__col">
-                                <span class="supplier-picker__label">Chọn từ danh sách</span>
-                                <select id="inputSupplierSelect" name="supplier_select">
-                                    <option value="">-- Chọn nhà cung cấp --</option>
-                                    <c:forEach var="s" items="${suppliers}">
-                                        <option value="${s.id}">${s.name}</option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-                            <div class="supplier-picker__col">
-                                <span class="supplier-picker__label">Hoặc nhập mới</span>
-                                <input type="text" id="inputSupplierName" name="supplier_name" placeholder="Nhập nhà cung cấp mới" />
-                            </div>
-                        </div>
-                        <input type="hidden" id="inputSupplierId" name="supplier_id" />
-                        <small class="field-hint">Chọn nhà cung cấp có sẵn hoặc nhập tên mới để thêm ngay trong phiếu.</small>
-                    </div>
-                    <div class="form-group form-group-full">
-                        <label for="inputNote">Ghi chú <span class="required">*</span></label>
-                        <textarea id="inputNote" name="note" rows="2" placeholder="Thông tin giao nhận, điều kiện, ghi chú kiểm hàng..." required></textarea>
-                    </div>
-                </div>
-
-                <div class="line-items-card">
-                    <div class="detail-lines__header detail-lines__header--split">
-                        <div class="detail-lines__heading">
-                            <h3>Danh sách hàng nhập</h3>
-                            <span>Thêm từng dòng sản phẩm</span>
-                        </div>
-                        <button type="button" class="btn btn-dashed btn-dashed--compact" id="addLineItemBtn">
-                            <i class='bx bx-plus'></i>
-                            <span>Thêm dòng hàng</span>
-                        </button>
-                    </div>
-                    <div class="line-item row-head">
-                        <span>Mã sản phẩm</span>
-                        <span>Số lượng</span>
-                        <span>Đơn giá (VND)</span>
-                        <span>Thành tiền</span>
-                        <span></span>
-                    </div>
-                    <div id="lineItemsContainer">
-                        <div class="line-item js-line-item">
-                            <select class="line-product-select" name="product_id" required>
-                                <option value="">-- Chọn mã sản phẩm --</option>
-                                <c:forEach var="p" items="${products}">
-                                    <option value="${p.id}">${p.id} - ${p.name}</option>
-                                </c:forEach>
-                            </select>
-                            <input type="number" class="line-qty" name="quantity" placeholder="0" min="1" required />
-                            <input type="number" class="line-price" name="price" placeholder="0" min="1" required />
-                            <input type="text" class="line-total" placeholder="Tự tính" disabled />
-                            <button type="button" class="line-remove-btn"><i class='bx bx-trash'></i></button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-ghost" data-close-modal>Hủy</button>
-            <button type="button" class="btn btn-primary" id="saveReceiptBtn">
-                <i class='bx bx-save'></i>
-                <span>Lưu phiếu nhập</span>
-            </button>
+                <span>Tạo phiếu mới</span>
+            </a>
         </div>
     </div>
 </div>
