@@ -44,176 +44,17 @@
                     color: #ccc;
                 }
             </style>
-        </head>
-
-        <body>
-            <!-- HEADER -->
-            <jsp:include page="header.jsp"></jsp:include>
-            <div class="breadcrumb">
-                <div class="container">
-                    <a href="<c:url value='/'/>">Trang chủ</a> &gt;
-                    <a href="<c:url value='/profile'/>">Tài khoản</a> &gt; <span>Địa chỉ</span>
-                </div>
+            <c:if test="${addr.defaultAddress}">
+                <button class="btn btn-outline btn-sm disabled" disabled>Thiết lập mặc
+                    định</button>
+            </c:if>
             </div>
-
-            <section class="profile-section">
-                <div class="container">
-                    <div class="profile-container">
-                        <aside class="profile-sidebar">
-                            <div class="profile-user-brief">
-                                <c:choose>
-                                    <c:when test="${not empty sessionScope.account.avatar}">
-                                        <c:set var="avatarSrc" value="${sessionScope.account.avatar}" />
-                                    </c:when>
-                                    <c:otherwise>
-                                        <c:set var="avatarSrc"
-                                            value="https://cdn-icons-png.flaticon.com/512/149/149071.png" />
-                                    </c:otherwise>
-                                </c:choose>
-
-                                <img src="<c:out value='${avatarSrc}'/>" alt="Avatar" class="brief-avatar" />
-
-                                <div class="brief-info">
-                                    <span class="brief-name">
-                                        <c:out value="${sessionScope.account.fullName}" />
-                                    </span>
-                                    <a href="<c:url value='/profile'/>" class="brief-edit">
-                                        <i class="fa-solid fa-pen"></i> Sửa hồ sơ
-                                    </a>
-                                </div>
-                            </div>
-
-                            <ul class="profile-menu">
-                                <li class="profile-menu-item ">
-                                    <a href="<c:url value='/profile'/>"><i class="fa-regular fa-user"></i> Hồ sơ của
-                                        tôi</a>
-                                </li>
-                                <li class="profile-menu-item">
-                                    <a href="<c:url value='/orders'/>"><i class="fa-solid fa-box-open"></i> Đơn mua</a>
-                                </li>
-                                <li class="profile-menu-item active">
-                                    <a href="<c:url value='/addresses'/>"><i class="fa-solid fa-location-dot"></i> Địa
-                                        chỉ</a>
-                                </li>
-                                <li class="profile-menu-item ">
-                                    <a href="<c:url value='/change-password.jsp'/>"><i class="fa-solid fa-key"></i> Đổi
-                                        mật khẩu</a>
-                                </li>
-                                <li class="profile-menu-item">
-                                    <a href="<c:url value='/wishlist'/>"><i class="fa-regular fa-heart"></i> Yêu
-                                        thích</a>
-                                </li>
-                                <li class="profile-menu-item">
-                                    <a href="<c:url value='/logout'/>" style="color: red;"><i
-                                            class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
-                                </li>
-                            </ul>
-                        </aside>
-
-                        <main class="profile-content">
-                            <div class="address-header">
-                                <h3>Địa chỉ của tôi</h3>
-                                <button class="btn btn-primary" id="btnAddAddress">
-                                    <i class="fa-solid fa-plus"></i> Thêm địa chỉ mới
-                                </button>
-                            </div>
-
-                            <c:if test="${not empty sessionScope.checkoutMessage}">
-                                <div class="alert alert-success">
-                                    <c:out value="${sessionScope.checkoutMessage}" />
-                                    <c:remove var="checkoutMessage" scope="session" />
-                                </div>
-                            </c:if>
-                            <c:if test="${not empty message}">
-                                <div class="alert alert-success">
-                                    <c:out value="${message}" />
-                                </div>
-                            </c:if>
-                            <c:if test="${not empty error}">
-                                <div class="alert alert-danger">
-                                    <c:out value="${error}" />
-                                </div>
-                            </c:if>
-
-                            <div class="address-list">
-                                <c:if test="${empty addresses}">
-                                    <div class="empty-addresses">
-                                        <i class="fa-solid fa-location-dot"></i>
-                                        <p>Bạn chưa có địa chỉ nào</p>
-                                        <p>Hãy thêm địa chỉ để thuận tiện cho việc giao hàng</p>
-                                    </div>
-                                </c:if>
-
-                                <c:forEach var="addr" items="${addresses}">
-                                    <div class="address-card <c:if test='${addr.defaultAddress}'>default</c:if>">
-                                        <div class="address-info">
-                                            <div class="info-row">
-                                                <span class="info-name">
-                                                    <c:out value="${addr.receiverName}" />
-                                                </span>
-                                                <span class="info-divider">|</span>
-                                                <span class="info-phone">
-                                                    <c:out value="${addr.phoneNumber}" />
-                                                </span>
-                                            </div>
-                                            <div class="info-address">
-                                                <p>
-                                                    <c:out value="${addr.address}" />
-                                                </p>
-                                                <p>
-                                                    <c:out value="${addr.city}" />
-                                                </p>
-                                            </div>
-                                            <div class="info-tags">
-                                                <c:if test="${addr.defaultAddress}">
-                                                    <span class="tag tag-default">Mặc định</span>
-                                                </c:if>
-                                            </div>
-                                        </div>
-                                        <div class="address-actions">
-                                            <div class="action-links">
-                                                <button class="btn-text btn-edit" data-id="${addr.id}"
-                                                    data-name="<c:out value='${addr.receiverName}'/>"
-                                                    data-phone="<c:out value='${addr.phoneNumber}'/>"
-                                                    data-address="<c:out value='${addr.address}'/>"
-                                                    data-city="<c:out value='${addr.city}'/>"
-                                                    data-default="${addr.defaultAddress}">Cập nhật
-                                                </button>
-                                                <c:choose>
-                                                    <c:when test="${addr.defaultAddress}">
-                                                        <button class="btn-text disabled" disabled>Xóa</button>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <form action="<c:url value='/addresses'/>" method="post"
-                                                            style="display:inline;">
-                                                            <input type="hidden" name="action" value="delete" />
-                                                            <input type="hidden" name="addressId" value="${addr.id}" />
-                                                            <button type="submit" class="btn-text text-danger"
-                                                                onclick="return confirm('Bạn có chắc muốn xóa địa chỉ này?')">Xóa</button>
-                                                        </form>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </div>
-                                            <c:if test="${!addr.defaultAddress}">
-                                                <form action="<c:url value='/addresses'/>" method="post"
-                                                    style="display:inline;">
-                                                    <input type="hidden" name="action" value="setDefault" />
-                                                    <input type="hidden" name="addressId" value="${addr.id}" />
-                                                    <button type="submit" class="btn btn-outline btn-sm">Thiết lập mặc
-                                                        định</button>
-                                                </form>
-                                            </c:if>
-                                            <c:if test="${addr.defaultAddress}">
-                                                <button class="btn btn-outline btn-sm disabled" disabled>Thiết lập mặc
-                                                    định</button>
-                                            </c:if>
-                                        </div>
-                                    </div>
-                                </c:forEach>
-                            </div>
-                        </main>
-                    </div>
-                </div>
+            </div>
+            </c:forEach>
+            </div>
+            </main>
+            </div>
+            </div>
             </section>
 
             <div class="modal" id="addressModal">
@@ -295,6 +136,105 @@
                     this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
                 });
 
+                let currentProvinceData = null;
+
+                function clearSelect(sel, placeholder) {
+                    sel.innerHTML = '';
+                    const opt = document.createElement('option');
+                    opt.value = '';
+                    opt.textContent = placeholder;
+                    sel.appendChild(opt);
+                }
+
+                async function loadProvinces() {
+                    if (!provinceSel) return;
+                    clearSelect(provinceSel, 'Chọn Tỉnh/Thành phố');
+                    try {
+                        const res = await fetch('https://provinces.open-api.vn/api/?depth=1');
+                        const data = await res.json();
+                        data.forEach(p => {
+                            const o = document.createElement('option');
+                            o.value = p.code;
+                            o.textContent = p.name;
+                            provinceSel.appendChild(o);
+                        });
+                        const cityVal = cityHidden?.value || '';
+                        if (cityVal) tryPrefillFromCity(cityVal);
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+
+                async function onProvinceChange() {
+                    clearSelect(districtSel, 'Chọn Quận/Huyện');
+                    clearSelect(wardSel, 'Chọn Phường/Xã');
+                    const code = provinceSel.value;
+                    currentProvinceData = null;
+                    if (!code) return;
+                    try {
+                        const res = await fetch('https://provinces.open-api.vn/api/p/' + code + '?depth=2');
+                        const data = await res.json();
+                        currentProvinceData = data;
+                        data.districts.forEach(d => {
+                            const o = document.createElement('option');
+                            o.value = d.code;
+                            o.textContent = d.name;
+                            districtSel.appendChild(o);
+                        });
+                        const cityVal = cityHidden?.value || '';
+                        if (cityVal) {
+                            const parts = cityVal.split(',').map(s => s.trim());
+                            if (parts[1]) {
+                                const match = Array.from(districtSel.options).find(o => o.text === parts[1]);
+                                if (match) {
+                                    districtSel.value = match.value;
+                                    onDistrictChange();
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+
+                function onDistrictChange() {
+                    clearSelect(wardSel, 'Chọn Phường/Xã');
+                    const dCode = districtSel.value;
+                    if (!dCode || !currentProvinceData) return;
+                    const district = currentProvinceData.districts.find(d => String(d.code) === String(dCode));
+                    if (!district) return;
+                    (district.wards || []).forEach(w => {
+                        const o = document.createElement('option');
+                        o.value = w.code;
+                        o.textContent = w.name;
+                        wardSel.appendChild(o);
+                    });
+                    const cityVal = cityHidden?.value || '';
+                    if (cityVal) {
+                        const parts = cityVal.split(',').map(s => s.trim());
+                        if (parts[2]) {
+                            const match = Array.from(wardSel.options).find(o => o.text === parts[2]);
+                            if (match) wardSel.value = match.value;
+                        }
+                    }
+                }
+
+                function tryPrefillFromCity(cityStr) {
+                    const parts = cityStr.split(',').map(s => s.trim());
+                    if (!parts.length) return;
+                    const provName = parts[0];
+                    const match = Array.from(provinceSel.options).find(o => o.text === provName);
+                    if (match) {
+                        provinceSel.value = match.value;
+                        onProvinceChange();
+                    }
+                }
+
+                provinceSel?.addEventListener('change', onProvinceChange);
+                districtSel?.addEventListener('change', onDistrictChange);
+
+                loadProvinces();
+
                 document.querySelector('.address-form').addEventListener('submit', function (e) {
                     if (provinceSel) {
                         if (provinceSel.value) {
@@ -367,6 +307,6 @@
                     };
                 });
             </script>
-        </body>
+            </body>
 
         </html>
