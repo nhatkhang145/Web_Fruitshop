@@ -1,6 +1,8 @@
 package controller;
 
+import dal.CartDAO;
 import model.CartItem;
+import model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -57,6 +59,13 @@ public class UpdateCartServlet extends HttpServlet {
                     totalMoney += item.getTotalPrice().doubleValue();
                 }
                 session.setAttribute("totalMoney", totalMoney);
+                session.setAttribute("size", cart.size());
+
+                User user = (User) session.getAttribute("account");
+                if (user != null) {
+                    CartDAO cartDAO = new CartDAO();
+                    cartDAO.replaceCartItems(user.getId(), cart);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
