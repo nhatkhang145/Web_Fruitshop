@@ -10,8 +10,8 @@ import java.nio.charset.StandardCharsets;
 public class VNPayConfig {
     public static final String vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     public static final String vnp_ReturnUrl = "http://localhost:8080/Fruitshop_Web/vnpay-return";
-    public static final String vnp_TmnCode = "0VJ27KB8";
-    public static final String vnp_HashSecret = "DKMVRCFRAA9NOU1F4LQGB5W6H8SY9B0C";
+    public static final String vnp_TmnCode = "4ZD10JQ5";
+    public static final String vnp_HashSecret = "TNPNY372A0QCMUP3V2QNRHRTXPQ2ZK6P";
     public static final String vnp_Version = "2.1.0";
     public static final String vnp_Command = "pay";
 
