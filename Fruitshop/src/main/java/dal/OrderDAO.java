@@ -3,6 +3,7 @@ package dal;
 import model.Order;
 import model.OrderItem;
 import model.Product;
+import model.ProductImage;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -69,56 +70,52 @@ public class OrderDAO {
     public List<Order> getOrdersByUserId(int userId) {
         String sql = "SELECT * FROM orders WHERE user_id = :userId ORDER BY created_at DESC";
 
-        return DBContext.get().withHandle(handle ->
-                handle.createQuery(sql)
-                        .bind("userId", userId)
-                        .map((rs, ctx) -> {
-                            Order order = new Order();
-                            order.setId(rs.getInt("id"));
-                            order.setUserId(rs.getInt("user_id"));
-                            order.setFullname(rs.getString("fullname"));
-                            order.setPhone(rs.getString("phone"));
-                            order.setAddress(rs.getString("address"));
-                            order.setNote(rs.getString("note"));
-                            order.setTotalProductsMoney(rs.getDouble("total_products_money"));
-                            order.setShippingFee(rs.getDouble("shipping_fee"));
-                            order.setFinalAmount(rs.getDouble("final_amount"));
-                            order.setPaymentMethod(rs.getString("payment_method"));
-                            order.setPaymentStatus(rs.getInt("payment_status"));
-                            order.setStatus(rs.getString("status"));
-                            order.setCreatedAt(rs.getTimestamp("created_at"));
-                            return order;
-                        })
-                        .list()
-        );
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .bind("userId", userId)
+                .map((rs, ctx) -> {
+                    Order order = new Order();
+                    order.setId(rs.getInt("id"));
+                    order.setUserId(rs.getInt("user_id"));
+                    order.setFullname(rs.getString("fullname"));
+                    order.setPhone(rs.getString("phone"));
+                    order.setAddress(rs.getString("address"));
+                    order.setNote(rs.getString("note"));
+                    order.setTotalProductsMoney(rs.getDouble("total_products_money"));
+                    order.setShippingFee(rs.getDouble("shipping_fee"));
+                    order.setFinalAmount(rs.getDouble("final_amount"));
+                    order.setPaymentMethod(rs.getString("payment_method"));
+                    order.setPaymentStatus(rs.getInt("payment_status"));
+                    order.setStatus(rs.getString("status"));
+                    order.setCreatedAt(rs.getTimestamp("created_at"));
+                    return order;
+                })
+                .list());
     }
 
     public List<Order> getOrdersByStatus(int userId, String status) {
         String sql = "SELECT * FROM orders WHERE user_id = :userId AND status = :status ORDER BY created_at DESC";
 
-        return DBContext.get().withHandle(handle ->
-                handle.createQuery(sql)
-                        .bind("userId", userId)
-                        .bind("status", status)
-                        .map((rs, ctx) -> {
-                            Order order = new Order();
-                            order.setId(rs.getInt("id"));
-                            order.setUserId(rs.getInt("user_id"));
-                            order.setFullname(rs.getString("fullname"));
-                            order.setPhone(rs.getString("phone"));
-                            order.setAddress(rs.getString("address"));
-                            order.setNote(rs.getString("note"));
-                            order.setTotalProductsMoney(rs.getDouble("total_products_money"));
-                            order.setShippingFee(rs.getDouble("shipping_fee"));
-                            order.setFinalAmount(rs.getDouble("final_amount"));
-                            order.setPaymentMethod(rs.getString("payment_method"));
-                            order.setPaymentStatus(rs.getInt("payment_status"));
-                            order.setStatus(rs.getString("status"));
-                            order.setCreatedAt(rs.getTimestamp("created_at"));
-                            return order;
-                        })
-                        .list()
-        );
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .bind("userId", userId)
+                .bind("status", status)
+                .map((rs, ctx) -> {
+                    Order order = new Order();
+                    order.setId(rs.getInt("id"));
+                    order.setUserId(rs.getInt("user_id"));
+                    order.setFullname(rs.getString("fullname"));
+                    order.setPhone(rs.getString("phone"));
+                    order.setAddress(rs.getString("address"));
+                    order.setNote(rs.getString("note"));
+                    order.setTotalProductsMoney(rs.getDouble("total_products_money"));
+                    order.setShippingFee(rs.getDouble("shipping_fee"));
+                    order.setFinalAmount(rs.getDouble("final_amount"));
+                    order.setPaymentMethod(rs.getString("payment_method"));
+                    order.setPaymentStatus(rs.getInt("payment_status"));
+                    order.setStatus(rs.getString("status"));
+                    order.setCreatedAt(rs.getTimestamp("created_at"));
+                    return order;
+                })
+                .list());
     }
 
     public Order getOrderById(int orderId) {
@@ -163,88 +160,85 @@ public class OrderDAO {
                 "LEFT JOIN products p ON od.product_id = p.id " +
                 "WHERE od.order_id = :orderId";
 
-        return DBContext.get().withHandle(handle ->
-                handle.createQuery(sql)
-                        .bind("orderId", orderId)
-                        .map((rs, ctx) -> {
-                            OrderItem item = new OrderItem();
-                            item.setId(rs.getInt("id"));
-                            item.setOrderId(rs.getInt("order_id"));
-                            item.setProductId((Integer) rs.getObject("product_id"));
-                            item.setProductName(rs.getString("product_name"));
-                            item.setPrice(rs.getDouble("final_price"));
-                            item.setQuantity(rs.getInt("quantity"));
-                            item.setTotal(java.math.BigDecimal.valueOf(rs.getDouble("total")));
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .bind("orderId", orderId)
+                .map((rs, ctx) -> {
+                    OrderItem item = new OrderItem();
+                    item.setId(rs.getInt("id"));
+                    item.setOrderId(rs.getInt("order_id"));
+                    item.setProductId((Integer) rs.getObject("product_id"));
+                    item.setProductName(rs.getString("product_name"));
+                    item.setPrice(rs.getDouble("final_price"));
+                    item.setQuantity(rs.getInt("quantity"));
+                    item.setTotal(java.math.BigDecimal.valueOf(rs.getDouble("total")));
 
-                            // Thêm thông tin product để hiển thị ảnh
-                            if (item.getProductId() != null) {
-                                Product product = new Product();
-                                product.setId(item.getProductId());
-                                product.setName(item.getProductName());
-                                product.setImage(rs.getString("image"));
-                                product.setSalePrice(rs.getDouble("sale_price"));
-                                item.setProduct(product);
+                    // Thêm thông tin product để hiển thị ảnh
+                    if (item.getProductId() != null) {
+                        Product product = new Product();
+                        product.setId(item.getProductId());
+                        product.setName(item.getProductName());
+                        String image = rs.getString("image");
+                        if (image == null || image.trim().isEmpty()) {
+                            List<ProductImage> productImages = new ProductDAO().getProductImages(item.getProductId());
+                            if (productImages != null && !productImages.isEmpty()
+                                    && productImages.get(0).getImageUrl() != null
+                                    && !productImages.get(0).getImageUrl().trim().isEmpty()) {
+                                image = productImages.get(0).getImageUrl();
+                                product.setProductImages(productImages);
                             }
+                        }
+                        product.setImage(image);
+                        product.setSalePrice(rs.getDouble("sale_price"));
+                        item.setProduct(product);
+                    }
 
-                            return item;
-                        })
-                        .list()
-        );
+                    return item;
+                })
+                .list());
     }
 
     public boolean cancelOrder(int orderId, int userId) {
         String sql = "UPDATE orders SET status = 'cancelled' " +
                 "WHERE id = :orderId AND user_id = :userId AND status IN ('pending', 'processing')";
 
-        return DBContext.get().withHandle(handle ->
-                handle.createUpdate(sql)
-                        .bind("orderId", orderId)
-                        .bind("userId", userId)
-                        .execute() > 0
-        );
+        return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
+                .bind("orderId", orderId)
+                .bind("userId", userId)
+                .execute() > 0);
     }
-
 
     public int countOrdersByStatus(int userId, String status) {
         String sql = "SELECT COUNT(*) FROM orders WHERE user_id = :userId AND status = :status";
 
-        return DBContext.get().withHandle(handle ->
-                handle.createQuery(sql)
-                        .bind("userId", userId)
-                        .bind("status", status)
-                        .mapTo(Integer.class)
-                        .one()
-        );
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .bind("userId", userId)
+                .bind("status", status)
+                .mapTo(Integer.class)
+                .one());
     }
+
     public List<Order> getAllOrders() {
         String sql = "SELECT * FROM orders ORDER BY id DESC";
-        return DBContext.get().withHandle(handle ->
-                handle.createQuery(sql)
-                        .mapToBean(Order.class)
-                        .list()
-        );
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .mapToBean(Order.class)
+                .list());
     }
-
-
 
     public boolean updateStatus(int orderId, String status) {
         String sql = "UPDATE orders SET status = :status WHERE id = :id";
-        return DBContext.get().withHandle(handle ->
-                handle.createUpdate(sql)
-                        .bind("status", status)
-                        .bind("id", orderId)
-                        .execute() > 0 // Trả về true nếu có ít nhất 1 dòng bị thay đổi
+        return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
+                .bind("status", status)
+                .bind("id", orderId)
+                .execute() > 0 // Trả về true nếu có ít nhất 1 dòng bị thay đổi
         );
     }
 
     public List<Order> getOrdersByStatus(String status) {
         String sql = "SELECT * FROM orders WHERE status = :status ORDER BY created_at DESC";
-        return DBContext.get().withHandle(handle ->
-                handle.createQuery(sql)
-                        .bind("status", status)
-                        .mapToBean(Order.class)
-                        .list()
-        );
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .bind("status", status)
+                .mapToBean(Order.class)
+                .list());
     }
 
     public double getTotalRevenue() {
@@ -256,14 +250,14 @@ public class OrderDAO {
     }
 
     public int countTotalOrders() {
-        return DBContext.get().withHandle(handle ->
-                handle.createQuery("SELECT COUNT(*) FROM orders").mapTo(Integer.class).one()
-        );
+        return DBContext.get()
+                .withHandle(handle -> handle.createQuery("SELECT COUNT(*) FROM orders").mapTo(Integer.class).one());
     }
 
     public List<Double> getRevenueByMonth(int year) {
         List<Double> list = new ArrayList<>();
-        for (int i = 0; i < 12; i++) list.add(0.0);
+        for (int i = 0; i < 12; i++)
+            list.add(0.0);
 
         String sql = "SELECT MONTH(created_at) as month, SUM(final_amount) as total " +
                 "FROM orders " +
@@ -295,43 +289,36 @@ public class OrderDAO {
                 "WHERE o.status = 'completed' " +
                 "GROUP BY c.name";
 
-        return DBContext.get().withHandle(handle ->
-                handle.createQuery(sql)
-                        .map((rs, ctx) -> new java.util.AbstractMap.SimpleEntry<>(
-                                rs.getString("name"),
-                                rs.getDouble("revenue")
-                        ))
-                        .list()
-                        .stream()
-                        .collect(java.util.stream.Collectors.toMap(
-                                java.util.Map.Entry::getKey,
-                                java.util.Map.Entry::getValue
-                        ))
-        );
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .map((rs, ctx) -> new java.util.AbstractMap.SimpleEntry<>(
+                        rs.getString("name"),
+                        rs.getDouble("revenue")))
+                .list()
+                .stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        java.util.Map.Entry::getKey,
+                        java.util.Map.Entry::getValue)));
     }
 
     public List<Order> getTop5RecentOrders() {
         String sql = "SELECT * FROM orders ORDER BY created_at DESC LIMIT 5";
-        return DBContext.get().withHandle(handle ->
-                handle.createQuery(sql)
-                        .map((rs, ctx) -> {
-                            Order o = new Order();
-                            o.setId(rs.getInt("id"));
-                            o.setFullname(rs.getString("fullname"));
-                            o.setFinalAmount(rs.getDouble("final_amount"));
-                            o.setStatus(rs.getString("status"));
-                            o.setCreatedAt(rs.getTimestamp("created_at"));
-                            return o;
-                        }).list()
-        );
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .map((rs, ctx) -> {
+                    Order o = new Order();
+                    o.setId(rs.getInt("id"));
+                    o.setFullname(rs.getString("fullname"));
+                    o.setFinalAmount(rs.getDouble("final_amount"));
+                    o.setStatus(rs.getString("status"));
+                    o.setCreatedAt(rs.getTimestamp("created_at"));
+                    return o;
+                }).list());
     }
 
     public int countTotalUsers() {
         String sql = "SELECT COUNT(*) FROM users WHERE role = 0";
-        return DBContext.get().withHandle(handle ->
-                handle.createQuery(sql).mapTo(Integer.class).one()
-        );
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql).mapTo(Integer.class).one());
     }
+
     public List<Double> getRevenueByPeriod(String startDate, String endDate) {
         List<Double> revenues = new ArrayList<>();
         LocalDate start = LocalDate.parse(startDate);
@@ -344,11 +331,10 @@ public class OrderDAO {
             String sql = "SELECT SUM(final_amount) FROM orders " +
                     "WHERE status = 'completed' AND DATE(created_at) = :date";
 
-            Double dayTotal = DBContext.get().withHandle(handle ->
-                    handle.createQuery(sql)
-                            .bind("date", current.toString())
-                            .mapTo(Double.class)
-                            .findFirst().orElse(0.0));
+            Double dayTotal = DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                    .bind("date", current.toString())
+                    .mapTo(Double.class)
+                    .findFirst().orElse(0.0));
 
             revenues.add(dayTotal != null ? dayTotal : 0.0);
         }
@@ -367,5 +353,14 @@ public class OrderDAO {
         return labels;
     }
 
+    // hàm cập nhật trạng thái thanh toán (0: Chưa thanh toán, 1: Đã thanh toán)
+    public boolean updatePaymentStatus(int orderId, int paymentStatus) {
+        String sql = "UPDATE orders SET payment_status = :paymentStatus WHERE id = :id";
+        return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
+                .bind("paymentStatus", paymentStatus)
+                .bind("id", orderId)
+                .execute() > 0
+        );
+    }
 
 }

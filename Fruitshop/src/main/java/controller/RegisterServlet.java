@@ -34,6 +34,11 @@ public class RegisterServlet extends HttpServlet {
             forwardWithError(request, response, "Email không được để trống!", fullname, email);
             return;
         }
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        if (!email.matches(emailRegex)){
+            forwardWithError(request, response, "Định dạng Email không hợp lệ (ví dụ: abc@gmail.com)!", fullname, email);
+            return;
+        }
 
         String passwordError = PasswordUtils.getPasswordValidationMessage(pass);
         if (passwordError != null) {

@@ -2,6 +2,7 @@ package controller;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import dal.CartDAO;
 import dal.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -9,7 +10,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import model.CartItem;
 import model.User;
+import util.CartSessionUtils;
 import util.GoogleOAuthConfig;
 
 import java.io.*;
@@ -18,6 +21,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 
 @WebServlet(name = "GoogleCallbackServlet", urlPatterns = {"/login-google"})
@@ -96,7 +100,9 @@ public class GoogleCallbackServlet extends HttpServlet {
                             "Tài khoản của bạn đã được liên kết với Google thành công!");
 
                 } else if ("google".equals(user.getLoginType())) {
-                    user.setFullName(name);
+                    if (!user.isNameChanged()){
+                        user.setFullName(name);
+                    }
                     if (picture != null && (user.getAvatar() == null || user.getAvatar().contains("default-user"))) {
                         user.setAvatar(picture);
                     }
@@ -108,6 +114,13 @@ public class GoogleCallbackServlet extends HttpServlet {
             session.setAttribute("account", user);
             session.setAttribute("user", user);
             session.removeAttribute("oauth_state");
+
+            CartDAO cartDAO = new CartDAO();
+            List<CartItem> dbCart = cartDAO.getCartItemsByUserId(user.getId());
+            List<CartItem> sessionCart = (List<CartItem>) session.getAttribute("cart");
+            List<CartItem> mergedCart = CartSessionUtils.mergeCarts(dbCart, sessionCart);
+            CartSessionUtils.updateSessionCart(session, mergedCart);
+            cartDAO.replaceCartItems(user.getId(), mergedCart);
 
             if (user.getRole() == 1) {
                 response.sendRedirect(request.getContextPath() + "/admin/index.jsp");

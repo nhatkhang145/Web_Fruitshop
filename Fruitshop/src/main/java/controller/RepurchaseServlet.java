@@ -1,9 +1,11 @@
 package controller;
 
+import dal.CartDAO;
 import dal.OrderDAO;
 import model.CartItem;
 import model.OrderItem;
 import model.Product;
+import model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -82,6 +84,12 @@ public class RepurchaseServlet extends HttpServlet {
             System.out.println("Total cart items now: " + cart.size());
             System.out.println("Total quantity: " + totalQuantity);
             System.out.println("========================");
+
+            User user = (User) session.getAttribute("account");
+            if (user != null) {
+                CartDAO cartDAO = new CartDAO();
+                cartDAO.replaceCartItems(user.getId(), cart);
+            }
 
             response.sendRedirect("cart.jsp");
 

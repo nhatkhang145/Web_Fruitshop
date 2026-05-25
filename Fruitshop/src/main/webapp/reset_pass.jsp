@@ -34,13 +34,8 @@
             <div class="input-wrapper">
                 <i class="fas fa-lock input-icon"></i>
                 <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        class="form-input"
-                        placeholder="Nhập mật khẩu mới"
-                        required
-                        minlength="8"
+                        type="password" id="password" name="password" class="form-input" placeholder="Nhập mật khẩu mới"
+                        required minlength="8" maxlength="16"
                 >
                 <i class="fas fa-eye toggle-password" data-target="password"></i>
             </div>
@@ -53,14 +48,8 @@
             <div class="input-wrapper">
                 <i class="fas fa-lock input-icon"></i>
                 <input
-                        type="password"
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        class="form-input"
-                        placeholder="Nhập lại mật khẩu mới"
-                        required
-                        minlength="8"
-                >
+                        type="password" id="confirmPassword" name="confirmPassword" class="form-input" placeholder="Nhập lại mật khẩu mới"
+                        required minlength="8" maxlength="16">
                 <i class="fas fa-eye toggle-password" data-target="confirmPassword"></i>
             </div>
             <span class="password-match" id="matchMessage"></span>
@@ -69,9 +58,9 @@
         <div class="password-requirements">
             <p class="requirements-title"><i class="fas fa-info-circle"></i> Yêu cầu mật khẩu:</p>
             <ul class="requirements-list">
-                <li id="req-length"><i class="fas fa-circle"></i> Ít nhất 8 ký tự</li>
+                <li id="req-length"><i class="fas fa-circle"></i> Từ 8 đến 16 ký tự</li>
                 <li id="req-uppercase"><i class="fas fa-circle"></i> Chứa chữ in hoa</li>
-                <li id="req-letter"><i class="fas fa-circle"></i> Chứa chữ cái</li>
+                <li id="req-letter"><i class="fas fa-circle"></i> Chứa chữ thường</li>
                 <li id="req-number"><i class="fas fa-circle"></i> Chứa số</li>
                 <li id="req-special"><i class="fas fa-circle"></i> Chứa ký tự đặc biệt (!@#$%^&*)</li>
             </ul>
@@ -124,7 +113,7 @@
 
     function checkPasswordRequirements(password) {
         const requirements = {
-            length: password.length >= 8,
+            length: password.length >= 8 && password.length <= 16,
             uppercase: /[A-Z]/.test(password),
             letter: /[a-zA-Z]/.test(password),
             number: /[0-9]/.test(password),
@@ -165,6 +154,21 @@
 
     // Form validation
     document.getElementById('resetForm').addEventListener('submit', function(e) {
+        const reqs = checkPasswordRequirements(passwordInput.value);
+        if (!reqs.length || !reqs.uppercase || !reqs.length || !reqs.number || !reqs.special) {
+            e.preventDefault();
+
+            let errorMsg = "Mật khẩu không hợp lệ:\n";
+            if (!reqs.length) errorMsg += "- Phải từ 8 đến 16 ký tự.\n";
+            if (!reqs.uppercase) errorMsg += "- Thiếu chữ in hoa.\n";
+            if (!reqs.letter) errorMsg += "- Thiếu chữ thường.\n";
+            if (!reqs.number) errorMsg += "- Thiếu số.\n";
+            if (!reqs.special) errorMsg += "- Thiếu ký tự đặc biệt.";
+
+            alert(errorMsg);
+            passwordInput.focus();
+            return false;
+        }
         if (passwordInput.value !== confirmInput.value) {
             e.preventDefault();
             matchMessage.innerHTML = '<i class="fas fa-times-circle"></i> Mật khẩu không khớp';

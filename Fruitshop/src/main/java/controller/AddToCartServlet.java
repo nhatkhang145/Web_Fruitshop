@@ -1,10 +1,12 @@
 package controller;
 
+import dal.CartDAO;
 import dal.ProductDAO;
 import dal.WeekendDealDAO;
 import model.CartItem;
 import model.Product;
 import model.WeekendDeal;
+import model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,8 +18,18 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(name = "AddToCartServlet", urlPatterns = {"/add-to-cart"})
+@WebServlet(name = "AddToCartServlet", urlPatterns = { "/add-to-cart" })
 public class AddToCartServlet extends HttpServlet {
+
+    private int limitQuantityStock(int requestedQuantity, int stockQuantity) {
+        if (stockQuantity <= 0) {
+            return 0;
+        }
+        if (requestedQuantity < 1) {
+            return 1;
+        }
+        return Math.min(requestedQuantity, stockQuantity);
+    }
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -31,7 +43,8 @@ public class AddToCartServlet extends HttpServlet {
         try {
             if (quantityRaw != null && !quantityRaw.isEmpty()) {
                 quantity = Integer.parseInt(quantityRaw);
-                if(quantity < 1) quantity = 1;
+                if (quantity < 1)
+                    quantity = 1;
             }
 
             int pid = Integer.parseInt(pidRaw);
@@ -41,6 +54,15 @@ public class AddToCartServlet extends HttpServlet {
             Product product = pDao.getProductByID(pid);
 
             if (product != null) {
+                int stockQuantity = product.getQuantity();
+                quantity = limitQuantityStock(quantity, stockQuantity);
+                if (quantity <= 0) {
+                    HttpSession session = request.getSession();
+                    session.setAttribute("cartError", "Sản phẩm hiện đã hết hàng.");
+                    response.sendRedirect("cart.jsp");
+                    return;
+                }
+
                 BigDecimal originalPrice = BigDecimal.valueOf(product.getPrice());
                 BigDecimal finalPrice = originalPrice;
                 BigDecimal discountAmount = BigDecimal.ZERO;
@@ -52,8 +74,7 @@ public class AddToCartServlet extends HttpServlet {
                     dealId = weekendDeal.getId();
                     finalPrice = java.math.BigDecimal.valueOf(weekendDeal.getDiscountedPrice());
                     discountAmount = originalPrice.subtract(finalPrice);
-                }
-                else if (product.getSalePrice() > 0) {
+                } else if (product.getSalePrice() > 0) {
                     dealType = "sale";
                     finalPrice = java.math.BigDecimal.valueOf(product.getSalePrice());
                     discountAmount = originalPrice.subtract(finalPrice);
@@ -88,13 +109,14 @@ public class AddToCartServlet extends HttpServlet {
 
                 List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
                 if (cart == null) {
-                    cart = new ArrayList<>(); // Nếu chưa có thì tạo mới
+                    cart = new ArrayList<>();
                 }
 
                 boolean found = false;
                 for (CartItem item : cart) {
                     if (item.getProduct().getId() == pid) {
-                        item.setQuantity(item.getQuantity() + quantity);
+                        int updatedQuantity = limitQuantityStock(item.getQuantity() + quantity, stockQuantity);
+                        item.setQuantity(updatedQuantity);
                         found = true;
                         break;
                     }
@@ -114,11 +136,18 @@ public class AddToCartServlet extends HttpServlet {
                 BigDecimal totalMoney = BigDecimal.ZERO;
                 int totalQuantity = 0;
                 for (CartItem item : cart) {
+                    item.setQuantity(limitQuantityStock(item.getQuantity(), item.getProduct().getQuantity()));
                     totalMoney = totalMoney.add(item.getTotalPrice());
                     totalQuantity += item.getQuantity();
                 }
                 session.setAttribute("totalMoney", totalMoney.doubleValue());
                 session.setAttribute("size", cart.size());
+
+                User user = (User) session.getAttribute("account");
+                if (user != null) {
+                    CartDAO cartDAO = new CartDAO();
+                    cartDAO.replaceCartItems(user.getId(), cart);
+                }
                 System.out.println("=== AddToCart Debug ===");
                 System.out.println("Product ID: " + pid + ", Quantity added: " + quantity);
                 System.out.println("Total cart items: " + cart.size());
@@ -137,11 +166,13 @@ public class AddToCartServlet extends HttpServlet {
         if ("XMLHttpRequest".equals(ajaxHeader)) {
             HttpSession session = request.getSession();
             Integer cartSize = (Integer) session.getAttribute("size");
-            if (cartSize == null) cartSize = 0;
+            if (cartSize == null)
+                cartSize = 0;
 
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("{\"success\": true, \"message\": \"Đã thêm vào giỏ hàng\", \"size\": " + cartSize + "}");
+            response.getWriter()
+                    .write("{\"success\": true, \"message\": \"Đã thêm vào giỏ hàng\", \"size\": " + cartSize + "}");
             return;
         }
 

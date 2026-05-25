@@ -77,13 +77,18 @@ public class AdminProductServlet extends HttpServlet {
         } else {
             Integer categoryId = tryParsePositiveInt(categoryIdStr);
             if (categoryId != null) {
+                Category selectedCategory = categoryDAO.getCategoryById(categoryId);
+                if (selectedCategory == null || selectedCategory.getParentId() == 0) {
+                    resp.sendRedirect(req.getContextPath() + "/admin/categories?error=root_category_not_allowed");
+                    return;
+                }
                 product.setCategoryId(categoryId);
                 if (fromCategoryId == null || fromCategoryId.isBlank()) {
                     fromCategoryId = String.valueOf(categoryId);
                 }
             }
         }
-        List<Category> categories = categoryDAO.getAllCategories();
+        List<Category> categories = categoryDAO.getNonRootCategories();
         req.setAttribute("product", product);
         req.setAttribute("categories", categories);
         req.setAttribute("fromCategoryId", fromCategoryId);
@@ -115,6 +120,11 @@ public class AdminProductServlet extends HttpServlet {
             String description = req.getParameter("description");
             String statusStr = req.getParameter("status");
             int status = (statusStr != null && statusStr.equals("1")) ? 1 : 0;
+
+            Category selectedCategory = categoryDAO.getCategoryById(categoryId);
+            if (selectedCategory == null || selectedCategory.getParentId() == 0) {
+                throw new IllegalArgumentException("Danh mục gốc không thể chứa sản phẩm.");
+            }
 
             
             Part filePart = req.getPart("image");
@@ -194,7 +204,7 @@ public class AdminProductServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             req.setAttribute("errorMessage", "Lỗi khi lưu sản phẩm: " + e.getMessage());
-            req.setAttribute("categories", categoryDAO.getAllCategories());
+            req.setAttribute("categories", categoryDAO.getNonRootCategories());
             req.setAttribute("fromCategoryId", req.getParameter("fromCategoryId"));
             try {
                 req.getRequestDispatcher("/admin/product-edit.jsp").forward(req, resp);

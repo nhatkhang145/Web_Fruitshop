@@ -14,25 +14,51 @@ public class ProductDAO {
     }
 
     public List<Product> getProductsByCategoryID(int cid) {
-        String sql = "SELECT id, name, price, sale_price AS salePrice, quantity, short_description AS description, image, category_id AS categoryId FROM products WHERE category_id = ?";
+        String sql = "SELECT p.id, p.name, p.price, p.sale_price AS salePrice, p.quantity, p.short_description AS description, p.image, p.category_id AS categoryId, "
+                + "COALESCE(rv.avg_rating, 0) AS averageRating, COALESCE(rv.review_count, 0) AS reviewCount "
+                + "FROM products p "
+                + "LEFT JOIN (SELECT product_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count FROM reviews WHERE status = 'approved' GROUP BY product_id) rv ON p.id = rv.product_id "
+                + "WHERE p.status = 1 AND p.category_id = ?";
         return DBContext.get().withHandle(handle -> handle.createQuery(sql)
                 .bind(0, cid)
                 .mapToBean(Product.class)
                 .list());
     }
 
+    public List<Product> getRelatedProducts(int categoryId, int excludeProductId, int limit) {
+        String sql = "SELECT p.id, p.name, p.price, p.sale_price AS salePrice, p.quantity, p.short_description AS description, p.image, p.category_id AS categoryId, "
+                + "COALESCE(rv.avg_rating, 0) AS averageRating, COALESCE(rv.review_count, 0) AS reviewCount "
+                + "FROM products p "
+                + "LEFT JOIN (SELECT product_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count FROM reviews WHERE status = 'approved' GROUP BY product_id) rv ON p.id = rv.product_id "
+                + "WHERE p.status = 1 AND p.category_id = :categoryId AND p.id <> :excludeProductId "
+                + "ORDER BY p.id DESC "
+                + "LIMIT :limit";
+
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .bind("categoryId", categoryId)
+                .bind("excludeProductId", excludeProductId)
+                .bind("limit", limit)
+                .mapToBean(Product.class)
+                .list());
+    }
+
     public Product getProductByID(int id) {
-        String sql = "SELECT id, " +
-                "       name, " +
-                "       product_code AS productCode, " +
-                "       price, " +
-                "       sale_price AS salePrice, " +
-                "       quantity, " +
-                "       short_description AS description, " +
-                "       image, " +
-                "       category_id AS categoryId, " +
-                "       status " +
-                "FROM products WHERE id = ?";
+        String sql = "SELECT p.id, " +
+                "       p.name, " +
+                "       p.product_code AS productCode, " +
+                "       p.price, " +
+                "       p.sale_price AS salePrice, " +
+                "       p.quantity, " +
+                "       p.short_description AS description, " +
+                "       p.image, " +
+                "       p.category_id AS categoryId, " +
+                "       p.status, " +
+                "       COALESCE(rv.avg_rating, 0) AS averageRating, " +
+                "       COALESCE(rv.review_count, 0) AS reviewCount " +
+                "FROM products p " +
+                "LEFT JOIN (SELECT product_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count FROM reviews WHERE status = 'approved' GROUP BY product_id) rv ON p.id = rv.product_id "
+                +
+                "WHERE p.id = ?";
 
         Product product = DBContext.get().withHandle(handle -> handle.createQuery(sql)
                 .bind(0, id)
@@ -46,6 +72,20 @@ public class ProductDAO {
         }
 
         return product;
+    }
+
+    public int getSoldQuantityByProductId(int productId) {
+        String sql = """
+                SELECT COALESCE(SUM(od.quantity), 0)
+                FROM orders o
+                JOIN order_details od ON o.id = od.order_id
+                WHERE od.product_id = :pid AND o.status = 'completed'
+                """;
+
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .bind("pid", productId)
+                .mapTo(Integer.class)
+                .one());
     }
 
     public List<ProductImage> getProductImages(int productId) {
@@ -66,7 +106,11 @@ public class ProductDAO {
     }
 
     public List<Product> pagingProduct(int index) {
-        String sql = "SELECT id, name, price, sale_price AS salePrice, quantity, short_description AS description, image, category_id AS categoryId FROM products ORDER BY id LIMIT ?, 16";
+        String sql = "SELECT p.id, p.name, p.price, p.sale_price AS salePrice, p.quantity, p.short_description AS description, p.image, p.category_id AS categoryId, "
+                + "COALESCE(rv.avg_rating, 0) AS averageRating, COALESCE(rv.review_count, 0) AS reviewCount "
+                + "FROM products p "
+                + "LEFT JOIN (SELECT product_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count FROM reviews WHERE status = 'approved' GROUP BY product_id) rv ON p.id = rv.product_id "
+                + "ORDER BY p.id LIMIT ?, 16";
         int offset = (index - 1) * 16;
 
         return DBContext.get().withHandle(handle -> handle.createQuery(sql)
@@ -172,8 +216,12 @@ public class ProductDAO {
 
         sql.append("SELECT p.id, p.name, p.product_code AS productCode, p.price, ")
                 .append("p.sale_price AS salePrice, p.quantity, p.short_description AS description, ")
-                .append("p.image, p.category_id AS categoryId, p.status, p.created_at, p.views ")
+                .append("p.image, p.category_id AS categoryId, p.status, p.created_at, p.views, ")
+                .append("COALESCE(rv.avg_rating, 0) AS averageRating, COALESCE(rv.review_count, 0) AS reviewCount ")
                 .append("FROM products p ");
+
+        sql.append(
+                "LEFT JOIN (SELECT product_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count FROM reviews WHERE status = 'approved' GROUP BY product_id) rv ON p.id = rv.product_id ");
 
         if ("best_sell".equals(sortType)) {
             sql.append("LEFT JOIN order_details od ON p.id = od.product_id ");
@@ -194,7 +242,7 @@ public class ProductDAO {
 
         if ("best_sell".equals(sortType)) {
             sql.append(
-                    " GROUP BY p.id, p.name, p.product_code, p.price, p.sale_price, p.quantity, p.short_description, p.image, p.category_id, p.status, p.created_at, p.views ");
+                    " GROUP BY p.id, p.name, p.product_code, p.price, p.sale_price, p.quantity, p.short_description, p.image, p.category_id, p.status, p.created_at, p.views, rv.avg_rating, rv.review_count ");
         }
 
         if (sortType != null) {
@@ -248,18 +296,20 @@ public class ProductDAO {
 
     public List<Product> searchProducts(String keyword, String category) {
         StringBuilder sql = new StringBuilder(
-                "SELECT id, name, price, sale_price AS salePrice, quantity, short_description AS description, image, category_id AS categoryId "
-                        +
-                        "FROM products WHERE status = 1");
+                "SELECT p.id, p.name, p.price, p.sale_price AS salePrice, p.quantity, p.short_description AS description, p.image, p.category_id AS categoryId, "
+                        + "COALESCE(rv.avg_rating, 0) AS averageRating, COALESCE(rv.review_count, 0) AS reviewCount "
+                        + "FROM products p "
+                        + "LEFT JOIN (SELECT product_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count FROM reviews WHERE status = 'approved' GROUP BY product_id) rv ON p.id = rv.product_id "
+                        + "WHERE p.status = 1");
 
         if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append(" AND (name LIKE :keyword OR short_description LIKE :keyword)");
+            sql.append(" AND (p.name LIKE :keyword OR p.short_description LIKE :keyword)");
         }
         if (category != null && !category.equals("all")) {
-            sql.append(" AND category_id = :categoryId");
+            sql.append(" AND p.category_id = :categoryId");
         }
 
-        sql.append(" ORDER BY id DESC");
+        sql.append(" ORDER BY p.id DESC");
 
         return DBContext.get().withHandle(handle -> {
             var query = handle.createQuery(sql.toString());
@@ -281,9 +331,11 @@ public class ProductDAO {
     }
 
     public List<Product> getNewestProducts(int limit) {
-        String sql = "SELECT id, name, price, sale_price AS salePrice, quantity, short_description AS description, image, category_id AS categoryId "
-                +
-                "FROM products WHERE status = 1 ORDER BY id DESC LIMIT ?";
+        String sql = "SELECT p.id, p.name, p.price, p.sale_price AS salePrice, p.quantity, p.short_description AS description, p.image, p.category_id AS categoryId, "
+                + "COALESCE(rv.avg_rating, 0) AS averageRating, COALESCE(rv.review_count, 0) AS reviewCount "
+                + "FROM products p "
+                + "LEFT JOIN (SELECT product_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count FROM reviews WHERE status = 'approved' GROUP BY product_id) rv ON p.id = rv.product_id "
+                + "WHERE p.status = 1 ORDER BY p.id DESC LIMIT ?";
 
         return DBContext.get().withHandle(handle -> handle.createQuery(sql)
                 .bind(0, limit)
@@ -293,8 +345,11 @@ public class ProductDAO {
 
     public List<Product> getBestSellingProducts(int limit) {
         String sql = "SELECT p.id, p.name, p.price, p.sale_price AS salePrice, p.quantity, " +
-                "p.short_description AS description, p.image, p.category_id AS categoryId " +
+                "p.short_description AS description, p.image, p.category_id AS categoryId, " +
+                "COALESCE(rv.avg_rating, 0) AS averageRating, COALESCE(rv.review_count, 0) AS reviewCount " +
                 "FROM products p " +
+                "LEFT JOIN (SELECT product_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count FROM reviews WHERE status = 'approved' GROUP BY product_id) rv ON p.id = rv.product_id "
+                +
                 "WHERE p.status = 1 " +
                 "ORDER BY RAND() " +
                 "LIMIT ?";
@@ -306,12 +361,13 @@ public class ProductDAO {
     }
 
     public List<Product> getDiscountProducts(int limit) {
-        String sql = "SELECT id, name, price, sale_price AS salePrice, quantity, short_description AS description, image, category_id AS categoryId "
-                +
-                "FROM products " +
-                "WHERE status = 1 AND sale_price > 0 AND sale_price < price " +
-                "ORDER BY (price - sale_price) / price DESC " +
-                "LIMIT ?";
+        String sql = "SELECT p.id, p.name, p.price, p.sale_price AS salePrice, p.quantity, p.short_description AS description, p.image, p.category_id AS categoryId, "
+                + "COALESCE(rv.avg_rating, 0) AS averageRating, COALESCE(rv.review_count, 0) AS reviewCount "
+                + "FROM products p "
+                + "LEFT JOIN (SELECT product_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count FROM reviews WHERE status = 'approved' GROUP BY product_id) rv ON p.id = rv.product_id "
+                + "WHERE p.status = 1 AND p.sale_price > 0 AND p.sale_price < p.price "
+                + "ORDER BY (p.price - p.sale_price) / p.price DESC "
+                + "LIMIT ?";
 
         return DBContext.get().withHandle(handle -> handle.createQuery(sql)
                 .bind(0, limit)
@@ -382,8 +438,12 @@ public class ProductDAO {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT p.id, p.name, p.product_code AS productCode, p.price, ")
                 .append("p.sale_price AS salePrice, p.quantity, p.short_description AS description, ")
-                .append("p.image, p.category_id AS categoryId, p.status, p.created_at, p.views ")
+                .append("p.image, p.category_id AS categoryId, p.status, p.created_at, p.views, ")
+                .append("COALESCE(rv.avg_rating, 0) AS averageRating, COALESCE(rv.review_count, 0) AS reviewCount ")
                 .append("FROM products p ");
+
+        sql.append(
+                "LEFT JOIN (SELECT product_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count FROM reviews WHERE status = 'approved' GROUP BY product_id) rv ON p.id = rv.product_id ");
 
         if ("best_sell".equals(sortType)) {
             sql.append("LEFT JOIN order_details od ON p.id = od.product_id ");
@@ -408,7 +468,7 @@ public class ProductDAO {
 
         if ("best_sell".equals(sortType)) {
             sql.append(
-                    " GROUP BY p.id, p.name, p.product_code, p.price, p.sale_price, p.quantity, p.short_description, p.image, p.category_id, p.status, p.created_at, p.views ");
+                    " GROUP BY p.id, p.name, p.product_code, p.price, p.sale_price, p.quantity, p.short_description, p.image, p.category_id, p.status, p.created_at, p.views, rv.avg_rating, rv.review_count ");
         }
 
         if (sortType != null) {

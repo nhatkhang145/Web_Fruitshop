@@ -1,12 +1,17 @@
 package dal;
 
 import model.Category;
+import org.jdbi.v3.core.Handle;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class AdminCategoryDAO {
     public List<Category> getAllCategories() {
@@ -68,6 +73,85 @@ public class AdminCategoryDAO {
                 .execute());
     }
 
+    public void deleteCategoryAndChildren(int rootId) {
+        DBContext.get().useTransaction(handle -> deleteCategoryTree(handle, rootId, new HashSet<>()));
+    }
+
+    public int countProductsInCategoryTree(int rootId) {
+        return DBContext.get().withHandle(handle -> countProductsInCategoryTree(handle, rootId));
+    }
+
+    public Map<Integer, Integer> getDirectProductCountByCategoryId() {
+        String sql = "SELECT category_id, COUNT(*) AS total FROM products WHERE category_id IS NOT NULL GROUP BY category_id";
+        return DBContext.get().withHandle(handle -> {
+            Map<Integer, Integer> counts = new HashMap<>();
+            handle.createQuery(sql)
+                    .map((rs, ctx) -> {
+                        counts.put(rs.getInt("category_id"), rs.getInt("total"));
+                        return 0;
+                    })
+                    .list();
+            return counts;
+        });
+    }
+
+    private void deleteCategoryTree(Handle handle, int categoryId, Set<Integer> visiting) {
+        if (!visiting.add(categoryId)) {
+            return;
+        }
+
+        String childQuery = "SELECT id FROM Categories WHERE parent_id = ?";
+        List<Integer> childIds = handle.createQuery(childQuery)
+                .bind(0, categoryId)
+                .mapTo(Integer.class)
+                .list();
+
+        for (Integer childId : childIds) {
+            deleteCategoryTree(handle, childId, visiting);
+        }
+
+        String detachProductsQuery = "UPDATE products SET category_id = NULL WHERE category_id = ?";
+        handle.createUpdate(detachProductsQuery)
+            .bind(0, categoryId)
+            .execute();
+
+        String deleteQuery = "DELETE FROM Categories WHERE id = ?";
+        handle.createUpdate(deleteQuery)
+                .bind(0, categoryId)
+                .execute();
+
+        visiting.remove(categoryId);
+    }
+
+    private int countProductsInCategoryTree(Handle handle, int categoryId) {
+        return countProductsInCategoryTree(handle, categoryId, new HashSet<>());
+    }
+
+    private int countProductsInCategoryTree(Handle handle, int categoryId, Set<Integer> visiting) {
+        if (!visiting.add(categoryId)) {
+            return 0;
+        }
+
+        String childQuery = "SELECT id FROM Categories WHERE parent_id = ?";
+        List<Integer> childIds = handle.createQuery(childQuery)
+                .bind(0, categoryId)
+                .mapTo(Integer.class)
+                .list();
+
+        String countQuery = "SELECT COUNT(*) FROM products WHERE category_id = ?";
+        int total = handle.createQuery(countQuery)
+                .bind(0, categoryId)
+                .mapTo(Integer.class)
+                .one();
+
+        for (Integer childId : childIds) {
+            total += countProductsInCategoryTree(handle, childId, visiting);
+        }
+
+        visiting.remove(categoryId);
+        return total;
+    }
+
     public List<Category> getCategoriesByParentId(int parentId) {
         String query = "SELECT id, name, description, parent_id AS parentId, status FROM Categories WHERE parent_id = ?";
         return DBContext.get().withHandle(handle -> handle.createQuery(query)
@@ -81,6 +165,74 @@ public class AdminCategoryDAO {
         return DBContext.get().withHandle(handle -> handle.createQuery(query)
                 .mapToBean(Category.class)
                 .list());
+    }
+
+    public List<Category> getNonRootCategories() {
+        String query = "SELECT id, name, description, parent_id AS parentId, status FROM Categories WHERE parent_id <> 0";
+        return DBContext.get().withHandle(handle -> handle.createQuery(query)
+                .mapToBean(Category.class)
+                .list());
+    }
+
+    public boolean categoryExists(int id) {
+        String query = "SELECT 1 FROM Categories WHERE id = ?";
+        Integer result = DBContext.get().withHandle(handle -> handle.createQuery(query)
+                .bind(0, id)
+                .mapTo(Integer.class)
+                .findFirst()
+                .orElse(null));
+        return result != null;
+    }
+
+    public boolean categoryNameExists(String name, Integer excludeId) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT 1 FROM Categories WHERE LOWER(TRIM(name)) = LOWER(TRIM(:name))");
+
+        if (excludeId != null && excludeId > 0) {
+            sql.append(" AND id <> :excludeId");
+        }
+
+        return DBContext.get().withHandle(handle -> {
+            var query = handle.createQuery(sql.toString())
+                    .bind("name", name == null ? "" : name.trim());
+
+            if (excludeId != null && excludeId > 0) {
+                query.bind("excludeId", excludeId);
+            }
+
+            return query.mapTo(Integer.class).findFirst().isPresent();
+        });
+    }
+
+    public Integer getParentIdByCategoryId(int id) {
+        String query = "SELECT parent_id FROM Categories WHERE id = ?";
+        return DBContext.get().withHandle(handle -> handle.createQuery(query)
+                .bind(0, id)
+                .mapTo(Integer.class)
+                .findFirst()
+                .orElse(null));
+    }
+
+    public boolean wouldCreateCycle(int categoryId, int newParentId) {
+        if (newParentId == 0) {
+            return false;
+        }
+        if (newParentId == categoryId) {
+            return true;
+        }
+
+        Set<Integer> visited = new HashSet<>();
+        Integer current = newParentId;
+        while (current != null && current != 0) {
+            if (current == categoryId) {
+                return true;
+            }
+            if (!visited.add(current)) {
+                return true;
+            }
+            current = getParentIdByCategoryId(current);
+        }
+        return false;
     }
 
 

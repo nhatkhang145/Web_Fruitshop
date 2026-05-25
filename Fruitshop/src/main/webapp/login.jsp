@@ -86,7 +86,7 @@
                                 <p style="text-align: center; margin: 15px 0; color: #666;">Hoặc đăng nhập bằng
                                 </p>
                                 <div style="display: flex; gap: 10px; justify-content: center;">
-                                    <a href="#" class="btn-social facebook"
+                                    <a href="${pageContext.request.contextPath}/login-facebook-redirect" class="btn-social facebook"
                                        style="background: #3b5998; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">
                                         <i class="fa-brands fa-facebook-f"></i> Facebook
                                     </a>
@@ -121,16 +121,19 @@
 
                             <label class="fm-label">Email
                                 <input name="email" type="email" required placeholder="Email"
-                                       value="${not empty regEmail ? regEmail : ''}" />
+                                       pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+                                       oninvalid="this.setCustomValidity('Định dạng email không hợp lệ (ví dụ: abc@gmail.com)')"
+                                       oninput="this.setCustomValidity('')"
+                                       value="${not empty regEmail ? regEmail : ' '}"/>
                             </label>
 
                             <label class="fm-label">Mật khẩu
                                 <div class="password-input-wrapper">
-                                    <input name="pass" type="password" id="registerPassword" required minlength="8" placeholder="Mật khẩu" />
+                                    <input name="pass" type="password" id="registerPassword" placeholder="Mật khẩu" />
                                     <i class="fas fa-eye toggle-password-icon" data-target="registerPassword"></i>
                                 </div>
                                 <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
-                                    Tối thiểu 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt (!@#$%...)
+                                    Mật khẩu từ 8 đến 16 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt (!@#$%...)
                                 </small>
                             </label>
 
@@ -203,6 +206,10 @@
         <c:if test="${not empty registerError}">
         registerTab.click();
         </c:if>
+
+        if (window.location.hash === '#register') {
+                    registerTab.click();
+        }
     </script>
 </div>
 <jsp:include page="footer.jsp"></jsp:include>
