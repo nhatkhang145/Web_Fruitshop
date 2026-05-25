@@ -378,6 +378,11 @@
     color: #516071;
 }
 
+.status-badge.cancelled {
+    background: #ffe5e9;
+    color: #c03f4f;
+}
+
 .icon-btn {
     display: inline-flex;
     align-items: center;
