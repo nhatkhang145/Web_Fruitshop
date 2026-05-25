@@ -32,6 +32,10 @@
                     <a href="${pageContext.request.contextPath}/admin/inventory-management"><i
                             class='bx bx-archive-in'></i>Phiếu nhập/xuất kho</a>
                 </li>
+                <li class="${param.activePage == 'stock-export' ? 'active' : ''}">
+                    <a href="${pageContext.request.contextPath}/admin/stock-export.jsp"><i
+                            class='bx bx-archive-out'></i>Phiếu xuất kho</a>
+                </li>
                 <li class="${param.activePage == 'weekend-deals' ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/weekend-deals"><i
                             class='bx bxs-discount'></i>Weekend Deals</a>
