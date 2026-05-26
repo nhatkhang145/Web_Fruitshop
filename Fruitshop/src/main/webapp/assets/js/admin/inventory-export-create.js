@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const lineContainer = document.getElementById("lineItemsContainer");
     const saveReceiptBtn = document.getElementById("saveReceiptBtn");
     const resetFormBtn = document.getElementById("resetFormBtn");
-
     const summaryCode = document.getElementById("summaryCode");
     const summaryDate = document.getElementById("summaryDate");
     const summarySupplier = document.getElementById("summarySupplier");

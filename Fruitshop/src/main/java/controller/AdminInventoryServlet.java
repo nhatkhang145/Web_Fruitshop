@@ -292,6 +292,7 @@ public class AdminInventoryServlet extends HttpServlet {
 
             for (InventoryReceipt r : receipts) {
                 Map<String, Object> map = new HashMap<>();
+                map.put("id", r.getId());
                 map.put("code", r.getCode());
                 map.put("dateData", r.getReceiptDate() != null ? r.getReceiptDate().format(dateFormatter) : "");
                 map.put("dateDisplay", r.getReceiptDate() != null ? r.getReceiptDate().format(timeFormatter) : "");
@@ -438,12 +439,28 @@ public class AdminInventoryServlet extends HttpServlet {
                 return;
             }
 
-            List<AdminInventoryDAO.ReceiptItemDetailDTO> items = inventoryDAO.getReceiptItemsDetail(receiptId);
+                AdminInventoryDAO.ReceiptDetailDTO detail = receiptDetail.get();
+                List<AdminInventoryDAO.ReceiptItemDetailDTO> items = inventoryDAO.getReceiptItemsDetail(receiptId);
+
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                String receiptDateDisplay = detail.getReceiptDate() != null
+                    ? detail.getReceiptDate().format(dateFormatter)
+                    : "";
+                String createdAtDisplay = detail.getCreatedAt() != null
+                    ? detail.getCreatedAt().format(dateTimeFormatter)
+                    : "";
+                String updatedAtDisplay = detail.getUpdatedAt() != null
+                    ? detail.getUpdatedAt().format(dateTimeFormatter)
+                    : "";
 
             // Set attributes cho JSP
-            request.setAttribute("receipt", receiptDetail.get());
+                request.setAttribute("receipt", detail);
             request.setAttribute("items", items);
             request.setAttribute("itemCount", items.size());
+                request.setAttribute("receiptDateDisplay", receiptDateDisplay);
+                request.setAttribute("createdAtDisplay", createdAtDisplay);
+                request.setAttribute("updatedAtDisplay", updatedAtDisplay);
 
             // Forward tới JSP
             request.getRequestDispatcher("/admin/inventory-receipt-detail.jsp").forward(request, response);
@@ -467,7 +484,7 @@ public class AdminInventoryServlet extends HttpServlet {
     private boolean isAdmin(HttpServletRequest request) { 
         Object accountObj = request.getSession().getAttribute("account");
         if (accountObj instanceof User) {
-            return ((User) accountObj).getRole() == 1; // Assuming role 1 is Admin
+            return ((User) accountObj).getRole() == 1; 
         }
         return false; 
     }

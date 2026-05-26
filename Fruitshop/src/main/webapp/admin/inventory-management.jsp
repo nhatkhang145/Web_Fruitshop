@@ -137,9 +137,9 @@
                             <td><fmt:formatNumber value="${item.totalValue}" type="number" groupingUsed="true"/> VND</td>
                             <td><span class="status-badge ${item.statusClass}">${item.statusDisplay}</span></td>
                             <td>
-                                <button type="button" class="icon-btn view js-view-receipt" title="Xem chi tiết">
+                                <a class="icon-btn view" href="${pageContext.request.contextPath}/admin/inventory-receipt-detail?id=${item.id}" title="Xem chi tiết">
                                     <i class='bx bx-show'></i>
-                                </button>
+                                </a>
                             </td>
                         </tr>
                     </c:forEach>
@@ -154,68 +154,6 @@
             </div>
         </section>
     </main>
-</div>
-
-<div class="modal" id="receiptDetailModal" aria-hidden="true">
-    <div class="modal-content modal-large">
-        <div class="modal-header">
-            <div>
-                <p class="modal-kicker">Chi tiết phiếu nhập</p>
-                <h2 id="detailCode">PNK-2026-018</h2>
-            </div>
-            <button type="button" class="modal-close" data-close-modal>&times;</button>
-        </div>
-        <div class="modal-body">
-            <div class="detail-grid">
-                <div class="detail-card">
-                    <span class="detail-label">Ngày nhập</span>
-                    <strong id="detailDate">02/05/2026 09:20</strong>
-                </div>
-                <div class="detail-card">
-                    <span class="detail-label">Nhà cung cấp</span>
-                    <strong id="detailSupplier">Công ty TNHH GreenFarm</strong>
-                </div>
-                <div class="detail-card">
-                    <span class="detail-label">Người tạo</span>
-                    <strong id="detailCreator">Nguyễn Minh Anh</strong>
-                </div>
-                <div class="detail-card">
-                    <span class="detail-label">Tổng sản phẩm</span>
-                    <strong id="detailItems">18 mặt hàng</strong>
-                </div>
-                <div class="detail-card highlight">
-                    <span class="detail-label">Tổng giá trị</span>
-                    <strong id="detailValue">42.850.000 VND</strong>
-                </div>
-                <div class="detail-card">
-                    <span class="detail-label">Trạng thái</span>
-                    <strong id="detailStatus">Đã duyệt</strong>
-                </div>
-            </div>
-
-            <div class="detail-note">
-                <span>Ghi chú phiếu nhập</span>
-                <p id="detailNote">Nhập bổ sung trái cây nhập khẩu cho chi nhánh trung tâm.</p>
-            </div>
-
-            <div class="detail-lines">
-                <div class="detail-lines__header">
-                    <div class="detail-lines__heading">
-                        <h3>Danh sách mặt hàng</h3>
-                        <span>Tham khảo để kiểm tra số lượng và loại hàng</span>
-                    </div>
-                </div>
-                <ul id="detailLines"></ul>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-ghost" data-close-modal>Đóng</button>
-            <a class="btn btn-primary" href="${pageContext.request.contextPath}/admin/inventory-receipt-new">
-                <i class='bx bx-copy-alt'></i>
-                <span>Tạo phiếu mới</span>
-            </a>
-        </div>
-    </div>
 </div>
 
 <script src="${pageContext.request.contextPath}/assets/js/admin/main.js"></script>
