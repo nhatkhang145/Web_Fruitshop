@@ -31,7 +31,7 @@
                                 <p>Theo dõi phiếu xuất, xem nhanh chi tiết, lọc theo thời gian và tạo phiếu mới.</p>
                             </div>
                             <div class="hero-actions">
-                                <a class="btn btn-primary" href="${pageContext.request.contextPath}/admin/inventory-export-create.jsp">
+                                <a class="btn btn-primary" href="${pageContext.request.contextPath}/admin/inventory-export-create">
                                     <i class='bx bx-plus-circle'></i>
                                     <span>Tạo phiếu xuất kho</span>
                                 </a>
@@ -43,7 +43,7 @@
                                 <div class="stat-icon"><i class='bx bx-archive-out'></i></div>
                                 <div>
                                     <span class="stat-label">Tổng phiếu xuất</span>
-                                    <strong>96</strong>
+                                    <strong><fmt:formatNumber value="${totalExports != null ? totalExports : 0}" type="number" groupingUsed="true"/></strong>
                                     <small>Cập nhật liên tục</small>
                                 </div>
                             </article>
@@ -51,7 +51,7 @@
                                 <div class="stat-icon"><i class='bx bx-cart'></i></div>
                                 <div>
                                     <span class="stat-label">Phiếu bán hàng</span>
-                                    <strong>62</strong>
+                                    <strong><fmt:formatNumber value="${salesExports != null ? salesExports : 0}" type="number" groupingUsed="true"/></strong>
                                     <small>Đơn hàng đã xuất</small>
                                 </div>
                             </article>
@@ -59,7 +59,7 @@
                                 <div class="stat-icon"><i class='bx bx-package'></i></div>
                                 <div>
                                     <span class="stat-label">Tổng số lượng xuất</span>
-                                    <strong>1,732</strong>
+                                    <strong><fmt:formatNumber value="${totalExportItems != null ? totalExportItems : 0}" type="number" groupingUsed="true"/></strong>
                                     <small>Trên toàn hệ thống</small>
                                 </div>
                             </article>
@@ -67,7 +67,7 @@
                                 <div class="stat-icon"><i class='bx bx-timer'></i></div>
                                 <div>
                                     <span class="stat-label">Phiếu chờ xử lý</span>
-                                    <strong>3</strong>
+                                    <strong><fmt:formatNumber value="${pendingExports != null ? pendingExports : 0}" type="number" groupingUsed="true"/></strong>
                                     <small>Cần kiểm tra</small>
                                 </div>
                             </article>
@@ -102,7 +102,7 @@
                                 <div>
                                     <h2>Danh sách phiếu xuất kho</h2>
                                 </div>
-                                <div class="panel-chip">Hiển thị 4 phiếu</div>
+                                <div class="panel-chip">Hiển thị ${totalExports != null ? totalExports : 0} phiếu</div>
                             </div>
 
                             <div class="table-wrap">
@@ -120,62 +120,22 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr data-code="PXK-202604-001" data-date="2026-04-25">
-                                            <td><span class="receipt-code">PXK-202604-001</span></td>
-                                            <td>25/04/2026 11:20</td>
-                                            <td>Bán hàng</td>
-                                            <td>85</td>
-                                            <td>41,350,000 VND</td>
-                                            <td>admin01</td>
-                                            <td><span class="status-badge approved">Đã xác nhận</span></td>
-                                            <td>
-                                                <a class="icon-btn view" href="${pageContext.request.contextPath}/admin/inventory-export-detail.jsp?code=PXK-202604-001" title="Xem chi tiết">
-                                                    <i class='bx bx-show'></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        <tr data-code="PXK-202604-002" data-date="2026-04-25">
-                                            <td><span class="receipt-code">PXK-202604-002</span></td>
-                                            <td>25/04/2026 14:05</td>
-                                            <td>Nội bộ</td>
-                                            <td>40</td>
-                                            <td>18,700,000 VND</td>
-                                            <td>admin02</td>
-                                            <td><span class="status-badge draft">Nháp</span></td>
-                                            <td>
-                                                <a class="icon-btn view" href="${pageContext.request.contextPath}/admin/inventory-export-detail.jsp?code=PXK-202604-002" title="Xem chi tiết">
-                                                    <i class='bx bx-show'></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        <tr data-code="PXK-202604-003" data-date="2026-04-24">
-                                            <td><span class="receipt-code">PXK-202604-003</span></td>
-                                            <td>24/04/2026 15:10</td>
-                                            <td>Điều chuyển</td>
-                                            <td>52</td>
-                                            <td>22,600,000 VND</td>
-                                            <td>admin03</td>
-                                            <td><span class="status-badge approved">Đã xác nhận</span></td>
-                                            <td>
-                                                <a class="icon-btn view" href="${pageContext.request.contextPath}/admin/inventory-export-detail.jsp?code=PXK-202604-003" title="Xem chi tiết">
-                                                    <i class='bx bx-show'></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        <tr data-code="PXK-202604-004" data-date="2026-04-23">
-                                            <td><span class="receipt-code">PXK-202604-004</span></td>
-                                            <td>23/04/2026 09:40</td>
-                                            <td>Bán hàng</td>
-                                            <td>30</td>
-                                            <td>15,050,000 VND</td>
-                                            <td>admin01</td>
-                                            <td><span class="status-badge cancelled">Đã hủy</span></td>
-                                            <td>
-                                                <a class="icon-btn view" href="${pageContext.request.contextPath}/admin/inventory-export-detail.jsp?code=PXK-202604-004" title="Xem chi tiết">
-                                                    <i class='bx bx-show'></i>
-                                                </a>
-                                            </td>
-                                        </tr>
+                                        <c:forEach var="item" items="${exportList}">
+                                            <tr data-code="${item.code}" data-date="${item.dateData}">
+                                                <td><span class="receipt-code">${item.code}</span></td>
+                                                <td>${item.dateDisplay}</td>
+                                                <td>${item.exportType}</td>
+                                                <td>${item.totalQuantity}</td>
+                                                <td><fmt:formatNumber value="${item.totalValue}" type="number" groupingUsed="true"/> VND</td>
+                                                <td>${item.creatorName}</td>
+                                                <td><span class="status-badge ${item.statusClass}">${item.statusDisplay}</span></td>
+                                                <td>
+                                                    <a class="icon-btn view" href="${pageContext.request.contextPath}/admin/inventory-export-detail?id=${item.id}" title="Xem chi tiết">
+                                                        <i class='bx bx-show'></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
                                     </tbody>
                                 </table>
                             </div>
