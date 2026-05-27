@@ -295,8 +295,6 @@
                     this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
                 });
 
-                let currentProvinceData = null;
-
                 function clearSelect(sel, placeholder) {
                     sel.innerHTML = '';
                     const opt = document.createElement('option');
@@ -328,12 +326,10 @@
                     clearSelect(districtSel, 'Chọn Quận/Huyện');
                     clearSelect(wardSel, 'Chọn Phường/Xã');
                     const code = provinceSel.value;
-                    currentProvinceData = null;
                     if (!code) return;
                     try {
                         const res = await fetch('https://provinces.open-api.vn/api/p/' + code + '?depth=2');
                         const data = await res.json();
-                        currentProvinceData = data;
                         data.districts.forEach(d => {
                             const o = document.createElement('option');
                             o.value = d.code;
@@ -356,25 +352,29 @@
                     }
                 }
 
-                function onDistrictChange() {
+                async function onDistrictChange() {
                     clearSelect(wardSel, 'Chọn Phường/Xã');
                     const dCode = districtSel.value;
-                    if (!dCode || !currentProvinceData) return;
-                    const district = currentProvinceData.districts.find(d => String(d.code) === String(dCode));
-                    if (!district) return;
-                    (district.wards || []).forEach(w => {
-                        const o = document.createElement('option');
-                        o.value = w.code;
-                        o.textContent = w.name;
-                        wardSel.appendChild(o);
-                    });
-                    const cityVal = cityHidden?.value || '';
-                    if (cityVal) {
-                        const parts = cityVal.split(',').map(s => s.trim());
-                        if (parts[2]) {
-                            const match = Array.from(wardSel.options).find(o => o.text === parts[2]);
-                            if (match) wardSel.value = match.value;
+                    if (!dCode) return;
+                    try {
+                        const res = await fetch('https://provinces.open-api.vn/api/d/' + dCode + '?depth=2');
+                        const data = await res.json();
+                        (data.wards || []).forEach(w => {
+                            const o = document.createElement('option');
+                            o.value = w.code;
+                            o.textContent = w.name;
+                            wardSel.appendChild(o);
+                        });
+                        const cityVal = cityHidden?.value || '';
+                        if (cityVal) {
+                            const parts = cityVal.split(',').map(s => s.trim());
+                            if (parts[2]) {
+                                const match = Array.from(wardSel.options).find(o => o.text === parts[2]);
+                                if (match) wardSel.value = match.value;
+                            }
                         }
+                    } catch (e) {
+                        console.error(e);
                     }
                 }
 
