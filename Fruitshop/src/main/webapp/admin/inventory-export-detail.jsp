@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/inventory-management.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/inventory-receipt-detail.css">
 </head>
-<body>
+<body data-context-path="${pageContext.request.contextPath}" data-export-id="${receipt.id}">
 <jsp:include page="/admin/layout/sidebar.jsp">
     <jsp:param name="activePage" value="stock-export" />
 </jsp:include>
@@ -33,14 +33,16 @@
                 </div>
             </div>
             <div class="hero-actions">
-                <button class="btn btn-primary" id="approveBtn">
-                    <i class='bx bx-check'></i>
-                    <span>Xác nhận xuất</span>
-                </button>
-                <button class="btn btn-ghost" id="rejectBtn">
-                    <i class='bx bx-x'></i>
-                    <span>Từ chối</span>
-                </button>
+                <c:if test="${fn:toUpperCase(receipt.status) == 'PENDING'}">
+                    <button class="btn btn-primary" id="approveBtn">
+                        <i class='bx bx-check'></i>
+                        <span>Xác nhận xuất</span>
+                    </button>
+                    <button class="btn btn-ghost" id="rejectBtn">
+                        <i class='bx bx-x'></i>
+                        <span>Từ chối</span>
+                    </button>
+                </c:if>
                 <a href="${pageContext.request.contextPath}/admin/stock-export" class="btn btn-ghost">
                     <i class='bx bx-arrow-back'></i>
                     <span>Quay lại</span>

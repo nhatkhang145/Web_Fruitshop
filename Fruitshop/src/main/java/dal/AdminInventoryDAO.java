@@ -179,7 +179,7 @@ public class AdminInventoryDAO {
 
             for (InventoryReceiptItem item : items) {
                 int updatedRows = handle.createUpdate(
-                        "UPDATE products SET stock = stock + ? WHERE id = ?")
+                    "UPDATE products SET quantity = quantity + ? WHERE id = ?")
                         .bind(0, item.getQuantity())
                         .bind(1, item.getProductId())
                         .execute();
@@ -188,6 +188,36 @@ public class AdminInventoryDAO {
                     throw new IllegalStateException("Không tìm thấy sản phẩm ID " + item.getProductId());
                 }
             }
+
+            return null;
+        });
+    }
+
+    public void rejectReceipt(int receiptId) {
+        DBContext.get().inTransaction(handle -> {
+            String currentStatus = handle.createQuery(
+                    "SELECT status FROM inventory_receipts WHERE id = ? FOR UPDATE")
+                    .bind(0, receiptId)
+                    .mapTo(String.class)
+                    .findFirst()
+                    .orElse(null);
+
+            if (currentStatus == null) {
+                throw new IllegalArgumentException("Không tìm thấy phiếu nhập kho");
+            }
+
+            if ("APPROVED".equalsIgnoreCase(currentStatus)) {
+                throw new IllegalStateException("Phiếu đã được duyệt, không thể từ chối");
+            }
+
+            if ("REJECTED".equalsIgnoreCase(currentStatus)) {
+                throw new IllegalStateException("Phiếu đã bị từ chối trước đó");
+            }
+
+            handle.createUpdate(
+                    "UPDATE inventory_receipts SET status = 'REJECTED' WHERE id = ?")
+                    .bind(0, receiptId)
+                    .execute();
 
             return null;
         });

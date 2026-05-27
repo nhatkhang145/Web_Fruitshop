@@ -115,11 +115,18 @@ public class AdminProductServlet extends HttpServlet {
             double price = Double.parseDouble(req.getParameter("price"));
             String salePriceStr = req.getParameter("salePrice");
             double salePrice = (salePriceStr == null || salePriceStr.isEmpty()) ? 0 : Double.parseDouble(salePriceStr);
-            int quantity = Integer.parseInt(req.getParameter("quantity"));
             int categoryId = Integer.parseInt(req.getParameter("categoryId"));
             String description = req.getParameter("description");
             String statusStr = req.getParameter("status");
             int status = (statusStr != null && statusStr.equals("1")) ? 1 : 0;
+
+            int quantity = 0;
+            if (idStr != null && !idStr.isEmpty() && !"0".equals(idStr)) {
+                Product existing = productDAO.getProductByID(Integer.parseInt(idStr));
+                if (existing != null) {
+                    quantity = existing.getQuantity();
+                }
+            }
 
             Category selectedCategory = categoryDAO.getCategoryById(categoryId);
             if (selectedCategory == null || selectedCategory.getParentId() == 0) {

@@ -66,10 +66,10 @@ public class AdminProductDAO {
 
     public int update(Product p) {
         String sql = "UPDATE products SET name = :name, product_code = :productCode, price = :price, sale_price = :salePrice, "
-                +
-                "quantity = :quantity, short_description = :description, image = :image, category_id = :categoryId, status = :status "
-                +
-                "WHERE id = :id";
+            +
+            "short_description = :description, image = :image, category_id = :categoryId, status = :status "
+            +
+            "WHERE id = :id";
 
         return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
                 .bindBean(p)
