@@ -29,7 +29,7 @@
     <main class="receipt-create-page">
         <section class="receipt-hero">
             <div class="hero-copy">
-                <a class="back-link" href="${pageContext.request.contextPath}/admin/stock-export.jsp">
+                <a class="back-link" href="${pageContext.request.contextPath}/admin/stock-export">
                     <i class='bx bx-arrow-back'></i>
                     Quay lại danh sách phiếu xuất
                 </a>
@@ -70,7 +70,15 @@
                                 </div>
                             </div>
 
-                            <div class="form-grid form-grid--2">
+                            <div class="form-grid form-grid--3">
+                                <div class="form-group">
+                                    <label for="inputExportType">Loại xuất <span class="required">*</span></label>
+                                    <select id="inputExportType" name="export_type" required>
+                                        <option value="SALES">Bán hàng</option>
+                                        <option value="INTERNAL">Nội bộ</option>
+                                        <option value="TRANSFER">Điều chuyển</option>
+                                    </select>
+                                </div>
                                 <div class="form-group">
                                     <label for="inputSupplierSelect">Chọn đơn vị nhận <span class="required">*</span></label>
                                     <select id="inputSupplierSelect" name="supplier_select">

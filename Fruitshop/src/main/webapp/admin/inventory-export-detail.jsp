@@ -29,7 +29,7 @@
                 <h1>Chi tiết phiếu xuất kho</h1>
                 <div class="detail-meta">
                     <span>Mã phiếu: <strong>${receipt.code}</strong></span>
-                    <span>Ngày xuất: <strong>${empty exportDateDisplay ? receipt.exportDate : exportDateDisplay}</strong></span>
+                    <span>Ngày xuất: <strong>${exportDateDisplay}</strong></span>
                 </div>
             </div>
             <div class="hero-actions">
@@ -41,7 +41,7 @@
                     <i class='bx bx-x'></i>
                     <span>Từ chối</span>
                 </button>
-                <a href="${pageContext.request.contextPath}/admin/stock-export.jsp" class="btn btn-ghost">
+                <a href="${pageContext.request.contextPath}/admin/stock-export" class="btn btn-ghost">
                     <i class='bx bx-arrow-back'></i>
                     <span>Quay lại</span>
                 </a>
@@ -67,7 +67,7 @@
                 </div>
                 <div class="detail-card">
                     <span class="detail-label">Loại xuất</span>
-                    <strong>${receipt.exportType}</strong>
+                    <strong>${exportTypeDisplay}</strong>
                 </div>
                 <div class="detail-card">
                     <span class="detail-label">Người tạo</span>
@@ -83,11 +83,11 @@
                 </div>
                 <div class="detail-card">
                     <span class="detail-label">Ngày tạo</span>
-                    <strong>${empty createdAtDisplay ? receipt.createdAt : createdAtDisplay}</strong>
+                    <strong>${createdAtDisplay}</strong>
                 </div>
                 <div class="detail-card">
                     <span class="detail-label">Cập nhật lần cuối</span>
-                    <strong>${empty updatedAtDisplay ? receipt.updatedAt : updatedAtDisplay}</strong>
+                    <strong>${updatedAtDisplay}</strong>
                 </div>
             </div>
 
@@ -161,7 +161,7 @@
                 <ul>
                     <li>
                         <span>Tạo phiếu</span>
-                        <strong>Admin (ID: ${receipt.createdBy}) - ${empty createdAtDisplay ? receipt.createdAt : createdAtDisplay}</strong>
+                        <strong>Admin (ID: ${receipt.createdBy}) - ${createdAtDisplay}</strong>
                     </li>
                 </ul>
             </div>

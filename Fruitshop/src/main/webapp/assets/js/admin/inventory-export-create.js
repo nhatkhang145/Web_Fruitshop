@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const receiptDateInput = document.getElementById("inputReceiptDate");
     const creatorInput = document.getElementById("inputCreator");
     const noteInput = document.getElementById("inputNote");
+    const exportTypeSelect = document.getElementById("inputExportType");
     const supplierSelect = document.getElementById("inputSupplierSelect");
     const supplierNameInput = document.getElementById("inputSupplierName");
     const supplierIdInput = document.getElementById("inputSupplierId");
@@ -169,6 +170,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const receiptDate = receiptDateInput?.value?.trim();
         const creatorName = creatorInput?.value?.trim();
         const note = noteInput?.value?.trim() || "";
+        const exportType = exportTypeSelect?.value || "SALES";
 
         if (!receiptCode) {
             showMsg("Vui lòng nhập mã phiếu xuất.", true);
@@ -231,6 +233,7 @@ document.addEventListener("DOMContentLoaded", function () {
             body.append("supplier_name", supplierName);
         }
         body.append("receipt_date", receiptDate);
+        body.append("export_type", exportType);
         body.append("note", note);
         body.append("items", JSON.stringify(items.map(function (i) {
             return {productId: i.productId, quantity: i.quantity, unitPrice: i.unitPrice};
@@ -248,7 +251,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (data.success) {
                     showMsg("Tạo phiếu xuất thành công! Mã: " + data.receipt_code, false);
                     setTimeout(function () {
-                        window.location.href = ctx + "/admin/stock-export.jsp";
+                        window.location.href = ctx + "/admin/stock-export";
                     }, 1200);
                 } else {
                     showMsg("Lỗi: " + (data.message || "Không xác định"), true);
