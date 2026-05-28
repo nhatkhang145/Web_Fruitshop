@@ -28,7 +28,7 @@
         <div class="page-hero">
             <div class="hero-copy">
                 <h1>Quản lý nhập kho</h1>
-                <p>Theo dõi phiếu nhập, xem nhanh chi tiết, lọc theo thời gian và tạo phiếu mới.</p>
+                
             </div>
             <div class="hero-actions">
                 <a class="btn btn-primary" href="${pageContext.request.contextPath}/admin/inventory-receipt-new">
