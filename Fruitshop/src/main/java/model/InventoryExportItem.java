@@ -7,16 +7,25 @@ public class InventoryExportItem {
     private int quantity;
     private double unitPrice;
     private double totalPrice;
+    private Integer batchItemId; 
 
     public InventoryExportItem() {
     }
-
+    
     public InventoryExportItem(int exportId, int productId, int quantity, double unitPrice) {
         this.exportId = exportId;
         this.productId = productId;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
         this.totalPrice = quantity * unitPrice;
+    }
+
+    public Integer getBatchItemId() {
+        return batchItemId;
+    }
+
+    public void setBatchItemId(Integer batchItemId) {
+        this.batchItemId = batchItemId;
     }
 
     public int getId() {

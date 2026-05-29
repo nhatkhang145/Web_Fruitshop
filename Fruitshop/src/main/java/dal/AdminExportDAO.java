@@ -140,17 +140,35 @@ public class AdminExportDAO {
                 .mapTo(Integer.class)
                 .one();
 
+            boolean hasBatchItemColumn = handle.createQuery("SHOW COLUMNS FROM inventory_export_items LIKE 'batch_item_id'")
+                    .mapToMap()
+                    .list()
+                    .size() > 0;
+
             for (InventoryExportItem item : items) {
                 double lineTotal = item.getQuantity() * item.getUnitPrice();
-                handle.createUpdate(
+                if (hasBatchItemColumn) {
+                    handle.createUpdate(
+                        "INSERT INTO inventory_export_items (export_id, product_id, quantity, unit_price, total_price, batch_item_id) " +
+                        "VALUES (?, ?, ?, ?, ?, ?)")
+                        .bind(0, exportId)
+                        .bind(1, item.getProductId())
+                        .bind(2, item.getQuantity())
+                        .bind(3, item.getUnitPrice())
+                        .bind(4, lineTotal)
+                        .bind(5, item.getBatchItemId())
+                        .execute();
+                } else {
+                    handle.createUpdate(
                         "INSERT INTO inventory_export_items (export_id, product_id, quantity, unit_price, total_price) " +
                         "VALUES (?, ?, ?, ?, ?)")
-                    .bind(0, exportId)
-                    .bind(1, item.getProductId())
-                    .bind(2, item.getQuantity())
-                    .bind(3, item.getUnitPrice())
-                    .bind(4, lineTotal)
-                    .execute();
+                        .bind(0, exportId)
+                        .bind(1, item.getProductId())
+                        .bind(2, item.getQuantity())
+                        .bind(3, item.getUnitPrice())
+                        .bind(4, lineTotal)
+                        .execute();
+                }
             }
 
             return exportId;
@@ -175,30 +193,126 @@ public class AdminExportDAO {
             }
 
             List<InventoryExportItem> items = handle.createQuery(
-                    "SELECT id, export_id, product_id, quantity, unit_price, total_price FROM inventory_export_items WHERE export_id = ?")
+                    "SELECT id, export_id, product_id, quantity, unit_price, total_price, batch_item_id FROM inventory_export_items WHERE export_id = ?")
                 .bind(0, exportId)
                 .mapToBean(InventoryExportItem.class)
                 .list();
 
             for (InventoryExportItem item : items) {
-                Integer quantity = handle.createQuery(
+                Integer batchItemId = item.getBatchItemId();
+                int productId = item.getProductId();
+                int needed = item.getQuantity();
+
+                if (batchItemId != null && batchItemId > 0) {
+                    Integer avail = handle.createQuery(
+                            "SELECT available_quantity FROM inventory_receipt_items WHERE id = ? FOR UPDATE")
+                        .bind(0, batchItemId)
+                        .mapTo(Integer.class)
+                        .findFirst()
+                        .orElse(null);
+
+                    if (avail == null) {
+                        throw new IllegalStateException("Không tìm thấy lô id " + batchItemId);
+                    }
+
+                    if (avail < needed) {
+                        throw new IllegalStateException("Tồn lô không đủ cho lô id " + batchItemId);
+                    }
+
+                    handle.createUpdate("UPDATE inventory_receipt_items SET available_quantity = available_quantity - ? WHERE id = ?")
+                        .bind(0, needed)
+                        .bind(1, batchItemId)
+                        .execute();
+
+                    if (avail - needed <= 0) {
+                        handle.createUpdate("UPDATE inventory_receipt_items SET status = 'SOLD_OUT' WHERE id = ?")
+                            .bind(0, batchItemId)
+                            .execute();
+                    }
+
+                } else {
+                    int remaining = needed;
+                    Integer exportItemId = handle.createQuery("SELECT id FROM inventory_export_items WHERE export_id = ? AND product_id = ? LIMIT 1")
+                        .bind(0, exportId)
+                        .bind(1, productId)
+                        .mapTo(Integer.class)
+                        .findFirst()
+                        .orElse(null);
+
+                    boolean firstAllocation = true;
+
+                    while (remaining > 0) {
+                        java.util.Map<String, Object> batchRow = handle.createQuery(
+                            "SELECT id, available_quantity FROM inventory_receipt_items WHERE product_id = ? AND available_quantity > 0 ORDER BY receipt_date ASC LIMIT 1 FOR UPDATE")
+                            .bind(0, productId)
+                            .mapToMap()
+                            .findFirst()
+                            .orElse(null);
+
+                        if (batchRow == null) {
+                            throw new IllegalStateException("Tồn kho không đủ cho sản phẩm ID " + productId);
+                        }
+
+                        Integer avail = ((Number)batchRow.get("available_quantity")).intValue();
+                        Integer batchId = ((Number)batchRow.get("id")).intValue();
+
+                        int take = Math.min(avail, remaining);
+
+                        handle.createUpdate("UPDATE inventory_receipt_items SET available_quantity = available_quantity - ? WHERE id = ?")
+                            .bind(0, take)
+                            .bind(1, batchId)
+                            .execute();
+
+                        if (avail - take <= 0) {
+                            handle.createUpdate("UPDATE inventory_receipt_items SET status = 'SOLD_OUT' WHERE id = ?")
+                                .bind(0, batchId)
+                                .execute();
+                        }
+
+                        double unitPrice = item.getUnitPrice();
+                        double totalPrice = take * unitPrice;
+
+                        if (firstAllocation && exportItemId != null) {
+                            handle.createUpdate("UPDATE inventory_export_items SET quantity = ?, total_price = ?, batch_item_id = ? WHERE id = ?")
+                                .bind(0, take)
+                                .bind(1, totalPrice)
+                                .bind(2, batchId)
+                                .bind(3, exportItemId)
+                                .execute();
+                            firstAllocation = false;
+                        } else {
+                            handle.createUpdate("INSERT INTO inventory_export_items (export_id, product_id, quantity, unit_price, total_price, batch_item_id) VALUES (?, ?, ?, ?, ?, ?)")
+                                .bind(0, exportId)
+                                .bind(1, productId)
+                                .bind(2, take)
+                                .bind(3, unitPrice)
+                                .bind(4, totalPrice)
+                                .bind(5, batchId)
+                                .execute();
+                        }
+
+                        remaining -= take;
+                    }
+                }
+
+                Integer prodQty = handle.createQuery(
                         "SELECT quantity FROM products WHERE id = ? FOR UPDATE")
-                    .bind(0, item.getProductId())
+                    .bind(0, productId)
                     .mapTo(Integer.class)
                     .findFirst()
                     .orElse(null);
 
-                if (quantity == null) {
-                    throw new IllegalStateException("Không tìm thấy sản phẩm ID " + item.getProductId());
+                if (prodQty == null) {
+                    throw new IllegalStateException("Không tìm thấy sản phẩm ID " + productId);
                 }
 
-                if (quantity < item.getQuantity()) {
-                    throw new IllegalStateException("Tồn kho không đủ cho sản phẩm ID " + item.getProductId());
+                if (prodQty < needed) {
+                    throw new IllegalStateException("Tồn kho không đủ cho sản phẩm ID " + productId);
                 }
 
                 handle.createUpdate("UPDATE products SET quantity = quantity - ? WHERE id = ?")
-                    .bind(0, item.getQuantity())
-                    .bind(1, item.getProductId())
+                    .bind(0, needed)
+                    .bind(1, productId)
                     .execute();
             }
 
@@ -284,6 +398,16 @@ public class AdminExportDAO {
         return count != null && count > 0;
     }
 
+    public Integer getBatchAvailableQuantity(int batchItemId) {
+        return DBContext.get().withHandle(handle ->
+            handle.createQuery("SELECT available_quantity FROM inventory_receipt_items WHERE id = ?")
+                .bind(0, batchItemId)
+                .mapTo(Integer.class)
+                .findFirst()
+                .orElse(null)
+        );
+    }
+
     public List<java.util.Map<String, Object>> getAllSuppliers() {
         return DBContext.get().withHandle(handle ->
             handle.createQuery("SELECT id, name FROM suppliers ORDER BY name")
@@ -339,7 +463,7 @@ public class AdminExportDAO {
         return DBContext.get().withHandle(handle ->
             handle.createQuery("""
                 SELECT i.id, i.export_id, i.product_id, i.quantity, i.unit_price,
-                       i.total_price, p.name as product_name
+                       i.total_price, i.batch_item_id, p.name as product_name
                 FROM inventory_export_items i
                 LEFT JOIN products p ON i.product_id = p.id
                 WHERE i.export_id = ?
@@ -352,7 +476,8 @@ public class AdminExportDAO {
                     rs.getString("product_name"),
                     rs.getInt("quantity"),
                     rs.getDouble("unit_price"),
-                    rs.getDouble("total_price")
+                    rs.getDouble("total_price"),
+                    rs.getObject("batch_item_id") == null ? null : rs.getInt("batch_item_id")
                 ))
                 .list()
         );
@@ -408,9 +533,10 @@ public class AdminExportDAO {
         private int quantity;
         private double unitPrice;
         private double totalPrice;
+        private Integer batchItemId;
 
         public ExportItemDetailDTO(int id, int exportId, int productId, String productName,
-                                   int quantity, double unitPrice, double totalPrice) {
+                                   int quantity, double unitPrice, double totalPrice, Integer batchItemId) {
             this.id = id;
             this.exportId = exportId;
             this.productId = productId;
@@ -418,7 +544,10 @@ public class AdminExportDAO {
             this.quantity = quantity;
             this.unitPrice = unitPrice;
             this.totalPrice = totalPrice;
+            this.batchItemId = batchItemId;
         }
+
+        public Integer getBatchItemId() { return batchItemId; }
 
         public int getId() { return id; }
         public int getExportId() { return exportId; }

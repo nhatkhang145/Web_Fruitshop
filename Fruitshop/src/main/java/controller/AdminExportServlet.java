@@ -124,6 +124,7 @@ public class AdminExportServlet extends HttpServlet {
                 if ("SALES".equalsIgnoreCase(r.getExportType())) exportTypeDisplay = "Bán hàng";
                 else if ("INTERNAL".equalsIgnoreCase(r.getExportType())) exportTypeDisplay = "Nội bộ";
                 else if ("TRANSFER".equalsIgnoreCase(r.getExportType())) exportTypeDisplay = "Điều chuyển";
+                else if ("WASTE".equalsIgnoreCase(r.getExportType())) exportTypeDisplay = "Sản phẩm hỏng";
                 map.put("exportType", exportTypeDisplay);
 
                 String statusDisplay = r.getStatus();
@@ -205,23 +206,35 @@ public class AdminExportServlet extends HttpServlet {
             String exportType = request.getParameter("export_type");
 
             String receiverName = null;
-            if (supplierId > 0) {
-                receiverName = exportDAO.getSupplierName(supplierId).orElse(null);
-                if (receiverName == null) {
+            String wasteReason = request.getParameter("waste_reason");
+
+            if (exportType != null && "WASTE".equalsIgnoreCase(exportType)) {
+                if (wasteReason == null || wasteReason.trim().isEmpty()) {
                     result.put("success", false);
-                    result.put("message", "Đơn vị nhận không tồn tại");
+                    result.put("message", "Vui lòng nhập lý do loại bỏ cho 'Sản phẩm hỏng'");
                     response.getWriter().write(gson.toJson(result));
                     return;
                 }
-            } else if (supplierName != null && !supplierName.trim().isEmpty()) {
-                receiverName = supplierName.trim();
-            }
+                receiverName = "";
+            } else {
+                if (supplierId > 0) {
+                    receiverName = exportDAO.getSupplierName(supplierId).orElse(null);
+                    if (receiverName == null) {
+                        result.put("success", false);
+                        result.put("message", "Đơn vị nhận không tồn tại");
+                        response.getWriter().write(gson.toJson(result));
+                        return;
+                    }
+                } else if (supplierName != null && !supplierName.trim().isEmpty()) {
+                    receiverName = supplierName.trim();
+                }
 
-            if (receiverName == null || receiverName.isEmpty()) {
-                result.put("success", false);
-                result.put("message", "Đơn vị nhận không hợp lệ");
-                response.getWriter().write(gson.toJson(result));
-                return;
+                if (receiverName == null || receiverName.isEmpty()) {
+                    result.put("success", false);
+                    result.put("message", "Đơn vị nhận không hợp lệ");
+                    response.getWriter().write(gson.toJson(result));
+                    return;
+                }
             }
 
             if (exportDate == null || exportDate.isEmpty()) {
@@ -285,6 +298,25 @@ public class AdminExportServlet extends HttpServlet {
                 totalAmount += item.getQuantity() * item.getUnitPrice();
             }
 
+            for (InventoryExportItem item : itemsArray) {
+                Integer batchItemId = item.getBatchItemId();
+                if (batchItemId != null && batchItemId > 0) {
+                    Integer avail = exportDAO.getBatchAvailableQuantity(batchItemId);
+                    if (avail == null) {
+                        result.put("success", false);
+                        result.put("message", "Không tìm thấy lô id " + batchItemId);
+                        response.getWriter().write(gson.toJson(result));
+                        return;
+                    }
+                    if (avail < item.getQuantity()) {
+                        result.put("success", false);
+                        result.put("message", "Số lượng yêu cầu vượt quá tồn lô (lô id " + batchItemId + ")");
+                        response.getWriter().write(gson.toJson(result));
+                        return;
+                    }
+                }
+            }
+
             String exportCode = exportDAO.generateExportCode();
 
             InventoryExportReceipt receipt = new InventoryExportReceipt();
@@ -294,7 +326,13 @@ public class AdminExportServlet extends HttpServlet {
             receipt.setExportDate(java.time.LocalDateTime.parse(exportDate + "T00:00:00"));
             receipt.setTotalAmount(totalAmount);
             receipt.setStatus("PENDING");
-            receipt.setNote(note);
+            if (wasteReason != null && !wasteReason.trim().isEmpty()) {
+                String combined = "Lý do loại bỏ: " + wasteReason.trim();
+                if (note != null && !note.trim().isEmpty()) combined += " | " + note.trim();
+                receipt.setNote(combined);
+            } else {
+                receipt.setNote(note);
+            }
             receipt.setCreatedBy(getUserId(request));
 
             int exportId = exportDAO.createExportWithItems(receipt, java.util.Arrays.asList(itemsArray));
@@ -490,6 +528,7 @@ public class AdminExportServlet extends HttpServlet {
             if ("SALES".equalsIgnoreCase(detail.getExportType())) exportTypeDisplay = "Bán hàng";
             else if ("INTERNAL".equalsIgnoreCase(detail.getExportType())) exportTypeDisplay = "Nội bộ";
             else if ("TRANSFER".equalsIgnoreCase(detail.getExportType())) exportTypeDisplay = "Điều chuyển";
+            else if ("WASTE".equalsIgnoreCase(detail.getExportType())) exportTypeDisplay = "Sản phẩm hỏng";
 
             request.setAttribute("receipt", detail);
             request.setAttribute("items", items);
