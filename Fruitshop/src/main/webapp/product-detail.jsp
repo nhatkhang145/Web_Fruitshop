@@ -305,13 +305,13 @@
                                                         </c:choose>
 
                                                         <img src="<c:out value='${userAvatar}'/>"
-                                                            alt="<c:out value='${r.user.fullname}'/>"
+                                                            alt="<c:out value='${r.user.fullName}'/>"
                                                             style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
                                                     </div>
                                                     <div class="review-content">
                                                         <div class="review-header" style="margin-bottom: 5px;">
                                                             <span
-                                                                style="font-weight: bold; font-size: 1.1rem;">${r.user.fullname}</span>
+                                                                style="font-weight: bold; font-size: 1.1rem;">${r.user.fullName}</span>
                                                             <span
                                                                 style="color: #999; font-size: 0.9rem; margin-left: 10px;">
                                                                 <fmt:formatDate value="${r.createdAt}"
