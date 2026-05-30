@@ -48,7 +48,8 @@ public class ProductDetailServlet extends HttpServlet {
                 request.setAttribute("weekendDeal", activeDeal);
             }
 
-            List<Product> relatedP = pDao.getRelatedProducts(p.getCategoryId(), p.getId(), 8);
+            double basePrice = p.getSalePrice() > 0 ? p.getSalePrice() : p.getPrice();
+            List<Product> relatedP = pDao.getRecommendedProducts(p.getCategoryId(), p.getId(), basePrice, 8);
 
             List<Category> listC = cDao.getAllCategories();
             request.setAttribute("listC", listC);
