@@ -50,7 +50,7 @@ public class OrderDetailServlet extends HttpServlet {
             }
 
             req.setAttribute("order", order);
-            req.getRequestDispatcher("/order-history-detail.jsp").forward(req, resp);
+            req.getRequestDispatcher("/orders").forward(req, resp);
 
         } catch (NumberFormatException e) {
             resp.sendRedirect(req.getContextPath() + "/orders");
