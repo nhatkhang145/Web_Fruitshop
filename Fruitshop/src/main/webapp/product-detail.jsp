@@ -296,11 +296,9 @@
                                                                 <c:set var="userAvatar" value="${r.user.avatar}" />
                                                             </c:when>
                                                             <c:otherwise>
-                                                                <%-- Kết hợp c:url cho ảnh mặc định --%>
-                                                                    <c:set var="userAvatar">
-                                                                        <c:url
-                                                                            value="/assets/images/default-user.png" />
-                                                                    </c:set>
+                                                                <c:set var="userAvatar">
+                                                                    <c:url value="/assets/images/default-user.png" />
+                                                                </c:set>
                                                             </c:otherwise>
                                                         </c:choose>
 
@@ -342,36 +340,84 @@
                             </div>
 
                             <div class="related-products-section">
-                                <h2 class="section-title">Sản phẩm liên quan</h2>
-                                <div class="trending-grid" style="display: flex; gap: 20px; flex-wrap: wrap;">
-
-                                    <c:forEach items="${relatedP}" var="rp">
-                                        <c:if test="${rp.id != detail.id}">
-                                            <div class="product-card" style="width: 250px;">
-                                                <div class="product-image">
-                                                    <img src="<c:out value='${rp.image}'/>"
-                                                        alt="<c:out value='${rp.name}'/>"
-                                                        style="width: 100%; height: 200px; object-fit: cover;">
-                                                    <div class="product-actions">
-                                                        <a href="<c:url value='/product-detail?pid=${rp.id}'/>"><button
-                                                                class="action-btn"><i
-                                                                    class="fas fa-eye"></i></button></a>
+                                <h2 class="section-title">Sản phẩm gợi ý</h2>
+                                <c:choose>
+                                    <c:when test="${empty relatedP}">
+                                        <p style="color: #666; font-style: italic;">Chưa có sản phẩm gợi ý phù hợp.</p>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="trending-grid" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                                            <c:forEach items="${relatedP}" var="rp">
+                                                <c:if test="${rp.id != detail.id}">
+                                                    <div class="product-card" style="width: 250px;">
+                                                        <div class="product-image">
+                                                            <img src="<c:out value='${rp.image}'/>"
+                                                                alt="<c:out value='${rp.name}'/>"
+                                                                style="width: 100%; height: 200px; object-fit: cover;">
+                                                            <div class="product-actions">
+                                                                <a href="<c:url value='/product-detail?pid=${rp.id}'/>"><button
+                                                                        class="action-btn"><i
+                                                                            class="fas fa-eye"></i></button></a>
+                                                            </div>
+                                                        </div>
+                                                        <div class="product-info">
+                                                            <h3><a href="<c:url value='/product-detail?pid=${rp.id}'/>">
+                                                                    <c:out value="${rp.name}" />
+                                                                </a></h3>
+                                                            <div class="rating"
+                                                                style="color: #ffc107; font-size: 0.8rem; margin-bottom: 6px;">
+                                                                <c:forEach begin="1" end="5" var="i">
+                                                                    <c:choose>
+                                                                        <c:when test="${i <= rp.averageRating}">
+                                                                            <i class="fas fa-star"></i>
+                                                                        </c:when>
+                                                                        <c:when test="${i - rp.averageRating <= 0.5}">
+                                                                            <i class="fas fa-star-half-alt"></i>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <i class="far fa-star"></i>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </c:forEach>
+                                                                <span style="color: #999;">
+                                                                    <fmt:formatNumber value="${rp.averageRating}"
+                                                                        minFractionDigits="1" maxFractionDigits="1" />/5
+                                                                    (${rp.reviewCount})
+                                                                </span>
+                                                            </div>
+                                                            <div class="price">
+                                                                <c:choose>
+                                                                    <c:when test="${rp.quantity == 0}">
+                                                                        <span class="current"
+                                                                            style="color: #999; font-weight: 600;">Hết
+                                                                            hàng</span>
+                                                                    </c:when>
+                                                                    <c:when
+                                                                        test="${rp.salePrice > 0 && rp.salePrice < rp.price}">
+                                                                        <span class="current">
+                                                                            <fmt:formatNumber value="${rp.salePrice}"
+                                                                                pattern="#,###" />₫
+                                                                        </span>
+                                                                        <span class="original">
+                                                                            <fmt:formatNumber value="${rp.price}"
+                                                                                pattern="#,###" />₫
+                                                                        </span>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <span class="current">
+                                                                            <fmt:formatNumber value="${rp.price}"
+                                                                                pattern="#,###" />₫
+                                                                        </span>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="product-info">
-                                                    <h3><a href="<c:url value='/product-detail?pid=${rp.id}'/>">
-                                                            <c:out value="${rp.name}" />
-                                                        </a></h3>
-                                                    <div class="price">
-                                                        <span class="current">
-                                                            <fmt:formatNumber value="${rp.price}" pattern="#,###" />₫
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </c:if>
-                                    </c:forEach>
-                                </div>
+                                                </c:if>
+                                            </c:forEach>
+                                        </div>
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
 
                         </div>
