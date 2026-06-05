@@ -81,6 +81,18 @@
                         </div>
 
                         <div class="form-group">
+                            <label for="roleId">Vai trò phân quyền</label>
+                            <select name="roleId" id="roleId" class="form-control">
+                                <option value="">-- Chưa gán vai trò --</option>
+                                <c:forEach items="${roles}" var="r">
+                                    <option value="${r.id}" ${user.roleId != null && user.roleId == r.id ? 'selected' : '' }>
+                                        ${r.name}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
                             <label for="status">Trạng thái</label>
                             <select name="status" id="status" class="form-control">
                                 <option value="active" ${user.status !=0 ? 'selected' : '' }>Hoạt động</option>

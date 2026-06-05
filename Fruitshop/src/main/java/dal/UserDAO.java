@@ -1,11 +1,14 @@
 package dal;
 
-import model.Address;
-import model.User;
-import org.jdbi.v3.core.mapper.RowMapper;
-
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+
+import org.jdbi.v3.core.mapper.RowMapper;
+
+import model.Address;
+import model.User;
 
 public class UserDAO {
     private final RowMapper<User> userMapper = (rs, ctx) -> {
@@ -16,6 +19,10 @@ public class UserDAO {
         user.setPassword(rs.getString("password"));
         user.setPhone(rs.getString("phone"));
         user.setRole(rs.getInt("role"));
+        if (hasRoleIdColumn()) {
+            int roleId = rs.getInt("role_id");
+            user.setRoleId(rs.wasNull() ? null : roleId);
+        }
         user.setAvatar(rs.getString("avatar"));
         user.setGender(rs.getString("gender"));
         user.setBirthDate(rs.getDate("birthdate"));
@@ -77,7 +84,7 @@ public class UserDAO {
     // Đăng nhập
     public Optional<User> checkLogin(String email, String password) {
         try {
-            String query = "SELECT * FROM users WHERE email = ? AND password = ? AND status = 1";
+            String query = userSelectSql() + " WHERE email = ? AND password = ? AND status = 1";
             return DBContext.get().withHandle(handle -> handle.createQuery(query)
                     .bind(0, email)
                     .bind(1, password)
@@ -195,7 +202,7 @@ public class UserDAO {
     // Lấy thông tin user theo email
     public Optional<User> getUserByEmail(String email) {
         try {
-            String query = "SELECT * FROM users WHERE email = ?";
+            String query = userSelectSql() + " WHERE email = ?";
             return DBContext.get().withHandle(handle -> handle.createQuery(query)
                     .bind(0, email)
                     .map(userMapper)
@@ -262,7 +269,7 @@ public class UserDAO {
     // Lấy thông tin user theo id
     public Optional<User> getUserById(int id) {
         try {
-            String sql = "SELECT * FROM users WHERE id = ?";
+            String sql = userSelectSql() + " WHERE id = ?";
             return DBContext.get().withHandle(handle -> handle.createQuery(sql)
                     .bind(0, id)
                     .map(userMapper)
@@ -299,6 +306,23 @@ public class UserDAO {
             System.err.println("Error counting users: " + e.getMessage());
             return 0;
         }
+    }
+
+    private boolean hasRoleIdColumn() {
+        return DBContext.get().withHandle(handle -> {
+            try (ResultSet columns = handle.getConnection().getMetaData().getColumns(null, null, "users", "role_id")) {
+                return columns.next();
+            } catch (SQLException e) {
+                return false;
+            }
+        });
+    }
+
+    private String userSelectSql() {
+        if (hasRoleIdColumn()) {
+            return "SELECT id, fullname, email, password, phone, role, role_id, avatar, gender, birthdate, status, login_type, social_id, created_at, name_changed FROM users";
+        }
+        return "SELECT id, fullname, email, password, phone, role, avatar, gender, birthdate, status, login_type, social_id, created_at, name_changed FROM users";
     }
 
 }

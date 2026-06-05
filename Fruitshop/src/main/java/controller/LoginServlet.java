@@ -1,16 +1,19 @@
 package controller;
 
+import java.io.IOException;
+import java.util.Optional;
+
+import dal.RoleDAO;
 import dal.UserDAO;
-import model.User;
-import util.PasswordUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.Optional;
+import model.User;
+import util.AdminPermissionHelper;
+import util.PasswordUtils;
 
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
@@ -46,16 +49,42 @@ public class LoginServlet extends HttpServlet {
 
             HttpSession session = request.getSession();
             session.setAttribute("account", account);
+            session.setAttribute("accountRoleName", resolveRoleName(account));
+            session.setAttribute("adminLandingPath", AdminPermissionHelper.resolveAdminLandingPath(account));
 
             dal.WishlistDAO wishlistDAO = new dal.WishlistDAO();
             int wishlistCount = wishlistDAO.countWishlist(account.getId());
             session.setAttribute("wishlistCount", wishlistCount);
 
-            if (account.getRole() == 1) {
-                response.sendRedirect("admin/dashboard");
+            if (isAdminAccount(account)) {
+                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
             } else {
                 response.sendRedirect(request.getContextPath() + "/");
             }
         }
+    }
+
+    private boolean isAdminAccount(User account) {
+        return account != null && account.getRole() == 1;
+    }
+
+    private String resolveRoleName(User account) {
+        if (account == null) {
+            return "Khách hàng";
+        }
+        if (account.getRole() == 1) {
+            return "Admin";
+        }
+
+        Integer roleId = account.getRoleId();
+        if (roleId != null && roleId > 0) {
+            var role = new RoleDAO().getRoleById(roleId);
+            if (role != null && role.getName() != null && !role.getName().isBlank()) {
+                return role.getName();
+            }
+            return "Vai trò #" + roleId;
+        }
+
+        return "Khách hàng";
     }
 }

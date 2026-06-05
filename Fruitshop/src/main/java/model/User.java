@@ -9,6 +9,7 @@ public class User {
     private String password;
     private String phone;
     private int role;
+    private Integer roleId;
     private String avatar;
     private String gender;
     private Date birthDate;
@@ -84,6 +85,14 @@ public class User {
 
     public void setRole(int role) {
         this.role = role;
+    }
+
+    public Integer getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Integer roleId) {
+        this.roleId = roleId;
     }
 
     public String getAvatar() {
