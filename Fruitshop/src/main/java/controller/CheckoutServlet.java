@@ -235,12 +235,30 @@ public class CheckoutServlet extends HttpServlet {
 
         syncCheckoutCartImages(cart);
 
+        dal.ProductDAO productDAO = new dal.ProductDAO();
+        for (CartItem item : cart) {
+            Product currentProduct = productDAO.getProductByID(item.getProduct().getId());
+
+            if (currentProduct == null || currentProduct.getStatus() != 1) {
+                req.setAttribute("error", "Sản phẩm [" + item.getProduct().getName()
+                        + "] hiện không còn kinh doanh. Vui lòng xóa khỏi giỏ hàng!");
+                doGet(req, resp);
+                return;
+            }
+
+            if (item.getQuantity() > currentProduct.getQuantity()) {
+                req.setAttribute("error", "Sản phẩm [" + item.getProduct().getName() + "] chỉ còn "
+                        + currentProduct.getQuantity() + " sản phẩm trong kho. Vui lòng cập nhật lại số lượng!");
+                doGet(req, resp);
+                return;
+            }
+        }
+
         try {
             double totalProducts = 0;
             for (CartItem item : cart) {
                 totalProducts += item.getFinalPrice().doubleValue() * item.getQuantity();
             }
-
             double shippingFee = 30000;
             double discount = 0;
             double finalAmount = totalProducts + shippingFee - discount;
@@ -307,7 +325,8 @@ public class CheckoutServlet extends HttpServlet {
                 session.removeAttribute("size");
                 session.removeAttribute("totalMoney");
                 if ("vnpay".equals(paymentMethod) || "VNPay".equalsIgnoreCase(paymentMethod)) {
-                    resp.sendRedirect(req.getContextPath() + "/vnpay-payment?orderId=" + orderId + "&amount=" + (long)finalAmount);
+                    resp.sendRedirect(req.getContextPath() + "/vnpay-payment?orderId=" + orderId + "&amount="
+                            + (long) finalAmount);
                 } else {
                     session.setAttribute("successMessage", "Đặt hàng thành công! Mã đơn hàng: #" + orderId);
                     resp.sendRedirect(req.getContextPath() + "/order-detail?id=" + orderId);
