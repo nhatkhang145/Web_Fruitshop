@@ -1,5 +1,5 @@
 .stats-grid--kpi {
-    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .stat-card.accent-rose .stat-icon {
