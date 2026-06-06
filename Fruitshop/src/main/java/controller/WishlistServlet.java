@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@WebServlet(name = "WishlistServlet", urlPatterns = {"/wishlist"})
+@WebServlet(name = "WishlistServlet", urlPatterns = { "/wishlist" })
 public class WishlistServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -81,7 +81,8 @@ public class WishlistServlet extends HttpServlet {
                 if ("XMLHttpRequest".equals(ajaxHeader)) {
                     response.setContentType("application/json");
                     response.setCharacterEncoding("UTF-8");
-                    response.getWriter().write("{\"success\": true, \"action\": \"removed\", \"count\": " + count + "}");
+                    response.getWriter()
+                            .write("{\"success\": true, \"action\": \"removed\", \"count\": " + count + "}");
                     return;
                 }
             }

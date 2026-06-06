@@ -1,60 +1,99 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Danh sách yêu thích</title>
+    <title>Yêu thích - Organic Harvest</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css" />
-
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/profile.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/orders.css" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/wishlist.css" />
 </head>
 
 <body>
-    <div class="main">
-        <jsp:include page="header.jsp"></jsp:include>
+<div class="main">
+    <jsp:include page="header.jsp"></jsp:include>
 
-        <div class="app__container" style="padding: 40px 0; background-color: #f5f5f5;">
-            <div class="grid wide"> <div class="row sm-gutter app__content">
-                    <div class="col l-12 m-12 c-12">
+    <div class="breadcrumb">
+        <div class="container">
+            <a href="${pageContext.request.contextPath}/">Trang chủ</a> &gt;
+            <a href="${pageContext.request.contextPath}/profile">Tài khoản</a> &gt; <span>Yêu thích</span>
+        </div>
+    </div>
 
-                        <div class="wishlist-header">
-                            <h3><i class="fa-solid fa-heart" style="color: #d0011b; margin-right: 10px;"></i> Sản phẩm yêu thích</h3>
-                            <span class="wishlist-count">${wishlist.size()} sản phẩm</span>
+    <section class="profile-section">
+        <div class="container">
+            <div class="profile-container">
+                <aside class="profile-sidebar">
+                    <div class="profile-user-brief">
+                        <img src="${sessionScope.account.avatar != null ? sessionScope.account.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"
+                             alt="Avatar" class="brief-avatar" />
+                        <div class="brief-info">
+                            <span class="brief-name">${sessionScope.account.fullName}</span>
+                            <a href="${pageContext.request.contextPath}/profile" class="brief-edit">
+                                <i class="fa-solid fa-pen"></i> Sửa hồ sơ
+                            </a>
                         </div>
+                    </div>
 
-                        <c:if test="${empty wishlist}">
-                            <div style="text-align: center; padding: 60px 0; background: #fff; border-radius: 8px;">
+                    <ul class="profile-menu">
+                        <li class="profile-menu-item">
+                            <a href="${pageContext.request.contextPath}/profile"><i class="fa-regular fa-user"></i> Hồ sơ của tôi</a>
+                        </li>
+                        <li class="profile-menu-item">
+                            <a href="${pageContext.request.contextPath}/orders"><i class="fa-solid fa-box-open"></i> Đơn mua</a>
+                        </li>
+                        <li class="profile-menu-item">
+                            <a href="${pageContext.request.contextPath}/addresses"><i class="fa-solid fa-location-dot"></i> Địa chỉ</a>
+                        </li>
+                        <li class="profile-menu-item">
+                            <a href="${pageContext.request.contextPath}/change-password.jsp"><i class="fa-solid fa-key"></i> Đổi mật khẩu</a>
+                        </li>
+                        <li class="profile-menu-item active">
+                            <a href="${pageContext.request.contextPath}/wishlist"><i class="fa-regular fa-heart"></i> Yêu thích</a>
+                        </li>
+                        <li class="profile-menu-item">
+                            <a href="${pageContext.request.contextPath}/logout" class="wishlist-logout"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
+                        </li>
+                    </ul>
+                </aside>
+
+                <main class="profile-content">
+                    <div class="wishlist-header">
+                        <h2><i class="fa-solid fa-heart" style="color: #d0011b; margin-right: 10px;"></i> Danh sách yêu thích (${wishlist.size()})</h2>
+                    </div>
+
+                    <c:choose>
+                        <c:when test="${empty wishlist}">
+                            <div class="wishlist-empty">
                                 <img src="https://deo.shopeemobile.com/shopee/shopee-pcmall-live-sg/cart/9bdd8040b334d31946f49e36beaf32db.png" alt="Empty" style="width: 100px; margin-bottom: 20px;">
                                 <p style="font-size: 1.4rem; color: #666;">Chưa có sản phẩm nào trong danh sách yêu thích.</p>
-                                <a href="shop" class="btn btn--primary" style="margin-top: 20px; text-decoration: none; display: inline-block; padding: 10px 20px;">Tiếp tục mua sắm</a>
+                                <a href="${pageContext.request.contextPath}/shop" class="btn btn-primary" style="margin-top: 15px;">Mua sắm ngay</a>
                             </div>
-                        </c:if>
-
-                        <c:if test="${not empty wishlist}">
+                        </c:when>
+                        <c:otherwise>
                             <div class="wishlist-grid">
                                 <c:forEach items="${wishlist}" var="item">
-                                    <div class="wishlist-item ${item.product.quantity == 0 ? 'disabled' : ''}">
+                                    <c:set var="product" value="${item.product}" />
+                                    <c:set var="weekendDeal" value="${weekendDeals[product.id]}" />
 
-                                        <a href="wishlist?action=remove&pid=${item.product.id}"
-                                           class="btn-remove"
-                                           onclick="return confirm('Bạn chắc chắn muốn bỏ sản phẩm này?')"
-                                           title="Xóa khỏi yêu thích">
+                                    <div class="wishlist-card ${product.quantity == 0 ? 'disabled' : ''}">
+                                        <a href="wishlist?action=remove&pid=${product.id}" class="btn-remove"
+                                           onclick="return confirm('Bạn chắc chắn muốn bỏ sản phẩm này?')" title="Xóa khỏi yêu thích">
                                             <i class="fa-solid fa-xmark"></i>
                                         </a>
 
-                                        <div class="wishlist-img">
-                                            <a href="product-detail?pid=${item.product.id}">
-                                                <img src="${item.product.image}" alt="${item.product.name}">
+                                        <div class="wishlist-image">
+                                            <a href="${pageContext.request.contextPath}/product-detail?pid=${product.id}">
+                                                <img src="${product.image}" alt="${product.name}" />
                                             </a>
-                                            <%-- Check weekend deal first --%>
-                                            <c:set var="weekendDeal" value="${weekendDeals[item.product.id]}" />
                                             <c:choose>
                                                 <c:when test="${not empty weekendDeal}">
                                                     <span class="badge-sale">-${weekendDeal.discountPercent}%</span>
@@ -64,113 +103,109 @@
                                                         </div>
                                                     </c:if>
                                                 </c:when>
-                                                <c:when test="${item.product.salePrice > 0}">
+                                                <c:when test="${product.salePrice > 0}">
                                                     <span class="badge-sale">Sale</span>
                                                 </c:when>
                                             </c:choose>
-                                            <c:if test="${item.product.quantity == 0}">
+                                            <c:if test="${product.quantity == 0}">
                                                 <div class="overlay-out">Hết hàng</div>
                                             </c:if>
                                         </div>
 
-                                        <div class="wishlist-info">
-                                            <a href="product-detail?pid=${item.product.id}" class="wishlist-name">
-                                                ${item.product.name}
+                                        <div class="wishlist-body">
+                                            <a class="wishlist-name" href="${pageContext.request.contextPath}/product-detail?pid=${product.id}">
+                                                    ${product.name}
                                             </a>
-
                                             <div class="wishlist-price">
-                                                <%-- Priority: Weekend Deal > Sale > Original --%>
                                                 <c:choose>
-                                                    <c:when test="${item.product.quantity == 0}">
-                                                        <span class="new" style="color: #999; font-weight: 600;">Hết hàng</span>
+                                                    <c:when test="${product.quantity == 0}">
+                                                        <span class="price-current" style="color: #999;">Hết hàng</span>
                                                     </c:when>
                                                     <c:when test="${not empty weekendDeal}">
-                                                        <span class="new" style="color: #ff6b6b;">
-                                                            <fmt:formatNumber value="${weekendDeal.discountedPrice}" pattern="#,###"/>đ
-                                                        </span>
-                                                        <span class="old">
-                                                            <fmt:formatNumber value="${item.product.price}" pattern="#,###"/>đ
-                                                        </span>
+                                                        <span class="price-current"><fmt:formatNumber value="${weekendDeal.discountedPrice}" pattern="#,###"/> ₫</span>
+                                                        <span class="price-old"><fmt:formatNumber value="${product.price}" pattern="#,###"/> ₫</span>
                                                     </c:when>
-                                                    <c:when test="${item.product.salePrice > 0}">
-                                                        <span class="new">
-                                                            <fmt:formatNumber value="${item.product.salePrice}" pattern="#,###"/>đ
-                                                        </span>
-                                                        <span class="old">
-                                                            <fmt:formatNumber value="${item.product.price}" pattern="#,###"/>đ
-                                                        </span>
+                                                    <c:when test="${product.salePrice > 0}">
+                                                        <span class="price-current"><fmt:formatNumber value="${product.salePrice}" pattern="#,###"/> ₫</span>
+                                                        <span class="price-old"><fmt:formatNumber value="${product.price}" pattern="#,###"/> ₫</span>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <span class="new">
-                                                            <fmt:formatNumber value="${item.product.price}" pattern="#,###"/>đ
-                                                        </span>
+                                                        <span class="price-current"><fmt:formatNumber value="${product.price}" pattern="#,###"/> ₫</span>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </div>
 
-                                            <div class="wishlist-status">
-                                                <c:if test="${item.product.quantity > 0}">
-                                                    <span class="in-stock"><i class="fa-solid fa-check"></i> Còn hàng</span>
-                                                </c:if>
-                                                <c:if test="${item.product.quantity == 0}">
-                                                    <span class="out-stock"><i class="fa-solid fa-ban"></i> Hết hàng</span>
-                                                </c:if>
+                                            <div class="wishlist-meta">
+                                                <c:choose>
+                                                    <c:when test="${product.quantity > 0}">
+                                                        <span class="in-stock"><i class="fa-solid fa-check"></i> Còn hàng (Tồn: ${product.quantity})</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="out-stock"><i class="fa-solid fa-ban"></i> Hết hàng</span>
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </div>
 
-                                            <c:choose>
-                                                <c:when test="${item.product.quantity > 0}">
-                                                    <button class="btn-cart wishlist-buy-now-btn" data-id="${item.product.id}">
-                                                        <i class="fa-solid fa-cart-plus"></i> Mua ngay
-                                                    </button>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <button class="btn-cart" style="background: #999; cursor: not-allowed;" disabled>
-                                                        <i class="fa-solid fa-ban"></i> Hết hàng
-                                                    </button>
-                                                </c:otherwise>
-                                            </c:choose>
+                                            <div class="wishlist-actions">
+                                                <c:choose>
+                                                    <c:when test="${product.quantity > 0}">
+                                                        <button class="btn btn-cart wishlist-buy-now-btn" data-id="${product.id}">
+                                                            <i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ
+                                                        </button>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <button class="btn btn-cart" style="background: #999; cursor: not-allowed;" disabled>
+                                                            <i class="fa-solid fa-ban"></i> Hết hàng
+                                                        </button>
+                                                    </c:otherwise>
+                                                </c:choose>
+
+                                                <a class="btn btn-danger" href="${pageContext.request.contextPath}/wishlist?action=remove&pid=${product.id}" onclick="return confirm('Bạn chắc chắn muốn bỏ sản phẩm này khỏi danh sách yêu thích?')">
+                                                    <i class="fa-regular fa-trash-can"></i> Xóa
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </c:forEach>
                             </div>
-                        </c:if>
-
-                    </div>
-                </div>
+                        </c:otherwise>
+                    </c:choose>
+                </main>
             </div>
         </div>
+    </section>
 
-        <jsp:include page="footer.jsp"></jsp:include>
-    </div>
+    <jsp:include page="footer.jsp"></jsp:include>
+</div>
 
-    <script src="${pageContext.request.contextPath}/assets/js/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const buyNowBtns = document.querySelectorAll('.wishlist-buy-now-btn');
+<script src="${pageContext.request.contextPath}/assets/js/main.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const buyNowBtns = document.querySelectorAll('.wishlist-buy-now-btn');
 
-            buyNowBtns.forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const productId = this.getAttribute('data-id');
-                    const contextPath = '${pageContext.request.contextPath}';
+        buyNowBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const productId = this.getAttribute('data-id');
+                const contextPath = '${pageContext.request.contextPath}';
 
-                    fetch(contextPath + '/add-to-cart?pid=' + productId + '&quantity=1', {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
+                fetch(contextPath + '/add-to-cart?pid=' + productId + '&quantity=1', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(response => {
+                        window.location.href = contextPath + '/cart.jsp';
                     })
-                        .then(response => {
-                            window.location.href = contextPath + '/cart.jsp';
-                        })
-                        .catch(error => {
-                            console.error('Lỗi khi thêm vào giỏ:', error);
-                            window.location.href = contextPath + '/cart.jsp';
-                        });
-                });
+                    .catch(error => {
+                        console.error('Lỗi khi thêm vào giỏ:', error);
+                        window.location.href = contextPath + '/cart.jsp';
+                    });
             });
         });
-    </script>
+    });
+</script>
 </body>
 </html>
