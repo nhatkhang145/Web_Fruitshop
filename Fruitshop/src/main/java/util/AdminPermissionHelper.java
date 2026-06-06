@@ -157,6 +157,7 @@ public final class AdminPermissionHelper {
             case "/admin/inventory-receipt-create" -> new PermissionRequirement(6, PermissionAction.CREATE);
             case "/admin/inventory-receipt-approve", "/admin/inventory-receipt-reject" -> new PermissionRequirement(6, PermissionAction.UPDATE);
             case "/admin/inventory-warehouse" -> new PermissionRequirement(8, PermissionAction.READ);
+            case "/admin/product-push-sale" -> new PermissionRequirement(8, PermissionAction.UPDATE);
 
             case "/admin/stock-export" -> new PermissionRequirement(7, PermissionAction.READ);
             case "/admin/inventory-export-create" -> new PermissionRequirement(7, PermissionAction.CREATE);

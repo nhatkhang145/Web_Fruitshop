@@ -1,5 +1,6 @@
 package model;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +9,7 @@ public class Product {
     private String name;
     private double price;
     private double salePrice;
+    private Timestamp salePriceExpiresAt;
     private int quantity;
     private String description;
     private String image;
@@ -128,5 +130,13 @@ public class Product {
 
     public void setReviewCount(int reviewCount) {
         this.reviewCount = reviewCount;
+    }
+
+    public Timestamp getSalePriceExpiresAt() {
+        return salePriceExpiresAt;
+    }
+
+    public void setSalePriceExpiresAt(Timestamp salePriceExpiresAt) {
+        this.salePriceExpiresAt = salePriceExpiresAt;
     }
 }
