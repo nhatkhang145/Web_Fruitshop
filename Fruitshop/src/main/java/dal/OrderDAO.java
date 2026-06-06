@@ -67,6 +67,73 @@ public class OrderDAO {
         });
     }
 
+    public int placeOrder(Order order, List<OrderItem> items) {
+        String insertOrderSql = "INSERT INTO orders (user_id, fullname, phone, address, note, " +
+                "total_products_money, shipping_fee, final_amount, " +
+                "payment_method, payment_status, status) " +
+                "VALUES (:userId, :fullname, :phone, :address, :note, " +
+                ":totalProductsMoney, :shippingFee, :finalAmount, " +
+                ":paymentMethod, :paymentStatus, :status)";
+
+        String insertDetailSql = "INSERT INTO order_details (order_id, product_id, product_name, " +
+                "deal_type, deal_id, original_price, discount_amount, final_price, quantity, total) " +
+                "VALUES (:orderId, :productId, :productName, " +
+                ":dealType, :dealId, :originalPrice, :discountAmount, :finalPrice, :quantity, :total)";
+
+        String updateInventorySql = "UPDATE products SET quantity = quantity - :quantity " +
+                "WHERE id = :productId AND quantity >= :quantity";
+
+        return DBContext.get().inTransaction(handle -> {
+            int orderId = handle.createUpdate(insertOrderSql)
+                    .bind("userId", order.getUserId())
+                    .bind("fullname", order.getFullname())
+                    .bind("phone", order.getPhone())
+                    .bind("address", order.getAddress())
+                    .bind("note", order.getNote())
+                    .bind("totalProductsMoney", order.getTotalProductsMoney())
+                    .bind("shippingFee", order.getShippingFee())
+                    .bind("finalAmount", order.getFinalAmount())
+                    .bind("paymentMethod", order.getPaymentMethod())
+                    .bind("paymentStatus", order.getPaymentStatus())
+                    .bind("status", order.getStatus())
+                    .executeAndReturnGeneratedKeys("id")
+                    .mapTo(Integer.class)
+                    .one();
+
+            var detailBatch = handle.prepareBatch(insertDetailSql);
+            var inventoryBatch = handle.prepareBatch(updateInventorySql);
+
+            for (OrderItem item : items) {
+                detailBatch.bind("orderId", orderId)
+                        .bind("productId", item.getProductId())
+                        .bind("productName", item.getProductName())
+                        .bind("dealType", item.getDealType())
+                        .bind("dealId", item.getDealId())
+                        .bind("originalPrice", item.getOriginalPrice())
+                        .bind("discountAmount", item.getDiscountAmount())
+                        .bind("finalPrice", item.getFinalPrice())
+                        .bind("quantity", item.getQuantity())
+                        .bind("total", item.getTotal())
+                        .add();
+
+                inventoryBatch.bind("quantity", item.getQuantity())
+                        .bind("productId", item.getProductId())
+                        .add();
+            }
+
+            detailBatch.execute();
+            int[] updateCounts = inventoryBatch.execute();
+
+            for (int count : updateCounts) {
+                if (count == 0) {
+                    throw new RuntimeException("Insufficient inventory");
+                }
+            }
+
+            return orderId;
+        });
+    }
+
     public List<Order> getOrdersByUserId(int userId) {
         String sql = "SELECT * FROM orders WHERE user_id = :userId ORDER BY created_at DESC";
 

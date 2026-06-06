@@ -278,26 +278,24 @@ public class CheckoutServlet extends HttpServlet {
             order.setPaymentStatus(0);
             order.setStatus("pending");
 
-            int orderId = orderDAO.createOrder(order);
+            List<OrderItem> orderItems = new ArrayList<>();
+            for (CartItem cartItem : cart) {
+                OrderItem item = new OrderItem();
+                item.setProductId(cartItem.getProduct().getId());
+                item.setProductName(cartItem.getProduct().getName());
+                item.setDealType(cartItem.getDealType());
+                item.setDealId(cartItem.getDealId());
+                item.setOriginalPrice(cartItem.getOriginalPrice());
+                item.setDiscountAmount(cartItem.getDiscountAmount());
+                item.setFinalPrice(cartItem.getFinalPrice());
+                item.setQuantity(cartItem.getQuantity());
+                item.setTotal(cartItem.getTotalPrice());
+                orderItems.add(item);
+            }
+
+            int orderId = orderDAO.placeOrder(order, orderItems);
 
             if (orderId > 0) {
-                List<OrderItem> orderItems = new ArrayList<>();
-                for (CartItem cartItem : cart) {
-                    OrderItem item = new OrderItem();
-                    item.setOrderId(orderId);
-                    item.setProductId(cartItem.getProduct().getId());
-                    item.setProductName(cartItem.getProduct().getName());
-                    item.setDealType(cartItem.getDealType());
-                    item.setDealId(cartItem.getDealId());
-                    item.setOriginalPrice(cartItem.getOriginalPrice());
-                    item.setDiscountAmount(cartItem.getDiscountAmount());
-                    item.setFinalPrice(cartItem.getFinalPrice());
-                    item.setQuantity(cartItem.getQuantity());
-                    item.setTotal(cartItem.getTotalPrice());
-                    orderItems.add(item);
-                }
-
-                orderDAO.addOrderDetails(orderId, orderItems);
 
                 try {
                     dal.NotificationDAO notificationDAO = new dal.NotificationDAO();
