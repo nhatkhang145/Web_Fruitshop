@@ -67,13 +67,13 @@ public class AdminUserDAO {
 
     public void updateAddress(int userId, String address, String city, String receiverName, String phone) {
         DBContext.get().useHandle(handle -> {
-            int count = handle.createQuery("SELECT COUNT(*) FROM user_addresses WHERE user_id = ?")
+            int count = handle.createQuery("SELECT COUNT(*) FROM user_addresses WHERE user_id = ? AND is_default = 1")
                     .bind(0, userId)
                     .mapTo(Integer.class)
                     .one();
 
             if (count > 0) {
-                String sqlUpdate = "UPDATE user_addresses SET address = ?, city = ?, receiver_name = ?, phone_number = ? WHERE user_id = ? LIMIT 1";
+                String sqlUpdate = "UPDATE user_addresses SET address = ?, city = ?, receiver_name = ?, phone_number = ? WHERE user_id = ? AND is_default = 1";
                 handle.createUpdate(sqlUpdate)
                         .bind(0, address)
                         .bind(1, city)
