@@ -10,6 +10,7 @@ public class Product {
     private double price;
     private double salePrice;
     private Timestamp salePriceExpiresAt;
+    private Integer saleBatchItemId;
     private int quantity;
     private String description;
     private String image;
@@ -138,5 +139,13 @@ public class Product {
 
     public void setSalePriceExpiresAt(Timestamp salePriceExpiresAt) {
         this.salePriceExpiresAt = salePriceExpiresAt;
+    }
+
+    public Integer getSaleBatchItemId() {
+        return saleBatchItemId;
+    }
+
+    public void setSaleBatchItemId(Integer saleBatchItemId) {
+        this.saleBatchItemId = saleBatchItemId;
     }
 }

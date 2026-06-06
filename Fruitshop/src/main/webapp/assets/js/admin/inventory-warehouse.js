@@ -238,6 +238,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				if (flashModal) {
 					flashModal.dataset.group = groupKey;
 					flashModal.dataset.batchCode = batch;
+					flashModal.dataset.batchItemId = batchRow?.dataset.itemId || '';
 				}
 				if (flashBatch) flashBatch.textContent = batch;
 				if (flashQty) flashQty.textContent = qty;
@@ -376,8 +377,12 @@ document.addEventListener("DOMContentLoaded", function () {
 			body.append('productId', String(pid));
 			body.append('salePrice', String(priceVal));
 			body.append('durationHours', String(durationVal));
+			var bId = flashModal.dataset.batchItemId || '';
+			if (bId) {
+				body.append('batchItemId', bId);
+			}
 			footerBtn.disabled = true;
-			footerBtn.textContent = 'Đang tạo...';
+			footerBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Đang tạo...';
 			fetch(url, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
@@ -385,7 +390,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			}).then(function (res) { return res.json(); })
 			.then(function (data) {
 				footerBtn.disabled = false;
-				footerBtn.textContent = 'Tạo Flash Sale ngay';
+				footerBtn.innerHTML = '<i class="bx bx-bolt"></i> Tạo Flash Sale ngay';
 				if (data.success) {
 					closeModal(flashModal);
 					alert('Đẩy sale sản phẩm thành công!');
@@ -395,7 +400,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				}
 			}).catch(function (err) {
 				footerBtn.disabled = false;
-				footerBtn.textContent = 'Tạo Flash Sale ngay';
+				footerBtn.innerHTML = '<i class="bx bx-bolt"></i> Tạo Flash Sale ngay';
 				alert('Lỗi kết nối: ' + err.message);
 			});
 		});
