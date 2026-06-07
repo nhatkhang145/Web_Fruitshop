@@ -303,9 +303,9 @@ public class CheckoutServlet extends HttpServlet {
                 }
 
                 session.removeAttribute("checkoutCart");
-
-                session.removeAttribute("size");
-                session.removeAttribute("totalMoney");
+//
+//                session.removeAttribute("size");
+//                session.removeAttribute("totalMoney");
                 if ("vnpay".equals(paymentMethod) || "VNPay".equalsIgnoreCase(paymentMethod)) {
                     resp.sendRedirect(req.getContextPath() + "/vnpay-payment?orderId=" + orderId + "&amount=" + (long)finalAmount);
                 } else {
