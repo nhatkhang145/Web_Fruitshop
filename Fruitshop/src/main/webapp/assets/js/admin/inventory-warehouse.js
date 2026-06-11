@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
 	var searchInput = document.getElementById("stockSearch");
-	var categorySelect = document.getElementById("stockCategory");
 	var freshnessSelect = document.getElementById("stockFreshness");
 	var clearFiltersBtn = document.getElementById("clearFiltersBtn");
 	var table = document.getElementById("stockTable");
@@ -94,21 +93,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	function applyFilters() {
 		var query = (searchInput?.value || "").trim().toLowerCase();
-		var category = categorySelect?.value || "all";
 		var freshness = freshnessSelect?.value || "all";
 		var visible = 0;
 
 		(table ? Array.from(table.querySelectorAll(".stock-row")) : []).forEach(function (row) {
 			var code = (row.dataset.code || "").toLowerCase();
 			var name = (row.dataset.name || "").toLowerCase();
-			var rowCategory = row.dataset.category || "";
 			var rowFreshness = row.dataset.freshness || "";
 			var batchRows = getBatchRows(row.dataset.group || "");
 			var batchMatch = batchRows.some(function (batch) {
 				return (batch.dataset.freshness || "") === freshness;
 			});
-			var matchesBase = (query === "" || code.includes(query) || name.includes(query))
-				&& (category === "all" || rowCategory === category);
+			var matchesBase = query === "" || code.includes(query) || name.includes(query);
 			var matches = matchesBase && (freshness === "all" || rowFreshness === freshness || batchMatch);
 
 			row.classList.toggle("is-hidden", !matches);
@@ -142,11 +138,9 @@ document.addEventListener("DOMContentLoaded", function () {
 	});
 
 	searchInput?.addEventListener("input", applyFilters);
-	categorySelect?.addEventListener("change", applyFilters);
 	freshnessSelect?.addEventListener("change", applyFilters);
 	clearFiltersBtn?.addEventListener("click", function () {
 		if (searchInput) searchInput.value = "";
-		if (categorySelect) categorySelect.value = "all";
 		if (freshnessSelect) freshnessSelect.value = "all";
 		applyFilters();
 	});

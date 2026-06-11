@@ -86,7 +86,56 @@
 }
 
 .stock-table td:first-child {
-	width: 340px;
+	width: 430px;
+}
+
+.stock-table th:nth-child(1),
+.stock-table td:nth-child(1) {
+	width: 430px;
+	min-width: 430px;
+}
+
+.stock-table th:nth-child(2),
+.stock-table td:nth-child(2) {
+	width: 140px;
+	min-width: 140px;
+}
+
+.stock-table th:nth-child(3),
+.stock-table td:nth-child(3) {
+	width: 110px;
+	min-width: 110px;
+	text-align: center;
+}
+
+.stock-table th:nth-child(4),
+.stock-table td:nth-child(4),
+.stock-table th:nth-child(5),
+.stock-table td:nth-child(5) {
+	width: 100px;
+	min-width: 100px;
+	text-align: center;
+}
+
+.stock-table th:nth-child(6),
+.stock-table td:nth-child(6) {
+	width: 124px;
+	min-width: 124px;
+	text-align: center;
+}
+
+.stock-table th:nth-child(7),
+.stock-table td:nth-child(7) {
+	width: 96px;
+	min-width: 96px;
+	text-align: center;
+}
+
+.stock-main {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-width: 0;
 }
 
 .tree-toggle {
@@ -115,9 +164,21 @@
 }
 
 .fruit-info {
-	display: inline-flex;
+	display: flex;
 	align-items: center;
 	gap: 12px;
+	min-width: 0;
+	flex: 1;
+}
+
+.fruit-info > div {
+	min-width: 0;
+}
+
+.fruit-info strong {
+	display: block;
+	line-height: 1.25;
+	word-break: break-word;
 }
 
 .fruit-code {
@@ -139,6 +200,7 @@
 
 .stock-qty {
 	font-weight: 700;
+	font-size: 14px;
 }
 
 .stock-low {
@@ -338,6 +400,18 @@
 @media (max-width: 980px) {
 	.stock-filters {
 		grid-template-columns: 1fr;
+	}
+
+	.stock-table th:nth-child(1),
+	.stock-table td:nth-child(1) {
+		width: 360px;
+		min-width: 360px;
+	}
+
+	.stock-table th:nth-child(6),
+	.stock-table td:nth-child(6) {
+		width: 110px;
+		min-width: 110px;
 	}
 
 	.stock-header {

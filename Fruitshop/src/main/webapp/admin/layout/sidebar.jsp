@@ -25,7 +25,7 @@
                         hàng</a>
                 </li>
                 <li class="${param.activePage == 'stock-management' ? 'active' : ''}">
-                    <a href="${pageContext.request.contextPath}/admin/inventory-warehouse.jsp"><i
+                    <a href="${pageContext.request.contextPath}/admin/inventory-warehouse"><i
                             class='bx bx-box'></i>Quản lý tồn kho</a>
                 </li>
                 <li class="${param.activePage == 'inventory' ? 'active' : ''}">
