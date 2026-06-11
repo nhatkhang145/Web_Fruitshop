@@ -181,28 +181,57 @@ public class AdminExportDAO {
                 .list();
 
             for (InventoryExportItem item : items) {
-                Integer stock = handle.createQuery(
-                        "SELECT stock FROM products WHERE id = ? FOR UPDATE")
+                Integer quantity = handle.createQuery(
+                        "SELECT quantity FROM products WHERE id = ? FOR UPDATE")
                     .bind(0, item.getProductId())
                     .mapTo(Integer.class)
                     .findFirst()
                     .orElse(null);
 
-                if (stock == null) {
+                if (quantity == null) {
                     throw new IllegalStateException("Không tìm thấy sản phẩm ID " + item.getProductId());
                 }
 
-                if (stock < item.getQuantity()) {
+                if (quantity < item.getQuantity()) {
                     throw new IllegalStateException("Tồn kho không đủ cho sản phẩm ID " + item.getProductId());
                 }
 
-                handle.createUpdate("UPDATE products SET stock = stock - ? WHERE id = ?")
+                handle.createUpdate("UPDATE products SET quantity = quantity - ? WHERE id = ?")
                     .bind(0, item.getQuantity())
                     .bind(1, item.getProductId())
                     .execute();
             }
 
             handle.createUpdate("UPDATE inventory_export_receipts SET status = 'APPROVED' WHERE id = ?")
+                .bind(0, exportId)
+                .execute();
+
+            return null;
+        });
+    }
+
+    public void rejectExport(int exportId) {
+        DBContext.get().inTransaction(handle -> {
+            String currentStatus = handle.createQuery(
+                    "SELECT status FROM inventory_export_receipts WHERE id = ? FOR UPDATE")
+                .bind(0, exportId)
+                .mapTo(String.class)
+                .findFirst()
+                .orElse(null);
+
+            if (currentStatus == null) {
+                throw new IllegalArgumentException("Không tìm thấy phiếu xuất kho");
+            }
+
+            if ("APPROVED".equalsIgnoreCase(currentStatus)) {
+                throw new IllegalStateException("Phiếu đã được xác nhận, không thể từ chối");
+            }
+
+            if ("CANCELLED".equalsIgnoreCase(currentStatus)) {
+                throw new IllegalStateException("Phiếu đã bị từ chối trước đó");
+            }
+
+            handle.createUpdate("UPDATE inventory_export_receipts SET status = 'CANCELLED' WHERE id = ?")
                 .bind(0, exportId)
                 .execute();
 

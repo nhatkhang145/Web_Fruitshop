@@ -89,18 +89,10 @@
                             </div>
                         </div>
 
-                        <div class="form-input-row">
-                            <div class="form-input">
-                                <label class="form-label" for="productCode">Mã SKU</label>
-                                <input type="text" id="productCode" name="productCode" class="form-control"
-                                       value="${product.productCode}" placeholder="VD: SP001" />
-                            </div>
-                            <div class="form-input">
-                                <label class="form-label" for="productStock">Số lượng kho <span
-                                        class="required-mark">*</span></label>
-                                <input type="number" id="productStock" name="quantity" class="form-control"
-                                       value="${product.quantity}" placeholder="0" required />
-                            </div>
+                        <div class="form-input">
+                            <label class="form-label" for="productCode">Mã SKU</label>
+                            <input type="text" id="productCode" name="productCode" class="form-control"
+                                   value="${product.productCode}" placeholder="VD: SP001" />
                         </div>
 
                         <div class="form-input">

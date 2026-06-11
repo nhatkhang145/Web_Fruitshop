@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.InventoryExportItem;
 import model.InventoryExportReceipt;
 import model.User;
-
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@WebServlet({"/admin/stock-export", "/admin/inventory-export-create", "/admin/inventory-export-detail", "/admin/inventory-export-approve"})
+@WebServlet({"/admin/stock-export", "/admin/inventory-export-create", "/admin/inventory-export-detail", "/admin/inventory-export-approve", "/admin/inventory-export-reject"})
 public class AdminExportServlet extends HttpServlet {
     private AdminExportDAO exportDAO;
 
@@ -70,6 +69,8 @@ public class AdminExportServlet extends HttpServlet {
                 handleCreateExport(request, response);
             } else if ("/admin/inventory-export-approve".equals(path)) {
                 handleApproveExport(request, response);
+            } else if ("/admin/inventory-export-reject".equals(path)) {
+                handleRejectExport(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -339,6 +340,41 @@ public class AdminExportServlet extends HttpServlet {
 
             result.put("success", true);
             result.put("message", "Xác nhận phiếu thành công");
+        } catch (NumberFormatException e) {
+            result.put("success", false);
+            result.put("message", "ID phiếu không hợp lệ");
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("success", false);
+            result.put("message", e.getMessage());
+        }
+
+        response.getWriter().write(gson.toJson(result));
+    }
+
+    private void handleRejectExport(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        Gson gson = new Gson();
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            String exportIdParam = request.getParameter("exportId");
+            if (exportIdParam == null || exportIdParam.isEmpty()) {
+                exportIdParam = request.getParameter("id");
+            }
+            if (exportIdParam == null || exportIdParam.isEmpty()) {
+                result.put("success", false);
+                result.put("message", "ID phiếu không hợp lệ");
+                response.getWriter().write(gson.toJson(result));
+                return;
+            }
+
+            int exportId = Integer.parseInt(exportIdParam);
+            exportDAO.rejectExport(exportId);
+
+            result.put("success", true);
+            result.put("message", "Từ chối phiếu thành công");
         } catch (NumberFormatException e) {
             result.put("success", false);
             result.put("message", "ID phiếu không hợp lệ");
