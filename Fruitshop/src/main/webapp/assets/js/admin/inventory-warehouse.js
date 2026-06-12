@@ -235,6 +235,10 @@ document.addEventListener("DOMContentLoaded", function () {
 			}
 
 			if (action === "flash") {
+				if (flashModal) {
+					flashModal.dataset.group = groupKey;
+					flashModal.dataset.batchCode = batch;
+				}
 				if (flashBatch) flashBatch.textContent = batch;
 				if (flashQty) flashQty.textContent = qty;
 				if (flashCurrentPrice) {
@@ -334,6 +338,64 @@ document.addEventListener("DOMContentLoaded", function () {
 			}).catch(function (err) {
 				footerBtn.disabled = false;
 				footerBtn.textContent = 'Xác nhận báo hỏng';
+				alert('Lỗi kết nối: ' + err.message);
+			});
+		});
+	})();
+
+	(function () {
+		if (!flashModal) return;
+		var footerBtn = flashModal.querySelector('.modal-footer .btn-primary');
+		var durationInput = document.getElementById("flashDuration");
+		footerBtn?.addEventListener('click', function () {
+			var groupKey = flashModal.dataset.group || '';
+			var priceVal = Number(flashPriceInput?.value || '0');
+			var durationVal = Number(durationInput?.value || '0');
+			if (!groupKey) {
+				alert('Không xác định được sản phẩm.');
+				return;
+			}
+			if (!Number.isFinite(priceVal) || priceVal <= 0) {
+				alert('Vui lòng nhập giá sale hợp lệ.');
+				return;
+			}
+			if (!Number.isFinite(durationVal) || durationVal <= 0) {
+				alert('Vui lòng nhập thời gian hiển thị hợp lệ.');
+				return;
+			}
+			var pid = null;
+			var m = groupKey.match(/product-(\d+)/);
+			if (m) pid = Number(m[1]);
+			if (!pid) {
+				alert('Không xác định được ID sản phẩm.');
+				return;
+			}
+			var ctx = document.querySelector("meta[name='contextPath']")?.content || '';
+			var url = ctx + '/admin/product-push-sale';
+			var body = new URLSearchParams();
+			body.append('productId', String(pid));
+			body.append('salePrice', String(priceVal));
+			body.append('durationHours', String(durationVal));
+			footerBtn.disabled = true;
+			footerBtn.textContent = 'Đang tạo...';
+			fetch(url, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+				body: body.toString()
+			}).then(function (res) { return res.json(); })
+			.then(function (data) {
+				footerBtn.disabled = false;
+				footerBtn.textContent = 'Tạo Flash Sale ngay';
+				if (data.success) {
+					closeModal(flashModal);
+					alert('Đẩy sale sản phẩm thành công!');
+					window.location.reload();
+				} else {
+					alert('Lỗi: ' + (data.message || 'Không xác định'));
+				}
+			}).catch(function (err) {
+				footerBtn.disabled = false;
+				footerBtn.textContent = 'Tạo Flash Sale ngay';
 				alert('Lỗi kết nối: ' + err.message);
 			});
 		});

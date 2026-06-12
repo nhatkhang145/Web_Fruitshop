@@ -2,6 +2,7 @@ package dal;
 
 import model.Product;
 import model.ProductImage;
+import java.sql.Timestamp;
 import java.util.List;
 
 public class AdminProductDAO {
@@ -172,7 +173,12 @@ public class AdminProductDAO {
                 .execute());
     }
 
-
-
-
+    public int updatePushSale(int productId, double salePrice, Timestamp expiresAt) {
+        String sql = "UPDATE products SET sale_price = ?, sale_price_expires_at = ? WHERE id = ?";
+        return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
+                .bind(0, salePrice)
+                .bind(1, expiresAt)
+                .bind(2, productId)
+                .execute());
+    }
 }
