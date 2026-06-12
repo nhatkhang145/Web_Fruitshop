@@ -1,6 +1,15 @@
 package controller;
 
+import java.io.IOException;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import com.google.gson.Gson;
+
 import dal.AdminExportDAO;
 import dal.UserDAO;
 import jakarta.servlet.ServletException;
@@ -11,13 +20,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.InventoryExportItem;
 import model.InventoryExportReceipt;
 import model.User;
-import java.io.IOException;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import util.AdminPermissionHelper;
 
 @WebServlet({"/admin/stock-export", "/admin/inventory-export-create", "/admin/inventory-export-detail", "/admin/inventory-export-approve", "/admin/inventory-export-reject"})
 public class AdminExportServlet extends HttpServlet {
@@ -557,7 +560,7 @@ public class AdminExportServlet extends HttpServlet {
     private boolean isAdmin(HttpServletRequest request) {
         Object accountObj = request.getSession().getAttribute("account");
         if (accountObj instanceof User) {
-            return ((User) accountObj).getRole() == 1;
+            return AdminPermissionHelper.isAdminAccount((User) accountObj);
         }
         return false;
     }

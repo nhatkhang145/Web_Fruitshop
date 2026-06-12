@@ -7,7 +7,7 @@ import model.User;
 import java.util.List;
 
 public class ReviewDAO {
-    // Thêm đánh giá mới
+
 
     public boolean insertReview(Review review) {
         String query = """

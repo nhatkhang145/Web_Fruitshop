@@ -1,24 +1,25 @@
 package controller;
 
+import java.io.IOException;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import com.google.gson.Gson;
+
 import dal.AdminInventoryDAO;
-import model.InventoryReceipt;
-import model.InventoryReceiptItem;
-import model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.google.gson.Gson;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ArrayList;
-import java.time.format.DateTimeFormatter;
+import model.InventoryReceipt;
+import model.InventoryReceiptItem;
+import model.User;
+import util.AdminPermissionHelper;
 
 
 @WebServlet({"/admin/inventory-management", "/admin/inventory-receipt-detail", "/admin/inventory-receipt-create", "/admin/inventory-receipt-approve", "/admin/inventory-receipt-reject", "/admin/inventory-receipt-new"})
@@ -523,7 +524,7 @@ public class AdminInventoryServlet extends HttpServlet {
     private boolean isAdmin(HttpServletRequest request) { 
         Object accountObj = request.getSession().getAttribute("account");
         if (accountObj instanceof User) {
-            return ((User) accountObj).getRole() == 1; 
+            return AdminPermissionHelper.isAdminAccount((User) accountObj); 
         }
         return false; 
     }

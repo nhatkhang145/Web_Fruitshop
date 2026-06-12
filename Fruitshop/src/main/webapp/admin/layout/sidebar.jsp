@@ -25,8 +25,8 @@
                         hàng</a>
                 </li>
                 <li class="${param.activePage == 'stock-management' ? 'active' : ''}">
-                    <a href="${pageContext.request.contextPath}/admin/inventory-warehouse"><i
-                            class='bx bx-box'></i>Quản lý tồn kho</a>
+                    <a href="${pageContext.request.contextPath}/admin/inventory-warehouse"><i class='bx bx-box'></i>Quản
+                        lý tồn kho</a>
                 </li>
                 <li class="${param.activePage == 'inventory' ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/inventory-management"><i
@@ -45,7 +45,7 @@
                         hàng</a>
                 </li>
                 <li class="${param.activePage == 'roles' ? 'active' : ''}">
-                    <a href="${pageContext.request.contextPath}/admin/roles.jsp"><i
+                    <a href="${pageContext.request.contextPath}/admin/roles"><i
                             class='bx bx-shield-quarter'></i>Phân quyền</a>
                 </li>
                 <li class="${param.activePage == 'banners' ? 'active' : ''}">
@@ -55,13 +55,13 @@
                 <li class="${param.activePage == 'reviews' ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/reviews"><i class='bx bx-star'></i>Đánh giá</a>
                 </li>
-                <li class="${param.activePage == 'notifications' ? 'active' : ''}">
+                <!-- <li class="${param.activePage == 'notifications' ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/notifications"><i class='bx bx-bell'></i>Lịch sử
                         Thông báo</a>
                 </li>
                 <li class="${param.activePage == 'reports' ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/reports"><i class='bx bx-line-chart'></i>Thống
                         kê</a>
-                </li>
+                </li> -->
             </ul>
         </div>

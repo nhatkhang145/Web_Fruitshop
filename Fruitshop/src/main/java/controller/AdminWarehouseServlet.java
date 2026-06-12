@@ -1,16 +1,5 @@
 package controller;
 
-import dal.AdminWarehouseDAO;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import model.BatchStockView;
-import model.ProductStockView;
-import model.User;
-import model.WarehouseBatchRow;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,6 +10,17 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import dal.AdminWarehouseDAO;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import model.BatchStockView;
+import model.ProductStockView;
+import model.User;
+import model.WarehouseBatchRow;
+import util.AdminPermissionHelper;
 
 @WebServlet({"/admin/inventory-warehouse"})
 public class AdminWarehouseServlet extends HttpServlet {
@@ -217,7 +217,7 @@ public class AdminWarehouseServlet extends HttpServlet {
     private boolean isAdmin(HttpServletRequest request) {
         Object accountObj = request.getSession().getAttribute("account");
         if (accountObj instanceof User) {
-            return ((User) accountObj).getRole() == 1;
+            return AdminPermissionHelper.isAdminAccount((User) accountObj);
         }
         return false;
     }

@@ -1,7 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <header class="header">
+    <c:if test="${not empty param.permMsg}">
+        <div data-flash-message class="notification notification-success">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>${param.permMsg}</span>
+        </div>
+    </c:if>
     <nav class="navbar">
         <div class="navbar__wrapper">
             <div class="navbar__content">
@@ -113,8 +120,20 @@
                                             <li><a href="change-password.jsp"><i class="fa-solid fa-key"></i> Đổi mật khẩu</a></li>
                                         </c:if>
 
-                                        <c:if test="${sessionScope.account.role == 1}">
-                                            <li><a href="${pageContext.request.contextPath}/admin/index.jsp" style="color: #007bff;"><i class="fa-solid fa-user-shield"></i> Trang quản trị</a></li>
+                                        <c:if test="${sessionScope.account.role == 1 or (sessionScope.account.roleId != null and sessionScope.account.roleId > 0)}">
+                                            <li>
+                                                <a href="${pageContext.request.contextPath}${not empty sessionScope.adminLandingPath ? sessionScope.adminLandingPath : '/admin/dashboard'}" style="color: #007bff;">
+                                                    <i class="fa-solid fa-user-shield"></i>
+                                                    <c:choose>
+                                                        <c:when test="${sessionScope.account.role == 1}">Trang tổng quan</c:when>
+                                                        <c:when test="${fn:contains(fn:toLowerCase(sessionScope.adminLandingPath), 'inventory-warehouse')}">Quản lý kho</c:when>
+                                                        <c:when test="${fn:contains(fn:toLowerCase(sessionScope.adminLandingPath), 'orders')}">Quản lý đơn hàng</c:when>
+                                                        <c:when test="${fn:contains(fn:toLowerCase(sessionScope.adminLandingPath), 'users')}">Quản lý khách hàng</c:when>
+                                                        <c:when test="${fn:contains(fn:toLowerCase(sessionScope.adminLandingPath), 'roles')}">Phân quyền</c:when>
+                                                        <c:otherwise>Trang quản trị</c:otherwise>
+                                                    </c:choose>
+                                                </a>
+                                            </li>
                                         </c:if>
                                         <li class="border-top">
                                             <a href="${pageContext.request.contextPath}/logout" class="text-danger"><i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất</a>
@@ -129,3 +148,4 @@
         </div>
     </nav>
 </header>
+<script src="${pageContext.request.contextPath}/assets/js/flash-message.js"></script>

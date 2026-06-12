@@ -1,5 +1,15 @@
 package controller;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.util.Optional;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dal.CartDAO;
@@ -27,7 +37,7 @@ import java.util.Optional;
 @WebServlet(name = "FacebookCallbackServlet", urlPatterns = {"/login-facebook"})
 public class FacebookCallbackServlet extends HttpServlet {
 
-    private UserDAO userDAO = new UserDAO();
+    private final UserDAO userDAO = new UserDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -119,6 +129,8 @@ public class FacebookCallbackServlet extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("account", user);
             session.setAttribute("user", user);
+            session.setAttribute("accountRoleName", resolveRoleName(user));
+            session.setAttribute("adminLandingPath", AdminPermissionHelper.resolveAdminLandingPath(user));
             session.removeAttribute("oauth_state");
 
             CartDAO cartDAO = new CartDAO();
@@ -129,13 +141,12 @@ public class FacebookCallbackServlet extends HttpServlet {
             cartDAO.replaceCartItems(user.getId(), mergedCart);
 
             if (user.getRole() == 1) {
-                response.sendRedirect(request.getContextPath() + "/admin/index.jsp");
+                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
             } else {
                 response.sendRedirect(request.getContextPath() + "/");
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException | RuntimeException e) {
             request.setAttribute("error", "Lỗi xử lý API Facebook: " + e.getMessage());
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
@@ -186,5 +197,25 @@ public class FacebookCallbackServlet extends HttpServlet {
         }
 
         return JsonParser.parseString(response.toString()).getAsJsonObject();
+    }
+
+    private String resolveRoleName(User user) {
+        if (user == null) {
+            return "Khách hàng";
+        }
+        if (user.getRole() == 1) {
+            return "Admin";
+        }
+
+        Integer roleId = user.getRoleId();
+        if (roleId != null && roleId > 0) {
+            var role = new RoleDAO().getRoleById(roleId);
+            if (role != null && role.getName() != null && !role.getName().isBlank()) {
+                return role.getName();
+            }
+            return "Vai trò #" + roleId;
+        }
+
+        return "Khách hàng";
     }
 }
