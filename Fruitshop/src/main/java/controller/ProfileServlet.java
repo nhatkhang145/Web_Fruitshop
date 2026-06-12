@@ -87,7 +87,7 @@ public class ProfileServlet extends HttpServlet {
         }
 
         if (phone != null && !phone.isEmpty()) {
-            if (!phone.matches("0[3578][0-9]{8}")) {
+            if (!phone.matches("0[35789][0-9]{8}")) {
                 forwardWithError(request, response,
                         "Số điện thoại không hợp lệ. Yêu cầu: 10 chữ số, bắt đầu từ 03, 05, 07, 08 hoặc 09. Ví dụ: 0912345678");
                 return;
