@@ -75,6 +75,13 @@ public class ReviewServlet extends HttpServlet {
         int productId = Integer.parseInt(productIdStr);
         int rating = Integer.parseInt(ratingStr);
 
+        // Kiểm tra user có đơn hàng hợp lệ không (chưa đánh giá, đã hoàn thành đơn)
+        Integer eligibleOrderDetailId = reviewDAO.getEligibleOrderDetailId(user.getId(), productId);
+        if (eligibleOrderDetailId == null) {
+            response.sendRedirect("product-detail?pid=" + productId + "&error=not_eligible");
+            return;
+        }
+
         // Cắt độ dài comment nếu quá 300 ký tự
         String finalComment = comment.trim();
         if (finalComment.length() > 300) {

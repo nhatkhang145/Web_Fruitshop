@@ -173,5 +173,23 @@ public class ReviewDAO {
                         .orElse(0.0));
     }
 
+    // Tìm Order Detail ID hợp lệ (đã mua & chưa đánh giá)
+    public Integer getEligibleOrderDetailId(int userId, int productId) {
+        String query = """
+                SELECT od.id FROM order_details od 
+                JOIN orders o ON o.id = od.order_id
+                WHERE o.user_id = ?
+                  AND od.product_id = ?
+                  AND o.status = 'completed'
+                  AND od.id NOT IN (SELECT order_detail_id FROM reviews WHERE order_detail_id IS NOT NULL)
+                LIMIT 1""";
 
+        return DBContext.get().withHandle(handle ->
+                handle.createQuery(query)
+                        .bind("userId", userId)
+                        .bind("productId", productId)
+                        .mapTo(Integer.class)
+                        .findFirst()
+                        .orElse(null));
+    }
 }
