@@ -173,12 +173,13 @@ public class AdminProductDAO {
                 .execute());
     }
 
-    public int updatePushSale(int productId, double salePrice, Timestamp expiresAt) {
-        String sql = "UPDATE products SET sale_price = ?, sale_price_expires_at = ? WHERE id = ?";
+    public int updatePushSale(int productId, double salePrice, Timestamp expiresAt, Integer batchItemId) {
+        String sql = "UPDATE products SET sale_price = ?, sale_price_expires_at = ?, sale_batch_item_id = ? WHERE id = ?";
         return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
                 .bind(0, salePrice)
                 .bind(1, expiresAt)
-                .bind(2, productId)
+                .bind(2, batchItemId)
+                .bind(3, productId)
                 .execute());
     }
 }

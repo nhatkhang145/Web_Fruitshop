@@ -21,14 +21,18 @@ public class SaleExpirationListener implements ServletContextListener {
             public void run() {
                 try {
                     DBContext.get().useHandle(handle -> handle.createUpdate(
-                        "UPDATE products SET sale_price = 0, sale_price_expires_at = NULL " +
-                        "WHERE sale_price_expires_at IS NOT NULL AND sale_price_expires_at <= NOW()"
+                        "UPDATE products SET sale_price = 0, sale_price_expires_at = NULL, sale_batch_item_id = NULL " +
+                        "WHERE (sale_price_expires_at IS NOT NULL AND sale_price_expires_at <= NOW()) " +
+                        "   OR (sale_batch_item_id IS NOT NULL AND (" +
+                        "       (SELECT status FROM inventory_receipt_items WHERE id = sale_batch_item_id) = 'SOLD_OUT' " +
+                        "       OR COALESCE((SELECT available_quantity FROM inventory_receipt_items WHERE id = sale_batch_item_id), 1) <= 0" +
+                        "   ))"
                     ).execute());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-        }, 0, 15, TimeUnit.MINUTES);
+        }, 0, 1, TimeUnit.MINUTES);
     }
 
     @Override

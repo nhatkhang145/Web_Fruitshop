@@ -33,10 +33,7 @@
 				
 			</div>
 			<div class="hero-actions">
-				<a class="btn btn-ghost" href="${pageContext.request.contextPath}/admin/inventory-management">
-					<i class='bx bx-archive-in'></i>
-					<span>Phiếu nhập/xuất kho</span>
-				</a>
+
 			</div>
 		</div>
 
@@ -194,6 +191,9 @@
 								</td>
 								<td>
 									<div class="action-group">
+										<a href="${pageContext.request.contextPath}/admin/inventory-receipt-detail?id=${batch.receiptId}" class="icon-btn view" title="Xem chi tiết lô">
+											<i class='bx bx-show'></i>
+										</a>
 										<button type="button" class="icon-btn danger js-batch-action" data-action="waste" data-batch="${batch.batchCode}" data-product="${product.productName}" data-qty="${batch.quantity}" title="Báo hỏng">
 											<i class='bx bx-trash'></i>
 										</button>
@@ -304,7 +304,7 @@
 		</div>
 		<div class="modal-footer">
 			<button type="button" class="btn btn-ghost" data-close-modal>Hủy</button>
-			<button type="button" class="btn btn-primary">Tạo Flash Sale ngay</button>
+			<button type="button" class="btn btn-primary"><i class='bx bx-bolt'></i> Tạo Flash Sale ngay</button>
 		</div>
 	</div>
 </div>

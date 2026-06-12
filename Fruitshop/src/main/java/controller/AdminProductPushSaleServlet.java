@@ -2,6 +2,8 @@ package controller;
 
 import com.google.gson.Gson;
 import dal.AdminProductDAO;
+import dal.WeekendDealDAO;
+import model.WeekendDeal;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -19,11 +21,13 @@ import java.util.Map;
 public class AdminProductPushSaleServlet extends HttpServlet {
 
     private AdminProductDAO productDAO;
+    private WeekendDealDAO weekendDealDAO;
 
     @Override
     public void init() throws ServletException {
         super.init();
         productDAO = new AdminProductDAO();
+        weekendDealDAO = new WeekendDealDAO();
     }
 
     @Override
@@ -45,6 +49,12 @@ public class AdminProductPushSaleServlet extends HttpServlet {
             int productId = Integer.parseInt(req.getParameter("productId"));
             double salePrice = Double.parseDouble(req.getParameter("salePrice"));
             int durationHours = Integer.parseInt(req.getParameter("durationHours"));
+            
+            String rawBatchItemId = req.getParameter("batchItemId");
+            Integer batchItemId = null;
+            if (rawBatchItemId != null && !rawBatchItemId.trim().isEmpty()) {
+                batchItemId = Integer.parseInt(rawBatchItemId.trim());
+            }
 
             if (salePrice <= 0 || durationHours <= 0) {
                 result.put("success", false);
@@ -53,8 +63,16 @@ public class AdminProductPushSaleServlet extends HttpServlet {
                 return;
             }
 
+            WeekendDeal activeDeal = weekendDealDAO.getActiveDealByProductId(productId);
+            if (activeDeal != null) {
+                result.put("success", false);
+                result.put("message", "Sản phẩm này đang có chương trình Weekend Deal, không thể đẩy sale từ tồn kho.");
+                resp.getWriter().write(gson.toJson(result));
+                return;
+            }
+
             Timestamp expiresAt = new Timestamp(System.currentTimeMillis() + (durationHours * 3600 * 1000L));
-            productDAO.updatePushSale(productId, salePrice, expiresAt);
+            productDAO.updatePushSale(productId, salePrice, expiresAt, batchItemId);
 
             result.put("success", true);
             result.put("message", "Đẩy sale thành công");
