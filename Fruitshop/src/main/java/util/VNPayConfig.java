@@ -5,13 +5,16 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class VNPayConfig {
     public static final String vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     public static final String vnp_ReturnUrl = "http://localhost:8080/Fruitshop_Web/vnpay-return";
     public static final String vnp_TmnCode = "0VJ27KB8";
-    public static final String vnp_HashSecret = "DKMVRCFRAA9NOU1F4LQGB5W6H8SY9B0C";
+    public static final String vnp_HashSecret = "TNPNY372A0QCMUP3V2QNRHRTXPQ2ZK6P";
     public static final String vnp_Version = "2.1.0";
     public static final String vnp_Command = "pay";
 
@@ -36,6 +39,31 @@ public class VNPayConfig {
         }
     }
 
+    public static String hashAllFields(Map<String, String> fields) {
+        List<String> fieldNames = new ArrayList<>(fields.keySet());
+        Collections.sort(fieldNames);
+        StringBuilder sb = new StringBuilder();
+        Iterator<String> itr = fieldNames.iterator();
+        while (itr.hasNext()) {
+            String fieldName = itr.next();
+            String fieldValue = fields.get(fieldName);
+            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+                sb.append(fieldName);
+                sb.append("=");
+                try {
+                    // Đồng bộ cách encode khoảng trắng thành %20 thay vì dấu +
+                    sb.append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8.toString()).replace("+", "%20"));
+                } catch (UnsupportedEncodingException e) {
+                    sb.append(fieldValue);
+                }
+            }
+            if (itr.hasNext()) {
+                sb.append("&");
+            }
+        }
+        return hmacSHA512(vnp_HashSecret, sb.toString());
+    }
+
     public static String getIpAddress(HttpServletRequest request){
         String ipAddress;
         try {
@@ -48,4 +76,5 @@ public class VNPayConfig {
         }
         return ipAddress;
     }
+
 }

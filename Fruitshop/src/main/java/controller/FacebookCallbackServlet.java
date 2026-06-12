@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 import java.util.Optional;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import dal.RoleDAO;
+import dal.CartDAO;
 import dal.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -20,9 +20,19 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import model.CartItem;
 import model.User;
-import util.AdminPermissionHelper;
+import util.CartSessionUtils;
 import util.FacebookOAuthConfig;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Optional;
 
 @WebServlet(name = "FacebookCallbackServlet", urlPatterns = {"/login-facebook"})
 public class FacebookCallbackServlet extends HttpServlet {
@@ -122,6 +132,13 @@ public class FacebookCallbackServlet extends HttpServlet {
             session.setAttribute("accountRoleName", resolveRoleName(user));
             session.setAttribute("adminLandingPath", AdminPermissionHelper.resolveAdminLandingPath(user));
             session.removeAttribute("oauth_state");
+
+            CartDAO cartDAO = new CartDAO();
+            List<CartItem> dbCart = cartDAO.getCartItemsByUserId(user.getId());
+            List<CartItem> sessionCart = (List<CartItem>) session.getAttribute("cart");
+            List<CartItem> mergedCart = CartSessionUtils.mergeCarts(dbCart, sessionCart);
+            CartSessionUtils.updateSessionCart(session, mergedCart);
+            cartDAO.replaceCartItems(user.getId(), mergedCart);
 
             if (user.getRole() == 1) {
                 response.sendRedirect(request.getContextPath() + "/admin/dashboard");

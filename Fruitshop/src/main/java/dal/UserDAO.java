@@ -120,13 +120,13 @@ public class UserDAO {
     public boolean updateAddress(int userId, String address, String city, String receiverName, String phone) {
         try {
             DBContext.get().useHandle(handle -> {
-                boolean hasAddress = handle.createQuery("SELECT COUNT(*) FROM user_addresses WHERE user_id = ?")
+                boolean hasAddress = handle.createQuery("SELECT COUNT(*) FROM user_addresses WHERE user_id = ? AND is_default = 1")
                         .bind(0, userId)
                         .mapTo(Integer.class)
                         .one() > 0;
 
                 if (hasAddress) {
-                    String sqlUpdate = "UPDATE user_addresses SET address = ?, city = ?, receiver_name = ?, phone_number = ? WHERE user_id = ? LIMIT 1";
+                    String sqlUpdate = "UPDATE user_addresses SET address = ?, city = ?, receiver_name = ?, phone_number = ? WHERE user_id = ? AND is_default = 1";
                     handle.createUpdate(sqlUpdate)
                             .bind(0, address).bind(1, city).bind(2, receiverName).bind(3, phone).bind(4, userId)
                             .execute();

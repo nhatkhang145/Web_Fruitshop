@@ -22,34 +22,28 @@ public class VNPayReturnServlet extends HttpServlet {
 
         // Lấy các tham số từ VNPAY trả về
         String vnp_ResponseCode = request.getParameter("vnp_ResponseCode");
-        String vnp_TxnRef = request.getParameter("vnp_TxnRef"); // Mã đơn hàng (orderId) chúng ta đã gửi đi
+        String vnp_TxnRef = request.getParameter("vnp_TxnRef");
 
+        String vnp_OrderInfo = request.getParameter("vnp_OrderInfo");
         int orderId = 0;
         try {
-            orderId = Integer.parseInt(vnp_TxnRef);
+            String[] parts = vnp_OrderInfo.split(" ");
+            orderId = Integer.parseInt(parts[4]);
         } catch (NumberFormatException e) {
             System.err.println("Mã đơn hàng không hợp lệ từ VNPAY");
         }
 
         if ("00".equals(vnp_ResponseCode)) {
-            // THÀNH CÔNG: Cập nhật DB
-            // Đổi status -> 'processing' (Đang xử lý) và payment_status -> 1 (Đã thanh toán)
             orderDAO.updateStatus(orderId, "processing");
             orderDAO.updatePaymentStatus(orderId, 1);
 
-            // Thiết lập thông báo thành công cho giao diện
             request.getSession().setAttribute("successMessage", "Thanh toán thành công qua ví VNPAY! Mã đơn hàng: #" + orderId);
 
         } else {
-            // THẤT BẠI: Người dùng hủy thanh toán hoặc lỗi thẻ
-            // Đổi status -> 'cancelled' (Đã hủy)
             orderDAO.updateStatus(orderId, "cancelled");
-
-            // Thiết lập thông báo lỗi cho giao diện
             request.getSession().setAttribute("error", "Giao dịch thanh toán thất bại hoặc đã bị hủy.");
         }
 
-        // Chuyển hướng về trang chi tiết đơn hàng (giống cách CheckoutServlet đang làm)
         response.sendRedirect(request.getContextPath() + "/order-detail?id=" + orderId);
     }
 }

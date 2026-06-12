@@ -1,19 +1,20 @@
 package controller;
 
-import java.io.IOException;
-import java.util.Optional;
-
-import dal.RoleDAO;
+import dal.CartDAO;
 import dal.UserDAO;
+import model.CartItem;
+import model.User;
+import util.CartSessionUtils;
+import util.PasswordUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import model.User;
-import util.AdminPermissionHelper;
-import util.PasswordUtils;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
@@ -51,6 +52,13 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("account", account);
             session.setAttribute("accountRoleName", resolveRoleName(account));
             session.setAttribute("adminLandingPath", AdminPermissionHelper.resolveAdminLandingPath(account));
+
+            CartDAO cartDAO = new CartDAO();
+            List<CartItem> dbCart = cartDAO.getCartItemsByUserId(account.getId());
+            List<CartItem> sessionCart = (List<CartItem>) session.getAttribute("cart");
+            List<CartItem> mergedCart = CartSessionUtils.mergeCarts(dbCart, sessionCart);
+            CartSessionUtils.updateSessionCart(session, mergedCart);
+            cartDAO.replaceCartItems(account.getId(), mergedCart);
 
             dal.WishlistDAO wishlistDAO = new dal.WishlistDAO();
             int wishlistCount = wishlistDAO.countWishlist(account.getId());

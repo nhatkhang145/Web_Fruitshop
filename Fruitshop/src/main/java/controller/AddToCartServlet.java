@@ -1,10 +1,12 @@
 package controller;
 
+import dal.CartDAO;
 import dal.ProductDAO;
 import dal.WeekendDealDAO;
 import model.CartItem;
 import model.Product;
 import model.WeekendDeal;
+import model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -140,6 +142,12 @@ public class AddToCartServlet extends HttpServlet {
                 }
                 session.setAttribute("totalMoney", totalMoney.doubleValue());
                 session.setAttribute("size", cart.size());
+
+                User user = (User) session.getAttribute("account");
+                if (user != null) {
+                    CartDAO cartDAO = new CartDAO();
+                    cartDAO.replaceCartItems(user.getId(), cart);
+                }
                 System.out.println("=== AddToCart Debug ===");
                 System.out.println("Product ID: " + pid + ", Quantity added: " + quantity);
                 System.out.println("Total cart items: " + cart.size());

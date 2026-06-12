@@ -1,6 +1,8 @@
 package controller;
 
+import dal.CartDAO;
 import model.CartItem;
+import model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -40,7 +42,13 @@ public class RemoveCartServlet extends HttpServlet {
                     totalMoney += item.getTotalPrice().doubleValue();
                 }
                 session.setAttribute("totalMoney", totalMoney);
-                session.setAttribute("size", cart.size()); // Cập nhật số lượng item trên icon giỏ
+                session.setAttribute("size", cart.size());
+
+                User user = (User) session.getAttribute("account");
+                if (user != null) {
+                    CartDAO cartDAO = new CartDAO();
+                    cartDAO.replaceCartItems(user.getId(), cart);
+                }
             }
         } catch (NumberFormatException e) {
             e.printStackTrace();
