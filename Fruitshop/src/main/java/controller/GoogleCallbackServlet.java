@@ -14,6 +14,7 @@ import java.util.Optional;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dal.CartDAO;
+import dal.RoleDAO;
 import dal.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -23,6 +24,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.CartItem;
 import model.User;
+import util.AdminPermissionHelper;
 import util.CartSessionUtils;
 import util.GoogleOAuthConfig;
 

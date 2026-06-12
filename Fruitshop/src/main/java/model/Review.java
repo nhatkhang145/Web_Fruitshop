@@ -12,13 +12,16 @@ public class Review {
     private String status;
     private Timestamp createdAt;
     private Product product;
+    private Integer orderDetailId;
+    private String images;
+    private String video;
 
     private User user;
 
     public Review() {
     }
 
-    public Review(int id, int userId, int productId, int rating, String comment, String adminReply, String status, Timestamp createdAt, Product product) {
+    public Review(int id, int userId, int productId, int rating, String comment, String adminReply, String status, Timestamp createdAt, Product product, Integer orderDetailId, String images, String video) {
         this.id = id;
         this.userId = userId;
         this.productId = productId;
@@ -28,6 +31,9 @@ public class Review {
         this.status = status;
         this.createdAt = createdAt;
         this.product = product;
+        this.orderDetailId = orderDetailId;
+        this.images = images;
+        this.video = video;
     }
 
 
@@ -100,5 +106,29 @@ public class Review {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public Integer getOrderDetailId() {
+        return orderDetailId;
+    }
+
+    public void setOrderDetailId(Integer orderDetailId) {
+        this.orderDetailId = orderDetailId;
+    }
+
+    public String getImages() {
+        return images;
+    }
+
+    public void setImages(String images) {
+        this.images = images;
+    }
+
+    public String getVideo() {
+        return video;
+    }
+
+    public void setVideo(String video) {
+        this.video = video;
     }
 }

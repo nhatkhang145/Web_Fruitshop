@@ -11,16 +11,19 @@ public class ReviewDAO {
 
     public boolean insertReview(Review review) {
         String query = """
-                INSERT INTO reviews (user_id, product_id, rating, comment, status, created_at)
-                VALUES (:userId, :productId, :rating, :comment, 'approved', NOW())
+                INSERT INTO reviews (user_id, product_id, order_detail_id, rating, comment, images, video, status, created_at)
+                VALUES (:userId, :productId, :orderDetailId, :rating, :comment, :images, :video, 'approved', NOW())
                 """;
 
         return DBContext.get().withHandle(handle ->
                 handle.createUpdate(query)
                         .bind("userId", review.getUserId())
                         .bind("productId", review.getProductId())
+                        .bind("orderDetailId", review.getOrderDetailId())
                         .bind("rating", review.getRating())
                         .bind("comment", review.getComment())
+                        .bind("images", review.getImages())
+                        .bind("video", review.getVideo())
                         .execute() > 0);
     }
 
@@ -169,4 +172,6 @@ public class ReviewDAO {
                         .findFirst()
                         .orElse(0.0));
     }
+
+
 }

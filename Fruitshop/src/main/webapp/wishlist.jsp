@@ -161,7 +161,7 @@
                                                 </c:choose>
 
                                                 <a class="btn btn-danger" href="${pageContext.request.contextPath}/wishlist?action=remove&pid=${product.id}" onclick="return confirm('Bạn chắc chắn muốn bỏ sản phẩm này khỏi danh sách yêu thích?')">
-                                                    <i class="fa-regular fa-trash-can"></i> Xóa
+                                                    <i class="fa-regular fa-trash-can"></i> Xóa khỏi yêu thích
                                                 </a>
                                             </div>
                                         </div>

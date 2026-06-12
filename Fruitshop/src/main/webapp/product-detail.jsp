@@ -269,11 +269,12 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="form-group" style="margin-bottom: 15px;">
-                                                        <textarea name="comment" rows="4"
-                                                            placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."
-                                                            required
-                                                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+                                                    <div class="form-group" style="position: relative; margin-bottom: 15px;">
+                                                        <label>Nội dung đánh giá:</label>
+                                                        <textarea name="comment" id="reviewComment" rows="4" maxlength="500" required
+                                                                  placeholder="Chia sẻ cảm nhận của bạn (Tối đa 300 ký tự)..."
+                                                                  style="width: 100%; padding: 10px; border: 1px solid #ccc; outline: none;"></textarea>
+                                                        <div id="charCount" style="text-align: right; font-size: 12px; color: #666;">0/300 ký tự</div>
                                                     </div>
 
                                                     <button type="submit" class="btn btn--primary">Gửi đánh giá</button>
@@ -568,6 +569,34 @@
                                 }
                             });
                         });
+                    });
+                </script>
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        const commentInput = document.getElementById('reviewComment');
+                        const charCount = document.getElementById('charCount');
+                        const MAX_CHARS = 300;
+
+                        if (commentInput) {
+                            commentInput.addEventListener('input', function() {
+                                if (this.value.length > MAX_CHARS) {
+                                    this.value = this.value.substring(0, MAX_CHARS);
+                                }
+                                const currentLength = this.value.length;
+                                charCount.textContent = currentLength + '/' + MAX_CHARS + ' ký tự';
+
+                                if (currentLength >= MAX_CHARS) {
+                                    this.style.borderColor = 'red';
+                                    charCount.style.color = 'red';
+                                } else {
+                                    this.style.borderColor = '#ccc';
+                                    charCount.style.color = '#666';
+                                }
+                            });
+                        }
+
+
                     });
                 </script>
             </body>
