@@ -1,9 +1,11 @@
 package controller;
 
 import dal.CartDAO;
+import dal.RoleDAO;
 import dal.UserDAO;
 import model.CartItem;
 import model.User;
+import util.AdminPermissionHelper;
 import util.CartSessionUtils;
 import util.PasswordUtils;
 import jakarta.servlet.ServletException;
@@ -64,17 +66,16 @@ public class LoginServlet extends HttpServlet {
             int wishlistCount = wishlistDAO.countWishlist(account.getId());
             session.setAttribute("wishlistCount", wishlistCount);
 
-            if (isAdminAccount(account)) {
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+            if (AdminPermissionHelper.isAdminAccount(account)) {
+                String landingPath = (String) session.getAttribute("adminLandingPath");
+                if (landingPath == null || landingPath.equals("/")) landingPath = "/admin/dashboard";
+                response.sendRedirect(request.getContextPath() + landingPath);
             } else {
                 response.sendRedirect(request.getContextPath() + "/");
             }
         }
     }
 
-    private boolean isAdminAccount(User account) {
-        return account != null && account.getRole() == 1;
-    }
 
     private String resolveRoleName(User account) {
         if (account == null) {

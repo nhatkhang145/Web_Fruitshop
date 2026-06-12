@@ -75,8 +75,6 @@
                                     <label for="inputExportType">Loại xuất <span class="required">*</span></label>
                                     <select id="inputExportType" name="export_type" required>
                                         <option value="SALES">Bán hàng</option>
-                                        <option value="INTERNAL">Nội bộ</option>
-                                        <option value="TRANSFER">Điều chuyển</option>
                                         <option value="WASTE">Sản phẩm hỏng</option>
                                     </select>
                                 </div>
