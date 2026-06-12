@@ -25,23 +25,13 @@
     <main class="roles-page">
         <section class="page-hero roles-hero">
             <div class="hero-copy">
-                <div class="eyebrow">Access control</div>
                 <h1>Phân quyền hệ thống</h1>
-                <p>Thiết kế vai trò, quản lý quyền truy cập và theo dõi thay đổi trong từng nhóm tài khoản.</p>
-                <div class="hero-meta">
-                    <div class="hero-chip"><i class='bx bx-shield-quarter'></i> 3 vai trò</div>
-                    <div class="hero-chip"><i class='bx bx-grid-alt'></i> 18 module</div>
-                    <div class="hero-chip"><i class='bx bx-history'></i> Cập nhật 2 giờ trước</div>
-                </div>
+                
             </div>
             <div class="hero-actions">
-                <button type="button" class="btn btn-primary" id="openCreateRoleBtn">
+                <button type="button" class="btn btn-primary" id="openCreateRoleBtn" aria-controls="create-role-panel" aria-expanded="false">
                     <i class='bx bx-plus-circle'></i>
                     <span>Thêm vai trò mới</span>
-                </button>
-                <button type="button" class="btn btn-ghost">
-                    <i class='bx bx-download'></i>
-                    <span>Xuất báo cáo</span>
                 </button>
             </div>
         </section>
@@ -52,7 +42,7 @@
                 <div>
                     <span class="metric-label">Tổng vai trò</span>
                     <strong class="metric-value">3</strong>
-                    <span class="metric-trend">+1 vai trò mới trong tháng</span>
+                    
                 </div>
             </article>
             <article class="role-metric accent-amber">
@@ -60,7 +50,7 @@
                 <div>
                     <span class="metric-label">Quyền đang mở</span>
                     <strong class="metric-value">42</strong>
-                    <span class="metric-trend">12 quyền cần rà soát</span>
+                    
                 </div>
             </article>
             <article class="role-metric accent-slate">
@@ -68,17 +58,51 @@
                 <div>
                     <span class="metric-label">Tài khoản áp dụng</span>
                     <strong class="metric-value">15</strong>
-                    <span class="metric-trend">Đang hoạt động</span>
+                    
                 </div>
             </article>
         </section>
+
+        <div class="create-role-overlay is-hidden" id="create-role-panel" aria-hidden="true">
+            <div class="create-role-backdrop" id="createRoleBackdrop"></div>
+            <section class="panel create-role-modal" role="dialog" aria-modal="true" aria-labelledby="createRoleTitle">
+                <div class="panel-header create-role-header">
+                    <div>
+                        <h2 id="createRoleTitle">Thêm vai trò</h2>
+                        <p>Nhập thông tin vai trò và chọn quyền cơ bản.</p>
+                    </div>
+                </div>
+
+                <div class="create-role-grid">
+                    <div class="create-role-form">
+                        <div class="form-field">
+                            <label for="roleName">Tên vai trò <span class="required-mark">*</span></label>
+                            <input id="roleName" type="text" placeholder="VD: NV Quản lý sản phẩm" />
+                        </div>
+
+                        <div class="form-field">
+                            <label for="roleDescription">Mô tả</label>
+                            <textarea id="roleDescription" rows="4" placeholder="Mô tả vai trò..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="create-role-actions">
+                        <button type="button" class="btn btn-ghost" id="closeCreateRoleBtn">Hủy</button>
+                        <button type="button" class="btn btn-primary">
+                            <i class='bx bx-check'></i>
+                            <span>Tạo</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
 
         <div class="roles-shell">
             <aside class="panel role-list-panel">
                 <div class="panel-header role-list-header">
                     <div>
                         <h2>Danh sách vai trò</h2>
-                        <p>Chọn vai trò để điều chỉnh quyền truy cập.</p>
+                        
                     </div>
                     <button type="button" class="btn btn-ghost btn-sm">
                         <i class='bx bx-filter-alt'></i>
@@ -94,47 +118,39 @@
                         <div class="role-info">
                             <h3>Admin</h3>
                             <p>Toàn quyền hệ thống, quản trị cấu hình.</p>
-                            <div class="role-meta">
-                                <span class="role-chip">System</span>
-                                <span class="role-chip muted">Cố định</span>
-                            </div>
+                            
                         </div>
                         <div class="role-stats">
                             <div class="role-users">
                                 <i class='bx bx-user'></i> 2
                             </div>
-                            <span class="role-badge">Full access</span>
+                            
                         </div>
                     </div>
                     <div class="role-card">
                         <div class="role-info">
                             <h3>Nhân viên kho</h3>
                             <p>Quản lý nhập xuất, tồn kho và kiểm kê.</p>
-                            <div class="role-meta">
-                                <span class="role-chip">Warehouse</span>
-                                <span class="role-chip muted">Chuẩn</span>
-                            </div>
+                            
                         </div>
                         <div class="role-stats">
                             <div class="role-users">
                                 <i class='bx bx-user'></i> 5
                             </div>
-                            <span class="role-badge ghost">18 quyền</span>
+                            
                         </div>
                     </div>
                     <div class="role-card">
                         <div class="role-info">
                             <h3>Chăm sóc khách hàng</h3>
                             <p>Quản lý đơn hàng, khách hàng và phản hồi.</p>
-                            <div class="role-meta">
-                                <span class="role-chip">Support</span>
-                            </div>
+                            
                         </div>
                         <div class="role-stats">
                             <div class="role-users">
                                 <i class='bx bx-user'></i> 8
                             </div>
-                            <span class="role-badge ghost">12 quyền</span>
+                           
                         </div>
                     </div>
                 </div>
@@ -147,12 +163,7 @@
                             <h2>Phân quyền: <span class="highlight-role">Admin</span></h2>
                             <span class="role-badge solid">System</span>
                         </div>
-                        <p>Thiết lập quyền truy cập cho từng module. Thay đổi sẽ áp dụng ngay sau khi lưu.</p>
-                    </div>
-                    <div class="role-actions">
-                        <button type="button" class="btn btn-ghost">Chỉ xem</button>
-                        <button type="button" class="btn btn-ghost">Toàn quyền</button>
-                        <button type="button" class="btn btn-primary">Lưu nhanh</button>
+                        
                     </div>
                 </div>
 
@@ -163,10 +174,7 @@
                         <button type="button" class="pill">Bán hàng</button>
                         <button type="button" class="pill">Hệ thống</button>
                     </div>
-                    <div class="matrix-summary">
-                        <span><strong>23</strong> quyền được bật</span>
-                        <span>Cập nhật gần nhất: 09:32</span>
-                    </div>
+                   
                 </div>
 
                 <div class="matrix-wrap">
@@ -386,9 +394,7 @@
                 </div>
 
                 <div class="action-bar">
-                    <div class="action-note">
-                        <i class='bx bx-info-circle'></i>
-                        Các thay đổi sẽ ảnh hưởng đến 15 tài khoản đang hoạt động.
+                    <div class="action-note">                                     
                     </div>
                     <div class="action-buttons">
                         <button type="button" class="btn btn-ghost">Hoàn tác</button>
@@ -402,6 +408,43 @@
         </div>
     </main>
 </div>
+
+    <script>
+        (function () {
+            const openButton = document.getElementById('openCreateRoleBtn');
+            const closeButton = document.getElementById('closeCreateRoleBtn');
+            const createPanel = document.getElementById('create-role-panel');
+            const backdrop = document.getElementById('createRoleBackdrop');
+
+            if (!openButton || !closeButton || !createPanel || !backdrop) {
+                return;
+            }
+
+            const showPanel = () => {
+                createPanel.classList.remove('is-hidden');
+                createPanel.setAttribute('aria-hidden', 'false');
+                openButton.setAttribute('aria-expanded', 'true');
+                document.body.classList.add('modal-open');
+            };
+
+            const hidePanel = () => {
+                createPanel.classList.add('is-hidden');
+                createPanel.setAttribute('aria-hidden', 'true');
+                openButton.setAttribute('aria-expanded', 'false');
+                document.body.classList.remove('modal-open');
+                openButton.focus();
+            };
+
+            openButton.addEventListener('click', showPanel);
+            closeButton.addEventListener('click', hidePanel);
+            backdrop.addEventListener('click', hidePanel);
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && !createPanel.classList.contains('is-hidden')) {
+                    hidePanel();
+                }
+            });
+        }());
+    </script>
 
 </body>
 </html>
