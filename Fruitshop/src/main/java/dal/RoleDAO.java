@@ -108,7 +108,7 @@ public class RoleDAO {
 
     public Map<Integer, RolePermission> getPermissionsMapByRoleId(int roleId) {
         String sql = "SELECT id, role_id, module_id, can_read, can_create, can_update, can_delete " +
-                     "FROM role_permissions WHERE role_id = :roleId";
+                "FROM role_permissions WHERE role_id = :roleId";
         List<RolePermission> list = DBContext.get().withHandle(handle -> handle.createQuery(sql)
                 .bind("roleId", roleId)
                 .map((rs, ctx) -> {

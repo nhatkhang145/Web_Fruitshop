@@ -134,17 +134,11 @@
                                 <div class="filter-field">
                                     <label for="exportType">Loại xuất</label>
                                     <select id="exportType" name="exportType">
-                                        <option value="all" ${empty currentExportType || currentExportType=='all'
-                                            ? 'selected' : '' }>Tất cả</option>
-                                        <option value="SALES" ${currentExportType=='SALES' ? 'selected' : '' }>Bán hàng
-                                        </option>
-                                        <option value="INTERNAL" ${currentExportType=='INTERNAL' ? 'selected' : '' }>Nội
-                                            bộ</option>
-                                        <option value="TRANSFER" ${currentExportType=='TRANSFER' ? 'selected' : '' }>
-                                            Điều chuyển</option>
-                                        <option value="WASTE" ${currentExportType=='WASTE' ? 'selected' : '' }>Sản phẩm
-                                            hỏng</option>
-                                    </select>
+                                         <option value="all" ${empty currentExportType || currentExportType=='all'
+                                             ? 'selected' : '' }>Tất cả</option>
+                                         <option value="SALES" ${currentExportType=='SALES' ? 'selected' : '' }>Bán hàng</option>
+                                         <option value="WASTE" ${currentExportType=='WASTE' ? 'selected' : '' }>Sản phẩm hỏng</option>
+                                     </select>
                                 </div>
                                 <div class="filter-actions">
                                     <button type="submit" class="btn btn-primary">Áp dụng</button>
