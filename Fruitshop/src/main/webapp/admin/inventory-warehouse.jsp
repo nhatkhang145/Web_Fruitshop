@@ -165,7 +165,7 @@
 							<td>—</td>
 						</tr>
 						<c:forEach var="batch" items="${product.batches}">
-							<tr class="batch-row is-hidden" data-group="${product.groupKey}" data-freshness="${batch.freshnessKey}">
+							<tr class="batch-row is-hidden" data-group="${product.groupKey}" data-freshness="${batch.freshnessKey}" data-item-id="${batch.itemId}">
 								<td class="batch-cell">
 									<div>
 										<strong class="batch-code">${batch.batchCode}</strong>
@@ -196,9 +196,6 @@
 									<div class="action-group">
 										<button type="button" class="icon-btn danger js-batch-action" data-action="waste" data-batch="${batch.batchCode}" data-product="${product.productName}" data-qty="${batch.quantity}" title="Báo hỏng">
 											<i class='bx bx-trash'></i>
-										</button>
-										<button type="button" class="icon-btn warn js-batch-action" data-action="grade" data-batch="${batch.batchCode}" data-product="${product.productName}" data-qty="${batch.quantity}" title="Chuyển loại">
-											<i class='bx bx-down-arrow-alt'></i>
 										</button>
 										<button type="button" class="icon-btn flash js-batch-action" data-action="flash" data-batch="${batch.batchCode}" data-product="${product.productName}" data-qty="${batch.quantity}" data-price="${product.price}" title="Đẩy sales">
 											<i class='bx bx-bolt'></i>

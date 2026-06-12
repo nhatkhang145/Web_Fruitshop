@@ -8,7 +8,7 @@ import java.util.List;
 public class AdminWarehouseDAO {
 	public List<WarehouseBatchRow> getWarehouseBatchRows() {
 		String sql =
-				"SELECT i.id AS item_id, i.quantity AS item_quantity, i.unit_price AS unit_price, " +
+			"SELECT i.id AS item_id, COALESCE(i.available_quantity, i.quantity) AS item_quantity, i.unit_price AS unit_price, " +
 						"r.id AS receipt_id, r.code AS receipt_code, r.receipt_date AS receipt_date, " +
 						"p.id AS product_id, p.name AS product_name, p.product_code AS product_code, " +
 						"p.price AS product_price, p.sale_price AS sale_price, p.quantity AS product_quantity, " +
