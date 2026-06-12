@@ -9,8 +9,8 @@
             </a>
             <ul class="side-menu">
                 <li class="${param.activePage == 'dashboard' ? 'active' : ''}">
-                    <a href="${pageContext.request.contextPath}/admin/dashboard"><i class='bx bxs-dashboard'></i>Tổng
-                        quan</a>
+                    <a href="${pageContext.request.contextPath}/admin/dashboard"><i class='bx bxs-dashboard'></i>Thống
+                        kê</a>
                 </li>
                 <li class="${param.activePage == 'products' ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/products"><i class='bx bx-basket'></i>Quản lý sản
