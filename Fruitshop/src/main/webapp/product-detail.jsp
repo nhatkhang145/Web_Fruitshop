@@ -277,6 +277,20 @@
                                                         <div id="charCount" style="text-align: right; font-size: 12px; color: #666;">0/300 ký tự</div>
                                                     </div>
 
+                                                    <div class="form-group" style="display: flex; gap: 20px; margin-bottom: 15px; flex-wrap: wrap;">
+                                                        <div style="flex: 1;">
+                                                            <label style="display: block; font-weight: bold; margin-bottom: 8px;">Thêm Ảnh (Tối đa 3):</label>
+                                                            <input type="file" name="images" id="imageUpload" accept="image/*" multiple style="margin-bottom: 10px;">
+                                                            <div id="imagePreviewContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+                                                        </div>
+
+                                                        <div style="flex: 1;">
+                                                            <label style="display: block; font-weight: bold; margin-bottom: 8px;">Thêm Video (Tối đa 1):</label>
+                                                            <input type="file" name="video" id="videoUpload" accept="video/*" style="margin-bottom: 10px;">
+                                                            <div id="videoPreviewContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+                                                        </div>
+                                                    </div>
+
                                                     <button type="submit" class="btn btn--primary">Gửi đánh giá</button>
                                                 </form>
                                             </c:if>
@@ -596,7 +610,144 @@
                             });
                         }
 
+                        const imageUpload = document.getElementById('imageUpload');
+                        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+                        let selectedImages = [];
 
+                        if (imageUpload) {
+                            imageUpload.addEventListener('change', function(e) {
+                                const files = Array.from(e.target.files);
+                                const availableSlots = 3 - selectedImages.length;
+
+                                if (files.length > availableSlots) {
+                                    alert('Bạn chỉ được chọn tối đa 3 ảnh. Các ảnh dư sẽ bị tự động loại bỏ!');
+                                }
+
+                                const filesToAdd = files.slice(0, availableSlots);
+                                selectedImages = selectedImages.concat(filesToAdd);
+
+                                updateImagePreviews();
+                                updateImageInput();
+
+                                imageUpload.value = '';
+                            });
+                        }
+
+                        function updateImagePreviews() {
+                            imagePreviewContainer.innerHTML = '';
+                            selectedImages.forEach((file, index) => {
+                                const reader = new FileReader();
+                                reader.onload = function(e) {
+                                    const div = document.createElement('div');
+                                    div.style.position = 'relative';
+                                    div.style.width = '70px';
+                                    div.style.height = '70px';
+                                    div.style.border = '1px solid #ddd';
+                                    div.style.borderRadius = '5px';
+
+                                    const img = document.createElement('img');
+                                    img.src = e.target.result;
+                                    img.style.width = '100%';
+                                    img.style.height = '100%';
+                                    img.style.objectFit = 'cover';
+                                    img.style.borderRadius = '5px';
+
+                                    const btnRemove = document.createElement('button');
+                                    btnRemove.innerHTML = '×';
+                                    btnRemove.style.position = 'absolute';
+                                    btnRemove.style.top = '-8px';
+                                    btnRemove.style.right = '-8px';
+                                    btnRemove.style.background = '#ff4d4f';
+                                    btnRemove.style.color = 'white';
+                                    btnRemove.style.border = 'none';
+                                    btnRemove.style.borderRadius = '50%';
+                                    btnRemove.style.width = '20px';
+                                    btnRemove.style.height = '20px';
+                                    btnRemove.style.cursor = 'pointer';
+                                    btnRemove.style.lineHeight = '18px';
+                                    btnRemove.style.fontWeight = 'bold';
+
+                                    btnRemove.onclick = function(event) {
+                                        event.preventDefault();
+                                        selectedImages.splice(index, 1);
+                                        updateImagePreviews();
+                                        updateImageInput();
+                                    };
+
+                                    div.appendChild(img);
+                                    div.appendChild(btnRemove);
+                                    imagePreviewContainer.appendChild(div);
+                                }
+                                reader.readAsDataURL(file);
+                            });
+                        }
+
+                        function updateImageInput() {
+                            const dataTransfer = new DataTransfer();
+                            selectedImages.forEach(file => dataTransfer.items.add(file));
+                            document.getElementById('imageUpload').files = dataTransfer.files;
+                        }
+
+                        // 3. Xử lý video
+
+                        const videoUpload = document.getElementById('videoUpload');
+                        const videoPreviewContainer = document.getElementById('videoPreviewContainer');
+
+                        if (videoUpload) {
+                            videoUpload.addEventListener('change', function(e) {
+                                videoPreviewContainer.innerHTML = '';
+                                if (this.files && this.files.length > 0) {
+                                    if (this.files.length > 1) {
+                                        alert('Chỉ được chọn 1 video duy nhất!');
+                                        const dt = new DataTransfer();
+                                        dt.items.add(this.files[0]);
+                                        this.files = dt.files;
+                                    }
+
+                                    const file = this.files[0];
+                                    const url = URL.createObjectURL(file);
+
+                                    const div = document.createElement('div');
+                                    div.style.position = 'relative';
+                                    div.style.width = '100px';
+                                    div.style.height = '70px';
+                                    div.style.background = '#000';
+                                    div.style.borderRadius = '5px';
+
+                                    const video = document.createElement('video');
+                                    video.src = url;
+                                    video.style.width = '100%';
+                                    video.style.height = '100%';
+                                    video.style.objectFit = 'cover';
+                                    video.style.borderRadius = '5px';
+
+                                    const btnRemove = document.createElement('button');
+                                    btnRemove.innerHTML = '×';
+                                    btnRemove.style.position = 'absolute';
+                                    btnRemove.style.top = '-8px';
+                                    btnRemove.style.right = '-8px';
+                                    btnRemove.style.background = '#ff4d4f';
+                                    btnRemove.style.color = 'white';
+                                    btnRemove.style.border = 'none';
+                                    btnRemove.style.borderRadius = '50%';
+                                    btnRemove.style.width = '20px';
+                                    btnRemove.style.height = '20px';
+                                    btnRemove.style.cursor = 'pointer';
+                                    btnRemove.style.lineHeight = '18px';
+                                    btnRemove.style.fontWeight = 'bold';
+
+                                    btnRemove.onclick = function(event) {
+                                        event.preventDefault();
+                                        videoUpload.value = "";
+                                        videoPreviewContainer.innerHTML = '';
+                                    };
+
+                                    div.appendChild(video);
+                                    div.appendChild(btnRemove);
+                                    videoPreviewContainer.appendChild(div);
+                                }
+                            });
+                        }
                     });
                 </script>
             </body>

@@ -88,6 +88,30 @@ public class ReviewServlet extends HttpServlet {
             finalComment = finalComment.substring(0, 500);
         }
 
+        // Xử lý lưu file upload
+        String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads" + File.separator + "reviews";
+        File uploadDir = new File(uploadPath);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+
+        List<String> imageUrls = new ArrayList<>();
+        String videoUrl = null;
+
+        for (Part part : request.getParts()) {
+            String fileName = getFileName(part);
+            if (fileName != null && !fileName.isEmpty()) {
+                String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
+                part.write(uploadPath + File.separator + uniqueFileName);
+                String filePath = "uploads/reviews/" + uniqueFileName;
+
+                if (part.getName().equals("images") && imageUrls.size() < 3) {
+                    imageUrls.add(filePath);
+                } else if (part.getName().equals("video") && videoUrl == null) {
+                    videoUrl = filePath;
+                }
+            }
+        }
 
         Review review = new Review();
         review.setUserId(user.getId());
