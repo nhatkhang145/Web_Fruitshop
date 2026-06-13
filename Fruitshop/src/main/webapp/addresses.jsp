@@ -233,7 +233,7 @@
                                 <input type="text" name="receiverName" id="receiverName" class="form-input"
                                     placeholder="Họ và tên" required />
                                 <input type="tel" name="phoneNumber" id="phoneNumber" class="form-input"
-                                    placeholder="Số điện thoại" pattern="0[3578][0-9]{8}" inputmode="numeric"
+                                    placeholder="Số điện thoại" pattern="0[35789][0-9]{8}" inputmode="numeric"
                                     maxlength="10" title="Số điện thoại phải có 10 chữ số. Ví dụ: 0912345678"
                                     required />
                             </div>
@@ -283,6 +283,7 @@
             <jsp:include page="footer.jsp"></jsp:include>
 
             <script>
+                const ctxPath = '<c:url value="/"/>';
                 const modal = document.getElementById("addressModal");
                 const btnAdd = document.getElementById("btnAddAddress");
                 const spanClose = document.getElementsByClassName("close-modal")[0];
@@ -314,7 +315,7 @@
                     if (!provinceSel) return;
                     clearSelect(provinceSel, 'Chọn Tỉnh/Thành phố');
                     try {
-                        const res = await fetch('api/location?type=province');
+                        const res = await fetch(ctxPath + 'api/location?type=province');
                         const jsonStr = await res.text();
                         if (!jsonStr) return;
                         const data = JSON.parse(jsonStr);
@@ -343,7 +344,7 @@
                     const provinceId = provinceSel.value;
                     if (!provinceId) return;
                     try {
-                        const res = await fetch('api/location?type=district&province_id=' + provinceId);
+                        const res = await fetch(ctxPath + 'api/location?type=district&province_id=' + provinceId);
                         const jsonStr = await res.text();
                         if (!jsonStr) return;
                         const data = JSON.parse(jsonStr);
@@ -378,7 +379,7 @@
                     const districtId = districtSel.value;
                     if (!districtId) return;
                     try {
-                        const res = await fetch('api/location?type=ward&district_id=' + districtId);
+                        const res = await fetch(ctxPath + 'api/location?type=ward&district_id=' + districtId);
                         const jsonStr = await res.text();
                         if (!jsonStr) return;
                         const data = JSON.parse(jsonStr);
@@ -446,7 +447,7 @@
                     }
 
                     const phoneValue = phoneInput.value.trim();
-                    const phoneRegex = /^0[3578][0-9]{8}$/;
+                    const phoneRegex = /^0[35789][0-9]{8}$/;
 
                     if (phoneValue && !phoneRegex.test(phoneValue)) {
                         e.preventDefault();

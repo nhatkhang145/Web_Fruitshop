@@ -203,7 +203,7 @@ public class AddressServlet extends HttpServlet {
     }
 
     private boolean validateVietnamesePhone(String phone) {
-        return phone != null && phone.matches("0[3578][0-9]{8}");
+        return phone != null && phone.matches("0[35789][0-9]{8}");
     }
 
     private String getParamTrim(HttpServletRequest request, String name) {

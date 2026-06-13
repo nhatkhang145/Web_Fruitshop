@@ -42,8 +42,9 @@ public class GHNShippingServlet extends HttpServlet {
             int toDistrictId = Integer.parseInt(toDistrictStr);
             int weight = Integer.parseInt(weightStr);
             int insuranceValue = insuranceValueStr != null ? Integer.parseInt(insuranceValueStr) : 0;
+            String toWardCode = req.getParameter("to_ward_code");
 
-            int shippingFee = ghnService.calculateShippingFee(fromDistrictId, toDistrictId, weight, insuranceValue);
+            int shippingFee = ghnService.calculateShippingFee(fromDistrictId, toDistrictId, toWardCode, weight, insuranceValue);
 
             JsonObject jsonResponse = new JsonObject();
             jsonResponse.addProperty("status", 200);

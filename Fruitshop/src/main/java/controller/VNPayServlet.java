@@ -61,20 +61,21 @@ public class VNPayServlet extends HttpServlet {
         List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
         Collections.sort(fieldNames);
 
-        for (int i = 0; i < fieldNames.size(); i++) {
-            String fieldName = fieldNames.get(i);
+        Iterator<String> itr = fieldNames.iterator();
+        while (itr.hasNext()) {
+            String fieldName = itr.next();
             String fieldValue = vnp_Params.get(fieldName);
             if (fieldValue != null && !fieldValue.isEmpty()) {
-                query.append(URLEncoder.encode(fieldName, StandardCharsets.UTF_8.toString()));
+                query.append(fieldName);
                 query.append("=");
                 query.append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8.toString()).replace("+", "%20"));
-                if (i < fieldNames.size() - 1) {
+                if (itr.hasNext()) {
                     query.append("&");
                 }
             }
         }
 
-        String paymentUrl = VNPayConfig.vnp_Url + "?" + query.toString() + "&vnp_SecureHash=" + vnp_SecureHash;
+        String paymentUrl = VNPayConfig.vnp_Url + "?" + query.toString() + "&vnp_SecureHashType=HmacSHA512" + "&vnp_SecureHash=" + vnp_SecureHash;
         response.sendRedirect(paymentUrl);
 
     }
