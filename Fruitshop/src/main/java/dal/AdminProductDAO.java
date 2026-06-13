@@ -2,6 +2,7 @@ package dal;
 
 import model.Product;
 import model.ProductImage;
+import java.sql.Timestamp;
 import java.util.List;
 
 public class AdminProductDAO {
@@ -56,8 +57,18 @@ public class AdminProductDAO {
                 +
                 "VALUES (:name, :productCode, :price, :salePrice, :quantity, :description, :image, :categoryId, :status)";
 
+        String code = (p.getProductCode() == null || p.getProductCode().isBlank()) ? null : p.getProductCode().trim();
+
         return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
-                .bindBean(p)
+                .bind("name",        p.getName())
+                .bind("productCode", code)
+                .bind("price",       p.getPrice())
+                .bind("salePrice",   p.getSalePrice())
+                .bind("quantity",    p.getQuantity())
+                .bind("description", p.getDescription())
+                .bind("image",       p.getImage())
+                .bind("categoryId",  p.getCategoryId())
+                .bind("status",      p.getStatus())
                 .executeAndReturnGeneratedKeys("id")
                 .mapTo(Integer.class)
                 .one());
@@ -66,13 +77,23 @@ public class AdminProductDAO {
 
     public int update(Product p) {
         String sql = "UPDATE products SET name = :name, product_code = :productCode, price = :price, sale_price = :salePrice, "
-                +
-                "quantity = :quantity, short_description = :description, image = :image, category_id = :categoryId, status = :status "
-                +
-                "WHERE id = :id";
+            +
+            "short_description = :description, image = :image, category_id = :categoryId, status = :status "
+            +
+            "WHERE id = :id";
+
+        String code = (p.getProductCode() == null || p.getProductCode().isBlank()) ? null : p.getProductCode().trim();
 
         return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
-                .bindBean(p)
+                .bind("name",        p.getName())
+                .bind("productCode", code)
+                .bind("price",       p.getPrice())
+                .bind("salePrice",   p.getSalePrice())
+                .bind("description", p.getDescription())
+                .bind("image",       p.getImage())
+                .bind("categoryId",  p.getCategoryId())
+                .bind("status",      p.getStatus())
+                .bind("id",          p.getId())
                 .execute());
     }
 
@@ -89,6 +110,13 @@ public class AdminProductDAO {
         DBContext.get().useHandle(handle -> handle.createUpdate(sql)
                 .bind(0, productId)
                 .execute());
+    }
+
+    public boolean deleteProductImageById(int imageId) {
+        String sql = "DELETE FROM product_images WHERE id = ?";
+        return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
+                .bind(0, imageId)
+                .execute()) > 0;
     }
 
     public int getMaxProductImageOrder(int productId) {
@@ -172,7 +200,13 @@ public class AdminProductDAO {
                 .execute());
     }
 
-
-
-
+    public int updatePushSale(int productId, double salePrice, Timestamp expiresAt, Integer batchItemId) {
+        String sql = "UPDATE products SET sale_price = ?, sale_price_expires_at = ?, sale_batch_item_id = ? WHERE id = ?";
+        return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
+                .bind(0, salePrice)
+                .bind(1, expiresAt)
+                .bind(2, batchItemId)
+                .bind(3, productId)
+                .execute());
+    }
 }

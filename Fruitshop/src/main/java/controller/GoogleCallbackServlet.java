@@ -3,6 +3,7 @@ package controller;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dal.CartDAO;
+import dal.RoleDAO;
 import dal.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,10 +13,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.CartItem;
 import model.User;
+import util.AdminPermissionHelper;
 import util.CartSessionUtils;
 import util.GoogleOAuthConfig;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -27,7 +32,7 @@ import java.util.Optional;
 @WebServlet(name = "GoogleCallbackServlet", urlPatterns = {"/login-google"})
 public class GoogleCallbackServlet extends HttpServlet {
 
-    private UserDAO userDAO = new UserDAO();
+    private final UserDAO userDAO = new UserDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -113,6 +118,8 @@ public class GoogleCallbackServlet extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("account", user);
             session.setAttribute("user", user);
+            session.setAttribute("accountRoleName", resolveRoleName(user));
+            session.setAttribute("adminLandingPath", AdminPermissionHelper.resolveAdminLandingPath(user));
             session.removeAttribute("oauth_state");
 
             CartDAO cartDAO = new CartDAO();
@@ -122,14 +129,15 @@ public class GoogleCallbackServlet extends HttpServlet {
             CartSessionUtils.updateSessionCart(session, mergedCart);
             cartDAO.replaceCartItems(user.getId(), mergedCart);
 
-            if (user.getRole() == 1) {
-                response.sendRedirect(request.getContextPath() + "/admin/index.jsp");
+            if (AdminPermissionHelper.isAdminAccount(user)) {
+                String landingPath = (String) session.getAttribute("adminLandingPath");
+                if (landingPath == null || landingPath.equals("/")) landingPath = "/admin/dashboard";
+                response.sendRedirect(request.getContextPath() + landingPath);
             } else {
                 response.sendRedirect(request.getContextPath() + "/");
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException | RuntimeException e) {
             request.setAttribute("error", "Lỗi đăng nhập Google: " + e.getMessage());
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
@@ -180,5 +188,25 @@ public class GoogleCallbackServlet extends HttpServlet {
         }
 
         return JsonParser.parseString(response.toString()).getAsJsonObject();
+    }
+
+    private String resolveRoleName(User user) {
+        if (user == null) {
+            return "Khách hàng";
+        }
+        if (user.getRole() == 1) {
+            return "Admin";
+        }
+
+        Integer roleId = user.getRoleId();
+        if (roleId != null && roleId > 0) {
+            var role = new RoleDAO().getRoleById(roleId);
+            if (role != null && role.getName() != null && !role.getName().isBlank()) {
+                return role.getName();
+            }
+            return "Vai trò #" + roleId;
+        }
+
+        return "Khách hàng";
     }
 }

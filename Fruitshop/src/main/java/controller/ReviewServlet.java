@@ -1,18 +1,26 @@
 package controller;
 
 import dal.ReviewDAO;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.http.*;
 import model.Review;
 import model.User;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @WebServlet(name = "ReviewServlet", urlPatterns = {"/review"})
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024 * 2,
+        maxFileSize = 1024 * 1024 * 50,
+        maxRequestSize = 1024 * 1024 * 100
+)
 public class ReviewServlet extends HttpServlet {
     private final ReviewDAO reviewDAO = new ReviewDAO();
 
@@ -48,7 +56,7 @@ public class ReviewServlet extends HttpServlet {
         }
     }
 
-    private void handleAddReview(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void handleAddReview(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         User user = getUserFromSession(request);
         if (user == null) {
             response.sendRedirect("login.jsp");
@@ -66,6 +74,44 @@ public class ReviewServlet extends HttpServlet {
 
         int productId = Integer.parseInt(productIdStr);
         int rating = Integer.parseInt(ratingStr);
+
+        // Kiểm tra user có đơn hàng hợp lệ không (chưa đánh giá, đã hoàn thành đơn)
+        Integer eligibleOrderDetailId = reviewDAO.getEligibleOrderDetailId(user.getId(), productId);
+        if (eligibleOrderDetailId == null) {
+            response.sendRedirect("product-detail?pid=" + productId + "&error=not_eligible");
+            return;
+        }
+
+        // Cắt độ dài comment nếu quá 300 ký tự
+        String finalComment = comment.trim();
+        if (finalComment.length() > 300) {
+            finalComment = finalComment.substring(0, 500);
+        }
+
+        // Xử lý lưu file upload
+        String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads" + File.separator + "reviews";
+        File uploadDir = new File(uploadPath);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+
+        List<String> imageUrls = new ArrayList<>();
+        String videoUrl = null;
+
+        for (Part part : request.getParts()) {
+            String fileName = getFileName(part);
+            if (fileName != null && !fileName.isEmpty()) {
+                String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
+                part.write(uploadPath + File.separator + uniqueFileName);
+                String filePath = "uploads/reviews/" + uniqueFileName;
+
+                if (part.getName().equals("images") && imageUrls.size() < 3) {
+                    imageUrls.add(filePath);
+                } else if (part.getName().equals("video") && videoUrl == null) {
+                    videoUrl = filePath;
+                }
+            }
+        }
 
         Review review = new Review();
         review.setUserId(user.getId());
@@ -99,5 +145,14 @@ public class ReviewServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Phương thức GET không được hỗ trợ cho chức năng này.");
+    }
+
+    private String getFileName(Part part) {
+        for (String content : part.getHeader("content-disposition").split(";")) {
+            if (content.trim().startsWith("filename")) {
+                return content.substring(content.indexOf('=') + 1).trim().replace("\"", "");
+            }
+        }
+        return null;
     }
 }

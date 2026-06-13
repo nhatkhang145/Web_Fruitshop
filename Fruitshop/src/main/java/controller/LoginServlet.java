@@ -1,9 +1,11 @@
 package controller;
 
 import dal.CartDAO;
+import dal.RoleDAO;
 import dal.UserDAO;
 import model.CartItem;
 import model.User;
+import util.AdminPermissionHelper;
 import util.CartSessionUtils;
 import util.PasswordUtils;
 import jakarta.servlet.ServletException;
@@ -50,6 +52,8 @@ public class LoginServlet extends HttpServlet {
 
             HttpSession session = request.getSession();
             session.setAttribute("account", account);
+            session.setAttribute("accountRoleName", resolveRoleName(account));
+            session.setAttribute("adminLandingPath", AdminPermissionHelper.resolveAdminLandingPath(account));
 
             CartDAO cartDAO = new CartDAO();
             List<CartItem> dbCart = cartDAO.getCartItemsByUserId(account.getId());
@@ -62,11 +66,34 @@ public class LoginServlet extends HttpServlet {
             int wishlistCount = wishlistDAO.countWishlist(account.getId());
             session.setAttribute("wishlistCount", wishlistCount);
 
-            if (account.getRole() == 1) {
-                response.sendRedirect("admin/dashboard");
+            if (AdminPermissionHelper.isAdminAccount(account)) {
+                String landingPath = (String) session.getAttribute("adminLandingPath");
+                if (landingPath == null || landingPath.equals("/")) landingPath = "/admin/dashboard";
+                response.sendRedirect(request.getContextPath() + landingPath);
             } else {
                 response.sendRedirect(request.getContextPath() + "/");
             }
         }
+    }
+
+
+    private String resolveRoleName(User account) {
+        if (account == null) {
+            return "Khách hàng";
+        }
+        if (account.getRole() == 1) {
+            return "Admin";
+        }
+
+        Integer roleId = account.getRoleId();
+        if (roleId != null && roleId > 0) {
+            var role = new RoleDAO().getRoleById(roleId);
+            if (role != null && role.getName() != null && !role.getName().isBlank()) {
+                return role.getName();
+            }
+            return "Vai trò #" + roleId;
+        }
+
+        return "Khách hàng";
     }
 }

@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
 	var searchInput = document.getElementById("stockSearch");
-	var categorySelect = document.getElementById("stockCategory");
 	var freshnessSelect = document.getElementById("stockFreshness");
 	var clearFiltersBtn = document.getElementById("clearFiltersBtn");
 	var table = document.getElementById("stockTable");
@@ -94,21 +93,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	function applyFilters() {
 		var query = (searchInput?.value || "").trim().toLowerCase();
-		var category = categorySelect?.value || "all";
 		var freshness = freshnessSelect?.value || "all";
 		var visible = 0;
 
 		(table ? Array.from(table.querySelectorAll(".stock-row")) : []).forEach(function (row) {
 			var code = (row.dataset.code || "").toLowerCase();
 			var name = (row.dataset.name || "").toLowerCase();
-			var rowCategory = row.dataset.category || "";
 			var rowFreshness = row.dataset.freshness || "";
 			var batchRows = getBatchRows(row.dataset.group || "");
 			var batchMatch = batchRows.some(function (batch) {
 				return (batch.dataset.freshness || "") === freshness;
 			});
-			var matchesBase = (query === "" || code.includes(query) || name.includes(query))
-				&& (category === "all" || rowCategory === category);
+			var matchesBase = query === "" || code.includes(query) || name.includes(query);
 			var matches = matchesBase && (freshness === "all" || rowFreshness === freshness || batchMatch);
 
 			row.classList.toggle("is-hidden", !matches);
@@ -142,11 +138,9 @@ document.addEventListener("DOMContentLoaded", function () {
 	});
 
 	searchInput?.addEventListener("input", applyFilters);
-	categorySelect?.addEventListener("change", applyFilters);
 	freshnessSelect?.addEventListener("change", applyFilters);
 	clearFiltersBtn?.addEventListener("click", function () {
 		if (searchInput) searchInput.value = "";
-		if (categorySelect) categorySelect.value = "all";
 		if (freshnessSelect) freshnessSelect.value = "all";
 		applyFilters();
 	});
@@ -205,6 +199,12 @@ document.addEventListener("DOMContentLoaded", function () {
 			var qty = btn.dataset.qty || "—";
 			var qtyNumber = Number(qty);
 			var priceNumber = Number(btn.dataset.price || "");
+			var batchRow = btn.closest('.batch-row');
+			var groupKey = batchRow?.dataset.group || '';
+			if (wasteModal) wasteModal.dataset.group = groupKey;
+			if (wasteModal) wasteModal.dataset.batchCode = batch;
+			if (wasteModal) wasteModal.dataset.batchQty = String(qtyNumber || 0);
+			if (wasteModal) wasteModal.dataset.batchItemId = batchRow?.dataset.itemId || '';
 
 			if (action === "waste") {
 				if (wasteBatch) wasteBatch.textContent = batch;
@@ -235,6 +235,11 @@ document.addEventListener("DOMContentLoaded", function () {
 			}
 
 			if (action === "flash") {
+				if (flashModal) {
+					flashModal.dataset.group = groupKey;
+					flashModal.dataset.batchCode = batch;
+					flashModal.dataset.batchItemId = batchRow?.dataset.itemId || '';
+				}
 				if (flashBatch) flashBatch.textContent = batch;
 				if (flashQty) flashQty.textContent = qty;
 				if (flashCurrentPrice) {
@@ -254,6 +259,152 @@ document.addEventListener("DOMContentLoaded", function () {
 			}
 		});
 	});
+
+	(function () {
+		if (!wasteModal) return;
+		var footerBtn = wasteModal.querySelector('.modal-footer .btn-primary');
+		footerBtn?.addEventListener('click', function () {
+			var groupKey = wasteModal.dataset.group || '';
+			var batchCode = wasteModal.dataset.batchCode || '';
+			var batchQty = Number(wasteModal.dataset.batchQty || '0');
+			var qtyVal = Number(wasteQtyInput?.value || '0');
+			if (!groupKey) {
+				alert('Không xác định được sản phẩm.');
+				return;
+			}
+			if (!Number.isFinite(qtyVal) || qtyVal <= 0) {
+				alert('Vui lòng nhập số lượng hỏng hợp lệ.');
+				return;
+			}
+			if (batchQty > 0 && qtyVal > batchQty) {
+				alert('Số lượng hỏng không thể lớn hơn số lượng trong lô.');
+				return;
+			}
+
+			var pid = null;
+			var m = groupKey.match(/product-(\d+)/);
+			if (m) pid = Number(m[1]);
+			if (!pid) {
+				alert('Không xác định được ID sản phẩm.');
+				return;
+			}
+
+			
+			var stockRow = document.querySelector('.stock-row[data-group="' + groupKey + '"]');
+			var unitPrice = 0;
+			if (stockRow) {
+				var priceCell = stockRow.cells && stockRow.cells[1] ? stockRow.cells[1].textContent : '';
+					if (priceCell) {
+					var num = priceCell.replace(/[^0-9\.\-]/g, '');
+					unitPrice = Number(num) || 0;
+				}
+			}
+
+			var batchItemId = wasteModal.dataset.batchItemId ? Number(wasteModal.dataset.batchItemId) : null;
+			var items = [{ productId: pid, quantity: qtyVal, unitPrice: unitPrice > 0 ? unitPrice : 1, batchItemId: batchItemId }];
+
+			
+			var ctx = document.querySelector("meta[name='contextPath']")?.content || '';
+			var url = ctx + '/admin/inventory-export-create';
+			var body = new URLSearchParams();
+			var today = new Date();
+			var yyyy = today.getFullYear();
+			var mm = String(today.getMonth()+1).padStart(2,'0');
+			var dd = String(today.getDate()).padStart(2,'0');
+			var todayStr = yyyy + '-' + mm + '-' + dd;
+
+			body.append('receipt_date', todayStr);
+			body.append('export_type', 'WASTE');
+			body.append('note', 'Báo hỏng tự động cho ' + batchCode);
+			body.append('waste_reason', 'Báo hỏng lô ' + batchCode);
+			body.append('items', JSON.stringify(items));
+
+			footerBtn.disabled = true;
+			footerBtn.textContent = 'Đang tạo...';
+
+			fetch(url, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+				body: body.toString()
+			}).then(function (res) { return res.json(); })
+			.then(function (data) {
+				footerBtn.disabled = false;
+				footerBtn.textContent = 'Xác nhận báo hỏng';
+					if (data.success) {
+						closeModal(wasteModal);
+						alert('Tạo phiếu báo hỏng thành công. Số lượng trong lô sẽ được trừ khi phiếu được duyệt.');
+				} else {
+					alert('Lỗi: ' + (data.message || 'Không xác định'));
+				}
+			}).catch(function (err) {
+				footerBtn.disabled = false;
+				footerBtn.textContent = 'Xác nhận báo hỏng';
+				alert('Lỗi kết nối: ' + err.message);
+			});
+		});
+	})();
+
+	(function () {
+		if (!flashModal) return;
+		var footerBtn = flashModal.querySelector('.modal-footer .btn-primary');
+		var durationInput = document.getElementById("flashDuration");
+		footerBtn?.addEventListener('click', function () {
+			var groupKey = flashModal.dataset.group || '';
+			var priceVal = Number(flashPriceInput?.value || '0');
+			var durationVal = Number(durationInput?.value || '0');
+			if (!groupKey) {
+				alert('Không xác định được sản phẩm.');
+				return;
+			}
+			if (!Number.isFinite(priceVal) || priceVal <= 0) {
+				alert('Vui lòng nhập giá sale hợp lệ.');
+				return;
+			}
+			if (!Number.isFinite(durationVal) || durationVal <= 0) {
+				alert('Vui lòng nhập thời gian hiển thị hợp lệ.');
+				return;
+			}
+			var pid = null;
+			var m = groupKey.match(/product-(\d+)/);
+			if (m) pid = Number(m[1]);
+			if (!pid) {
+				alert('Không xác định được ID sản phẩm.');
+				return;
+			}
+			var ctx = document.querySelector("meta[name='contextPath']")?.content || '';
+			var url = ctx + '/admin/product-push-sale';
+			var body = new URLSearchParams();
+			body.append('productId', String(pid));
+			body.append('salePrice', String(priceVal));
+			body.append('durationHours', String(durationVal));
+			var bId = flashModal.dataset.batchItemId || '';
+			if (bId) {
+				body.append('batchItemId', bId);
+			}
+			footerBtn.disabled = true;
+			footerBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Đang tạo...';
+			fetch(url, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+				body: body.toString()
+			}).then(function (res) { return res.json(); })
+			.then(function (data) {
+				footerBtn.disabled = false;
+				footerBtn.innerHTML = '<i class="bx bx-bolt"></i> Tạo Flash Sale ngay';
+				if (data.success) {
+					closeModal(flashModal);
+					alert('Đẩy sale sản phẩm thành công!');
+					window.location.reload();
+				} else {
+					alert('Lỗi: ' + (data.message || 'Không xác định'));
+				}
+			}).catch(function (err) {
+				footerBtn.disabled = false;
+				footerBtn.innerHTML = '<i class="bx bx-bolt"></i> Tạo Flash Sale ngay';
+				alert('Lỗi kết nối: ' + err.message);
+			});
+		});
+	})();
 
 	document.querySelectorAll("[data-close-modal]").forEach(function (btn) {
 		btn.addEventListener("click", function () {

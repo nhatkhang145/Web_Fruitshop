@@ -460,6 +460,8 @@ public class ProductDAO {
         appendUnique(result, seen, getActiveWeekendDealProductsByCategory(categoryId, excludeProductId, limit), limit);
         appendUnique(result, seen, getBestSellingByCategory(categoryId, excludeProductId, limit), limit);
         appendUnique(result, seen, getProductsByPriceRange(categoryId, excludeProductId, basePrice, limit), limit);
+        appendUnique(result, seen, getProductsByPriceRange(categoryId, excludeProductId, basePrice, limit), limit);
+        appendUnique(result, seen, getBestSellingByCategory(categoryId, excludeProductId, limit), limit);
         appendUnique(result, seen, getNewestByCategory(categoryId, excludeProductId, limit), limit);
         appendUnique(result, seen, getRelatedProducts(categoryId, excludeProductId, limit), limit);
 
