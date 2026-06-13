@@ -170,7 +170,7 @@
                             <div class="secondary-images-container" id="subImagesContainer">
                                 <c:if test="${not empty product.productImages}">
                                     <c:forEach items="${product.productImages}" var="img">
-                                        <div class="sub-image-item">
+                                        <div class="sub-image-item" id="sub-img-${img.id}">
                                             <c:choose>
                                                 <c:when test="${fn:startsWith(img.imageUrl, 'http')}">
                                                     <img src="${img.imageUrl}" alt="Ảnh chi tiết" />
@@ -179,6 +179,12 @@
                                                     <img src="${pageContext.request.contextPath}/${img.imageUrl}" alt="Ảnh chi tiết" />
                                                 </c:otherwise>
                                             </c:choose>
+                                            <button type="button"
+                                                    class="btn-delete-sub-img"
+                                                    title="Xóa ảnh này"
+                                                    onclick="deleteSubImage(${img.id})">
+                                                <i class='bx bx-x'></i>
+                                            </button>
                                         </div>
                                     </c:forEach>
                                 </c:if>
@@ -203,6 +209,32 @@
 
 <script src="${pageContext.request.contextPath}/assets/js/admin/main.js"></script>
 <script src="${pageContext.request.contextPath}/assets/js/admin/product-edit.js"></script>
+
+<script>
+function deleteSubImage(imageId) {
+    if (!confirm('Bạn có chắc muốn xóa ảnh này không?')) return;
+
+    fetch('${pageContext.request.contextPath}/admin/product-image-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'imageId=' + imageId
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            const el = document.getElementById('sub-img-' + imageId);
+            if (el) {
+                el.style.transition = 'opacity 0.3s';
+                el.style.opacity = '0';
+                setTimeout(() => el.remove(), 300);
+            }
+        } else {
+            alert('Xóa thất bại: ' + (data.message || 'Lỗi không xác định'));
+        }
+    })
+    .catch(() => alert('Lỗi kết nối, vui lòng thử lại.'));
+}
+</script>
 
 </body>
 

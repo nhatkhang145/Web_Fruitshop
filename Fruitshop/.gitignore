@@ -60,6 +60,7 @@ out/
 
 
 src/main/resources/db.properties
+gradle-local.properties
 
 build/
 *.war
