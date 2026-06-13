@@ -83,6 +83,29 @@ public class AdminDashboardServlet extends HttpServlet {
             topLossProducts = reportDAO.getTopLossProducts(startDateStr, endDateStr, 5);
         }
 
+        double weekendDealRevenue = reportDAO.getWeekendDealRevenue(startDateStr, endDateStr);
+        double salePriceRevenue   = reportDAO.getSalePriceRevenue(startDateStr, endDateStr);
+        double totalDiscountAmt   = reportDAO.getTotalDiscountAmount(startDateStr, endDateStr);
+        int activeWeekendDeals    = reportDAO.getActiveWeekendDeals();
+        int activeSaleProducts    = reportDAO.getActiveSaleProducts();
+        int totalOrders           = reportDAO.getTotalCompletedOrders(startDateStr, endDateStr);
+        int promotionOrders       = reportDAO.getPromotionOrders(startDateStr, endDateStr);
+        double promoRevenue       = weekendDealRevenue + salePriceRevenue;
+
+        double pctRevenue  = (totalRevenue > 0) ? promoRevenue / totalRevenue * 100 : 0;
+        double pctProfit   = (totalRevenue > 0) ? (totalRevenue - totalDiscountAmt) / totalRevenue * 100 : 0;
+        double pctOrders   = (totalOrders  > 0) ? (double) promotionOrders / totalOrders * 100 : 0;
+
+        Map<java.time.LocalDate, Double> wdByDate   = reportDAO.getWeekendDealRevenueByDate(startDateStr, endDateStr);
+        Map<java.time.LocalDate, Double> saleByDate = reportDAO.getSalePriceRevenueByDate(startDateStr, endDateStr);
+
+        List<Double> wdSeries   = new ArrayList<>();
+        List<Double> saleSeries = new ArrayList<>();
+        for (java.time.LocalDate date : dateRange) {
+            wdSeries.add(wdByDate.getOrDefault(date, 0.0));
+            saleSeries.add(saleByDate.getOrDefault(date, 0.0));
+        }
+
         request.setAttribute("totalImportValue", totalImportValue);
         request.setAttribute("totalExportValue", totalExportValue);
         request.setAttribute("totalRevenue", totalRevenue);
@@ -101,6 +124,19 @@ public class AdminDashboardServlet extends HttpServlet {
 
         request.setAttribute("topProfitProducts", topProfitProducts);
         request.setAttribute("topLossProducts", topLossProducts);
+
+        request.setAttribute("weekendDealRevenue",  weekendDealRevenue);
+        request.setAttribute("salePriceRevenue",    salePriceRevenue);
+        request.setAttribute("totalDiscountAmount", totalDiscountAmt);
+        request.setAttribute("activeWeekendDeals",  activeWeekendDeals);
+        request.setAttribute("activeSaleProducts",  activeSaleProducts);
+        request.setAttribute("totalCompletedOrders",totalOrders);
+        request.setAttribute("promotionOrders",     promotionOrders);
+        request.setAttribute("pctPromoRevenue",     String.format("%.1f", pctRevenue));
+        request.setAttribute("pctPromoProfit",      String.format("%.1f", pctProfit));
+        request.setAttribute("pctPromoOrders",      String.format("%.1f", pctOrders));
+        request.setAttribute("wdSeries",            wdSeries);
+        request.setAttribute("saleSeries",          saleSeries);
 
         request.setAttribute("startDate", startDateStr);
         request.setAttribute("endDate", endDateStr);
