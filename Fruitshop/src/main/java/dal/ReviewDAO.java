@@ -178,8 +178,8 @@ public class ReviewDAO {
         String query = """
                 SELECT od.id FROM order_details od 
                 JOIN orders o ON o.id = od.order_id
-                WHERE o.user_id = ?
-                  AND od.product_id = ?
+                WHERE o.user_id = :userId
+                  AND od.product_id = :productId
                   AND o.status = 'completed'
                   AND od.id NOT IN (SELECT order_detail_id FROM reviews WHERE order_detail_id IS NOT NULL)
                 LIMIT 1""";

@@ -236,64 +236,72 @@
                                     <div class="product-reviews">
                                         <h3>Đánh giá sản phẩm</h3>
 
-                                        <div class="review-form-wrapper"
-                                            style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
-                                            <c:if test="${sessionScope.account == null}">
-                                                <p>Vui lòng <a href="<c:url value='/login.jsp'/>"
-                                                        style="color: var(--primary-color); font-weight: bold;">đăng
-                                                        nhập</a> để viết đánh giá.</p>
-                                            </c:if>
+                                        <div class="review-form-wrapper">
+                                            <c:choose>
+                                            <%--Đã đăng nhập và đã mua hàng--%>
+                                                <c:when test="${canReview}">
+                                                    <h4 style="margin-bottom: 15px; font-weight: bold; color: #333;">Thêm đánh giá của bạn</h4>
 
-                                            <c:if test="${sessionScope.account != null}">
-                                                <form action="<c:url value='/review'/>" method="post"
-                                                    class="review-form">
-                                                    <input type="hidden" name="action" value="add">
-                                                    <input type="hidden" name="productId" value="${detail.id}">
+                                                    <form action="ReviewServlet" method="post" class="review-form" enctype="multipart/form-data" id="reviewForm">
+                                                        <input type="hidden" name="action" value="add">
+                                                        <input type="hidden" name="productId" value="${detail.id}">
 
-                                                    <div class="form-group" style="margin-bottom: 15px;">
-                                                        <label
-                                                            style="font-weight: 600; display: block; margin-bottom: 5px;">Đánh
-                                                            giá của bạn:</label>
-                                                        <div class="rate">
-                                                            <input type="radio" id="star5" name="rating" value="5"
-                                                                checked />
-                                                            <label for="star5" title="5 sao">5 stars</label>
-                                                            <input type="radio" id="star4" name="rating" value="4" />
-                                                            <label for="star4" title="4 sao">4 stars</label>
-                                                            <input type="radio" id="star3" name="rating" value="3" />
-                                                            <label for="star3" title="3 sao">3 stars</label>
-                                                            <input type="radio" id="star2" name="rating" value="2" />
-                                                            <label for="star2" title="2 sao">2 stars</label>
-                                                            <input type="radio" id="star1" name="rating" value="1" />
-                                                            <label for="star1" title="1 sao">1 star</label>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="form-group" style="position: relative; margin-bottom: 15px;">
-                                                        <label>Nội dung đánh giá:</label>
-                                                        <textarea name="comment" id="reviewComment" rows="4" maxlength="500" required
-                                                                  placeholder="Chia sẻ cảm nhận của bạn (Tối đa 300 ký tự)..."
-                                                                  style="width: 100%; padding: 10px; border: 1px solid #ccc; outline: none;"></textarea>
-                                                        <div id="charCount" style="text-align: right; font-size: 12px; color: #666;">0/300 ký tự</div>
-                                                    </div>
-
-                                                    <div class="form-group" style="display: flex; gap: 20px; margin-bottom: 15px; flex-wrap: wrap;">
-                                                        <div style="flex: 1;">
-                                                            <label style="display: block; font-weight: bold; margin-bottom: 8px;">Thêm Ảnh (Tối đa 3):</label>
-                                                            <input type="file" name="images" id="imageUpload" accept="image/*" multiple style="margin-bottom: 10px;">
-                                                            <div id="imagePreviewContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+                                                        <div class="form-group" style="margin-bottom: 15px;">
+                                                            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Chất lượng sản phẩm *</label>
+                                                            <div class="rating-input" style="display: flex; gap: 5px; font-size: 20px; color: #ffb800;">
+                                                                <div class="rate">
+                                                                    <input type="radio" id="star5" name="rating" value="5" checked />
+                                                                    <label for="star5" title="5 sao">5 stars</label>
+                                                                    <input type="radio" id="star4" name="rating" value="4" />
+                                                                    <label for="star4" title="4 sao">4 stars</label>
+                                                                    <input type="radio" id="star3" name="rating" value="3" />
+                                                                    <label for="star3" title="3 sao">3 stars</label>
+                                                                    <input type="radio" id="star2" name="rating" value="2" />
+                                                                    <label for="star2" title="2 sao">2 stars</label>
+                                                                    <input type="radio" id="star1" name="rating" value="1" />
+                                                                    <label for="star1" title="1 sao">1 star</label>
+                                                                </div>
+                                                            </div>
                                                         </div>
 
-                                                        <div style="flex: 1;">
-                                                            <label style="display: block; font-weight: bold; margin-bottom: 8px;">Thêm Video (Tối đa 1):</label>
-                                                            <input type="file" name="video" id="videoUpload" accept="video/*" style="margin-bottom: 10px;">
-                                                            <div id="videoPreviewContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+                                                        <div class="form-group" style="position: relative; margin-bottom: 15px;">
+                                                            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Nội dung đánh giá *</label>
+                                                            <textarea name="comment" id="reviewComment" rows="4" maxlength="500" required
+                                                                      placeholder="Chia sẻ cảm nhận của bạn về sản phẩm (Tối đa 500 ký tự)..."
+                                                                      style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; outline: none; box-sizing: border-box; transition: all 0.3s;"></textarea>
+                                                            <div id="charCount" style="text-align: right; font-size: 12px; color: #666; margin-top: 5px;">0/500 ký tự</div>
                                                         </div>
-                                                    </div>
 
-                                                    <button type="submit" class="btn btn--primary">Gửi đánh giá</button>
-                                                </form>
-                                            </c:if>
+                                                        <div class="form-group" style="display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap;">
+                                                            <div style="flex: 1; min-width: 250px;">
+                                                                <label style="display: block; font-weight: 500; margin-bottom: 8px;"><i class="fa-solid fa-camera"></i> Thêm Ảnh (Tối đa 3):</label>
+                                                                <input type="file" name="images" id="imageUpload" accept="image/*" multiple style="margin-bottom: 10px; display: block;">
+                                                                <div id="imagePreviewContainer" style="display: flex; gap: 10px; flex-wrap: wrap; min-height: 20px;"></div>
+                                                                <div id="imageError" style="color: red; font-size: 12px; display: none; margin-top: 5px;">Chỉ được chọn tối đa 3 ảnh!</div>
+                                                            </div>
+
+                                                            <div style="flex: 1; min-width: 250px;">
+                                                                <label style="display: block; font-weight: 500; margin-bottom: 8px;"><i class="fa-solid fa-video"></i> Thêm Video (Tối đa 1):</label>
+                                                                <input type="file" name="video" id="videoUpload" accept="video/*" style="margin-bottom: 10px; display: block;">
+                                                                <div id="videoPreviewContainer" style="display: flex; gap: 10px; flex-wrap: wrap; min-height: 20px;"></div>
+                                                                <div id="videoError" style="color: red; font-size: 12px; display: none; margin-top: 5px;">Chỉ được chọn 1 video!</div>
+                                                            </div>
+                                                        </div>
+
+                                                        <button type="submit" class="btn btn--primary" id="btnSubmitReview" style="padding: 10px 20px; font-weight: bold;">Gửi đánh giá</button>
+                                                    </form>
+                                                </c:when>
+
+                                                <%--Chưa mua hàng --%>
+                                                <c:otherwise>
+                                                    <div style="padding: 25px; background-color: #f8f9fa; border: 1px dashed #ced4da; border-radius: 8px; text-align: center; margin-top: 15px;">
+                                                        <i class="fa-solid fa-lock" style="font-size: 26px; color: #6c757d; margin-bottom: 12px; display: block;"></i>
+                                                        <p style="margin: 0; color: #495057; font-size: 14px; font-weight: 500;">
+                                                            Chỉ những khách hàng đã mua và nhận thành công sản phẩm này mới có thể gửi đánh giá.
+                                                        </p>
+                                                    </div>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </div>
 
                                         <div class="review-list">
