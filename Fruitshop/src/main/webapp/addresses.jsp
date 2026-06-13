@@ -176,6 +176,9 @@
                                                     data-phone="<c:out value='${addr.phoneNumber}'/>"
                                                     data-address="<c:out value='${addr.address}'/>"
                                                     data-city="<c:out value='${addr.city}'/>"
+                                                    data-province-id="${addr.provinceId}"
+                                                    data-district-id="${addr.districtId}"
+                                                    data-ward-code="${addr.wardCode}"
                                                     data-default="${addr.defaultAddress}">Cập nhật
                                                 </button>
                                                 <c:choose>
@@ -236,13 +239,13 @@
                             </div>
                             <div class="form-group">
                                 <div style="display: flex; gap: 8px;">
-                                    <select name="province" id="provinceSelect" class="form-input" style="flex:1">
+                                    <select name="provinceId" id="provinceSelect" class="form-input" style="flex:1">
                                         <option value="">Chọn Tỉnh/Thành phố</option>
                                     </select>
-                                    <select name="district" id="districtSelect" class="form-input" style="flex:1">
+                                    <select name="districtId" id="districtSelect" class="form-input" style="flex:1">
                                         <option value="">Chọn Quận/Huyện</option>
                                     </select>
-                                    <select name="ward" id="wardSelect" class="form-input" style="flex:1">
+                                    <select name="wardCode" id="wardSelect" class="form-input" style="flex:1">
                                         <option value="">Chọn Phường/Xã</option>
                                     </select>
                                 </div>
@@ -291,6 +294,10 @@
                 const cityHidden = document.getElementById('city');
                 const addressInput = document.getElementById('address');
 
+                let prefillProvinceId = 0;
+                let prefillDistrictId = 0;
+                let prefillWardCode = '';
+
                 phoneInput.addEventListener('input', function (e) {
                     this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
                 });
@@ -307,16 +314,24 @@
                     if (!provinceSel) return;
                     clearSelect(provinceSel, 'Chọn Tỉnh/Thành phố');
                     try {
-                        const res = await fetch('https://provinces.open-api.vn/api/?depth=1');
-                        const data = await res.json();
-                        data.forEach(p => {
-                            const o = document.createElement('option');
-                            o.value = p.code;
-                            o.textContent = p.name;
-                            provinceSel.appendChild(o);
-                        });
-                        const cityVal = cityHidden?.value || '';
-                        if (cityVal) tryPrefillFromCity(cityVal);
+                        const res = await fetch('api/location?type=province');
+                        const jsonStr = await res.text();
+                        if (!jsonStr) return;
+                        const data = JSON.parse(jsonStr);
+                        if (data && data.code === 200 && data.data) {
+                            data.data.forEach(p => {
+                                const o = document.createElement('option');
+                                o.value = p.ProvinceID;
+                                o.textContent = p.ProvinceName;
+                                provinceSel.appendChild(o);
+                            });
+                            if (prefillProvinceId && prefillProvinceId !== 0) {
+                                provinceSel.value = prefillProvinceId;
+                                await onProvinceChange();
+                            } else if (cityHidden.value) {
+                                tryPrefillFromCity(cityHidden.value);
+                            }
+                        }
                     } catch (e) {
                         console.error(e);
                     }
@@ -325,25 +340,31 @@
                 async function onProvinceChange() {
                     clearSelect(districtSel, 'Chọn Quận/Huyện');
                     clearSelect(wardSel, 'Chọn Phường/Xã');
-                    const code = provinceSel.value;
-                    if (!code) return;
+                    const provinceId = provinceSel.value;
+                    if (!provinceId) return;
                     try {
-                        const res = await fetch('https://provinces.open-api.vn/api/p/' + code + '?depth=2');
-                        const data = await res.json();
-                        data.districts.forEach(d => {
-                            const o = document.createElement('option');
-                            o.value = d.code;
-                            o.textContent = d.name;
-                            districtSel.appendChild(o);
-                        });
-                        const cityVal = cityHidden?.value || '';
-                        if (cityVal) {
-                            const parts = cityVal.split(',').map(s => s.trim());
-                            if (parts[1]) {
-                                const match = Array.from(districtSel.options).find(o => o.text === parts[1]);
-                                if (match) {
-                                    districtSel.value = match.value;
-                                    onDistrictChange();
+                        const res = await fetch('api/location?type=district&province_id=' + provinceId);
+                        const jsonStr = await res.text();
+                        if (!jsonStr) return;
+                        const data = JSON.parse(jsonStr);
+                        if (data && data.code === 200 && data.data) {
+                            data.data.forEach(d => {
+                                const o = document.createElement('option');
+                                o.value = d.DistrictID;
+                                o.textContent = d.DistrictName;
+                                districtSel.appendChild(o);
+                            });
+                            if (prefillDistrictId && prefillDistrictId !== 0) {
+                                districtSel.value = prefillDistrictId;
+                                await onDistrictChange();
+                            } else if (cityHidden.value) {
+                                const parts = cityHidden.value.split(',').map(s => s.trim());
+                                if (parts[1]) {
+                                    const match = Array.from(districtSel.options).find(o => o.text === parts[1]);
+                                    if (match) {
+                                        districtSel.value = match.value;
+                                        await onDistrictChange();
+                                    }
                                 }
                             }
                         }
@@ -354,23 +375,31 @@
 
                 async function onDistrictChange() {
                     clearSelect(wardSel, 'Chọn Phường/Xã');
-                    const dCode = districtSel.value;
-                    if (!dCode) return;
+                    const districtId = districtSel.value;
+                    if (!districtId) return;
                     try {
-                        const res = await fetch('https://provinces.open-api.vn/api/d/' + dCode + '?depth=2');
-                        const data = await res.json();
-                        (data.wards || []).forEach(w => {
-                            const o = document.createElement('option');
-                            o.value = w.code;
-                            o.textContent = w.name;
-                            wardSel.appendChild(o);
-                        });
-                        const cityVal = cityHidden?.value || '';
-                        if (cityVal) {
-                            const parts = cityVal.split(',').map(s => s.trim());
-                            if (parts[2]) {
-                                const match = Array.from(wardSel.options).find(o => o.text === parts[2]);
-                                if (match) wardSel.value = match.value;
+                        const res = await fetch('api/location?type=ward&district_id=' + districtId);
+                        const jsonStr = await res.text();
+                        if (!jsonStr) return;
+                        const data = JSON.parse(jsonStr);
+                        if (data && data.code === 200 && data.data) {
+                            data.data.forEach(w => {
+                                const o = document.createElement('option');
+                                o.value = w.WardCode;
+                                o.textContent = w.WardName;
+                                wardSel.appendChild(o);
+                            });
+                            if (prefillWardCode) {
+                                wardSel.value = prefillWardCode;
+                                prefillWardCode = '';
+                                prefillDistrictId = 0;
+                                prefillProvinceId = 0;
+                            } else if (cityHidden.value) {
+                                const parts = cityHidden.value.split(',').map(s => s.trim());
+                                if (parts[2]) {
+                                    const match = Array.from(wardSel.options).find(o => o.text === parts[2]);
+                                    if (match) wardSel.value = match.value;
+                                }
                             }
                         }
                     } catch (e) {
@@ -439,6 +468,10 @@
                     if (cityHidden) cityHidden.value = "";
                     document.getElementById("address").value = "";
 
+                    prefillProvinceId = 0;
+                    prefillDistrictId = 0;
+                    prefillWardCode = '';
+
                     const isDefaultCheckbox = document.getElementById("isDefault");
                     if (isDefaultCheckbox) isDefaultCheckbox.checked = false;
                 }
@@ -457,7 +490,7 @@
                 };
 
                 document.querySelectorAll('.btn-edit').forEach(btn => {
-                    btn.onclick = function () {
+                    btn.onclick = async function () {
                         document.getElementById("modalTitle").textContent = "Cập nhật địa chỉ";
                         document.getElementById("formAction").value = "update";
                         document.getElementById("addressId").value = this.dataset.id;
@@ -466,12 +499,21 @@
                         if (cityHidden) cityHidden.value = this.dataset.city;
                         document.getElementById("address").value = this.dataset.address;
 
+                        prefillProvinceId = parseInt(this.dataset.provinceId) || 0;
+                        prefillDistrictId = parseInt(this.dataset.districtId) || 0;
+                        prefillWardCode = this.dataset.wardCode || '';
+
                         const isDefaultCheckbox = document.getElementById("isDefault");
                         if (isDefaultCheckbox) isDefaultCheckbox.checked = this.dataset.default === "true";
 
-                        if (cityHidden.value) tryPrefillFromCity(cityHidden.value);
-
                         modal.style.display = "flex";
+
+                        if (prefillProvinceId && prefillProvinceId !== 0) {
+                            provinceSel.value = prefillProvinceId;
+                            await onProvinceChange();
+                        } else if (cityHidden.value) {
+                            tryPrefillFromCity(cityHidden.value);
+                        }
                     };
                 });
             </script>

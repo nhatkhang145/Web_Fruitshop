@@ -17,13 +17,15 @@ public class AddressDAO {
         addr.setAddress(rs.getString("address"));
         addr.setCity(rs.getString("city"));
         addr.setDefault(rs.getInt("is_default") == 1);
+        addr.setProvinceId(rs.getInt("province_id"));
+        addr.setDistrictId(rs.getInt("district_id"));
+        addr.setWardCode(rs.getString("ward_code"));
         return addr;
     };
 
-    // 1. Lấy danh sách địa chỉ theo userId
     public List<Address> getAddressesByUserId(int userId) {
         try {
-            String query = "SELECT id, user_id, receiver_name, phone_number, address, city, is_default " +
+            String query = "SELECT id, user_id, receiver_name, phone_number, address, city, is_default, province_id, district_id, ward_code " +
                     "FROM user_addresses WHERE user_id = ? ORDER BY is_default DESC, id DESC";
 
             return DBContext.get().withHandle(handle -> handle.createQuery(query)
@@ -31,15 +33,14 @@ public class AddressDAO {
                     .map(addressMapper)
                     .list());
         } catch (Exception e) {
-            System.err.println("Error getting addresses by user ID: " + e.getMessage());
+            System.err.println(e.getMessage());
             return Collections.emptyList();
         }
     }
 
-    // 2. Lấy địa chỉ theo ID
     public Optional<Address> getAddressById(int addressId) {
         try {
-            String query = "SELECT id, user_id, receiver_name, phone_number, address, city, is_default " +
+            String query = "SELECT id, user_id, receiver_name, phone_number, address, city, is_default, province_id, district_id, ward_code " +
                     "FROM user_addresses WHERE id = ?";
 
             return DBContext.get().withHandle(handle -> handle.createQuery(query)
@@ -47,12 +48,11 @@ public class AddressDAO {
                     .map(addressMapper)
                     .findFirst());
         } catch (Exception e) {
-            System.err.println("Error getting address by ID: " + e.getMessage());
+            System.err.println(e.getMessage());
             return Optional.empty();
         }
     }
 
-    // 3. Thêm địa chỉ mới
     public boolean addAddress(Address address) {
         try {
             DBContext.get().useHandle(handle -> {
@@ -62,9 +62,9 @@ public class AddressDAO {
                             .execute();
                 }
 
-                String query = "INSERT INTO user_addresses (user_id, receiver_name, phone_number, address, city, is_default) "
+                String query = "INSERT INTO user_addresses (user_id, receiver_name, phone_number, address, city, is_default, province_id, district_id, ward_code) "
                         +
-                        "VALUES (?, ?, ?, ?, ?, ?)";
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 handle.createUpdate(query)
                         .bind(0, address.getUserId())
                         .bind(1, address.getReceiverName())
@@ -72,16 +72,18 @@ public class AddressDAO {
                         .bind(3, address.getAddress())
                         .bind(4, address.getCity())
                         .bind(5, address.isDefault() ? 1 : 0)
+                        .bind(6, address.getProvinceId())
+                        .bind(7, address.getDistrictId())
+                        .bind(8, address.getWardCode())
                         .execute();
             });
             return true;
         } catch (Exception e) {
-            System.err.println("Error adding address: " + e.getMessage());
+            System.err.println(e.getMessage());
             return false;
         }
     }
 
-    // 4. Cập nhật địa chỉ
     public boolean updateAddress(Address address) {
         try {
             DBContext.get().useHandle(handle -> {
@@ -92,7 +94,7 @@ public class AddressDAO {
                             .execute();
                 }
 
-                String query = "UPDATE user_addresses SET receiver_name = ?, phone_number = ?, address = ?, city = ?, is_default = ? "
+                String query = "UPDATE user_addresses SET receiver_name = ?, phone_number = ?, address = ?, city = ?, is_default = ?, province_id = ?, district_id = ?, ward_code = ? "
                         +
                         "WHERE id = ?";
                 handle.createUpdate(query)
@@ -101,17 +103,19 @@ public class AddressDAO {
                         .bind(2, address.getAddress())
                         .bind(3, address.getCity())
                         .bind(4, address.isDefault() ? 1 : 0)
-                        .bind(5, address.getId())
+                        .bind(5, address.getProvinceId())
+                        .bind(6, address.getDistrictId())
+                        .bind(7, address.getWardCode())
+                        .bind(8, address.getId())
                         .execute();
             });
             return true;
         } catch (Exception e) {
-            System.err.println("Error updating address: " + e.getMessage());
+            System.err.println(e.getMessage());
             return false;
         }
     }
 
-    // 5. Xóa địa chỉ
     public boolean deleteAddress(int addressId) {
         try {
             String query = "DELETE FROM user_addresses WHERE id = ?";
@@ -121,12 +125,11 @@ public class AddressDAO {
                     .execute());
             return rows > 0;
         } catch (Exception e) {
-            System.err.println("Error deleting address: " + e.getMessage());
+            System.err.println(e.getMessage());
             return false;
         }
     }
 
-    // 6. Đặt địa chỉ mặc định
     public boolean setDefaultAddress(int userId, int addressId) {
         try {
             DBContext.get().useHandle(handle -> {
@@ -140,15 +143,14 @@ public class AddressDAO {
             });
             return true;
         } catch (Exception e) {
-            System.err.println("Error setting default address: " + e.getMessage());
+            System.err.println(e.getMessage());
             return false;
         }
     }
 
-    // 7. Lấy địa chỉ mặc định của user
     public Optional<Address> getDefaultAddress(int userId) {
         try {
-            String query = "SELECT id, user_id, receiver_name, phone_number, address, city, is_default " +
+            String query = "SELECT id, user_id, receiver_name, phone_number, address, city, is_default, province_id, district_id, ward_code " +
                     "FROM user_addresses WHERE user_id = ? AND is_default = 1 LIMIT 1";
 
             return DBContext.get().withHandle(handle -> handle.createQuery(query)
@@ -156,12 +158,11 @@ public class AddressDAO {
                     .map(addressMapper)
                     .findFirst());
         } catch (Exception e) {
-            System.err.println("Error getting default address: " + e.getMessage());
+            System.err.println(e.getMessage());
             return Optional.empty();
         }
     }
 
-    // 8. Đếm số địa chỉ của user
     public int countAddresses(int userId) {
         try {
             String query = "SELECT COUNT(*) FROM user_addresses WHERE user_id = ?";
@@ -171,7 +172,7 @@ public class AddressDAO {
                     .mapTo(Integer.class)
                     .one());
         } catch (Exception e) {
-            System.err.println("Error counting addresses: " + e.getMessage());
+            System.err.println(e.getMessage());
             return 0;
         }
     }
