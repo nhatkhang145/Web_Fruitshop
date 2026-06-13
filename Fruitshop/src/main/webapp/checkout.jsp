@@ -67,7 +67,7 @@
                                                     <c:if test="${empty defaultAddr}">
                                                         <c:set var="defaultAddr" value="${addresses[0]}" />
                                                     </c:if>
-                                                    
+
                                                     <c:if test="${not empty defaultAddr}">
                                                         <div class="address-info">
                                                             <span
@@ -262,7 +262,8 @@
                                                 <th class="order-summary__cell order-summary__cell--label">Phí vận
                                                     chuyển</th>
                                                 <td class="order-summary__cell">
-                                                    <span class="order-summary__price--shipping" id="shippingFeeDisplay">
+                                                    <span class="order-summary__price--shipping"
+                                                        id="shippingFeeDisplay">
                                                         <fmt:formatNumber value="${shippingFee}" type="number"
                                                             groupingUsed="true" /> ₫
                                                     </span>
@@ -285,7 +286,8 @@
                                                 <th class="order-summary__cell order-summary__cell--label">Tổng cộng
                                                 </th>
                                                 <td class="order-summary__cell">
-                                                    <span class="order-summary__price order-summary__price--total" id="finalAmountDisplay">
+                                                    <span class="order-summary__price order-summary__price--total"
+                                                        id="finalAmountDisplay">
                                                         <fmt:formatNumber value="${finalAmount}" type="number"
                                                             groupingUsed="true" /> ₫
                                                     </span>
@@ -319,7 +321,8 @@
                                             nghiệm của bạn trên trang web này và cho các mục đích khác được mô tả trong
                                             chính sách riêng tư của chúng tôi.
                                         </p>
-                                        <button type="submit" class="button button--primary button--fullwidth" id="btnPlaceOrder" <c:if
+                                        <button type="submit" class="button button--primary button--fullwidth"
+                                            id="btnPlaceOrder" <c:if
                                             test="${addressMissing or empty addresses}">disabled</c:if>>Đặt
                                             hàng</button>
                                     </div>
@@ -332,11 +335,11 @@
                 <jsp:include page="footer.jsp"></jsp:include>
                 <script src="${pageContext.request.contextPath}/assets/js/main.js"></script>
                 <script>
-                    const storeDistrictId = ${storeDistrictId != null ? storeDistrictId : 0};
-                    const totalWeight = ${totalWeight != null ? totalWeight : 0};
-                    const insuranceValue = ${totalProducts != null ? totalProducts : 0};
-                    const totalProductsAmount = ${totalProducts != null ? totalProducts : 0};
-                    const discountAmount = ${discount != null ? discount : 0};
+                    const storeDistrictId = ${ storeDistrictId != null ? storeDistrictId : 0};
+                    const totalWeight = ${ totalWeight != null ? totalWeight : 0};
+                    const insuranceValue = ${ totalProducts != null ? totalProducts : 0};
+                    const totalProductsAmount = ${ totalProducts != null ? totalProducts : 0};
+                    const discountAmount = ${ discount != null ? discount : 0};
 
                     function formatMoney(amount) {
                         return new Intl.NumberFormat('vi-VN').format(amount) + ' ₫';
@@ -397,7 +400,7 @@
                                         document.getElementById('shippingFeeDisplay').innerText = formatMoney(30000);
                                         document.getElementById('finalAmountDisplay').innerText = formatMoney(totalProductsAmount + 30000 - discountAmount);
                                     }
-                                } catch(e) {
+                                } catch (e) {
                                     console.error("Error fetching shipping fee", e);
                                     document.getElementById('shippingFeeDisplay').innerText = formatMoney(30000);
                                     document.getElementById('finalAmountDisplay').innerText = formatMoney(totalProductsAmount + 30000 - discountAmount);
