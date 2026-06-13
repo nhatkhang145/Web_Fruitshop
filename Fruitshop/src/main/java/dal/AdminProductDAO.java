@@ -57,8 +57,18 @@ public class AdminProductDAO {
                 +
                 "VALUES (:name, :productCode, :price, :salePrice, :quantity, :description, :image, :categoryId, :status)";
 
+        String code = (p.getProductCode() == null || p.getProductCode().isBlank()) ? null : p.getProductCode().trim();
+
         return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
-                .bindBean(p)
+                .bind("name",        p.getName())
+                .bind("productCode", code)
+                .bind("price",       p.getPrice())
+                .bind("salePrice",   p.getSalePrice())
+                .bind("quantity",    p.getQuantity())
+                .bind("description", p.getDescription())
+                .bind("image",       p.getImage())
+                .bind("categoryId",  p.getCategoryId())
+                .bind("status",      p.getStatus())
                 .executeAndReturnGeneratedKeys("id")
                 .mapTo(Integer.class)
                 .one());
@@ -72,8 +82,18 @@ public class AdminProductDAO {
             +
             "WHERE id = :id";
 
+        String code = (p.getProductCode() == null || p.getProductCode().isBlank()) ? null : p.getProductCode().trim();
+
         return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
-                .bindBean(p)
+                .bind("name",        p.getName())
+                .bind("productCode", code)
+                .bind("price",       p.getPrice())
+                .bind("salePrice",   p.getSalePrice())
+                .bind("description", p.getDescription())
+                .bind("image",       p.getImage())
+                .bind("categoryId",  p.getCategoryId())
+                .bind("status",      p.getStatus())
+                .bind("id",          p.getId())
                 .execute());
     }
 
@@ -90,6 +110,13 @@ public class AdminProductDAO {
         DBContext.get().useHandle(handle -> handle.createUpdate(sql)
                 .bind(0, productId)
                 .execute());
+    }
+
+    public boolean deleteProductImageById(int imageId) {
+        String sql = "DELETE FROM product_images WHERE id = ?";
+        return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
+                .bind(0, imageId)
+                .execute()) > 0;
     }
 
     public int getMaxProductImageOrder(int productId) {

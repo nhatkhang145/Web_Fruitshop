@@ -2,6 +2,7 @@ package controller;
 
 import dal.UserDAO;
 import model.User;
+import util.CloudinaryUploadHelper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -10,9 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 
 @WebServlet(name = "ProfileServlet", urlPatterns = { "/profile" })
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 1, maxFileSize = 1024 * 1024 * 10, maxRequestSize = 1024 * 1024 * 15)
@@ -148,29 +147,10 @@ public class ProfileServlet extends HttpServlet {
 
     private void handleAvatarUpload(HttpServletRequest request, User user) throws IOException, ServletException {
         Part avatarPart = request.getPart("avatarFile");
-
-        if (avatarPart != null && avatarPart.getSize() > 0) {
-            String fileName = Paths.get(avatarPart.getSubmittedFileName()).getFileName().toString();
-
-            String extension = "";
-            int dotIndex = fileName.lastIndexOf(".");
-            if (dotIndex > 0) {
-                extension = fileName.substring(dotIndex);
-            }
-
-            String newFileName = "avatar_" + user.getId() + "_" + System.currentTimeMillis() + extension;
-
-            String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads" + File.separator
-                    + "avatars";
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
-
-            avatarPart.write(uploadPath + File.separator + newFileName);
-
-            String avatarUrl = "uploads/avatars/" + newFileName;
-            user.setAvatar(avatarUrl);
+        String avatarFolder = "fruitshop/avatars/user_" + user.getId();
+        String uploadedUrl = CloudinaryUploadHelper.upload(avatarPart, avatarFolder);
+        if (uploadedUrl != null) {
+            user.setAvatar(uploadedUrl);
         }
     }
 

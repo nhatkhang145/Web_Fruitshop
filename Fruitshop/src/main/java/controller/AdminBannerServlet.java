@@ -2,13 +2,12 @@ package controller;
 
 import dal.AdminBannerDAO;
 import model.Banner;
+import util.CloudinaryUploadHelper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.List;
 
 @WebServlet(name = "AdminBannerServlet", urlPatterns = {"/admin/banners"})
@@ -19,7 +18,7 @@ import java.util.List;
 )
 public class AdminBannerServlet extends HttpServlet {
 
-    private static final String UPLOAD_DIR = "assets/images/banners";
+    private static final String CLOUDINARY_FOLDER = "fruitshop/banners";
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         AdminBannerDAO dao = new AdminBannerDAO();
@@ -66,8 +65,8 @@ public class AdminBannerServlet extends HttpServlet {
         }
 
         if ("add".equals(action)) {
-            String fileName = uploadFile(request);
-            String imageUrl = (fileName != null) ? UPLOAD_DIR + "/" + fileName : "";
+            String imageUrl = CloudinaryUploadHelper.upload(request.getPart("image"), CLOUDINARY_FOLDER);
+            if (imageUrl == null) imageUrl = "";
 
             Banner b = new Banner(0, title, description, imageUrl, link, linkType, linkTarget, order, status);
             dao.insert(b);
@@ -76,9 +75,8 @@ public class AdminBannerServlet extends HttpServlet {
             int id = Integer.parseInt(request.getParameter("id"));
             String oldImage = request.getParameter("oldImage");
 
-            String fileName = uploadFile(request);
-
-            String finalImageUrl = (fileName != null && !fileName.isEmpty()) ? UPLOAD_DIR + "/" + fileName : oldImage;
+            String uploaded = CloudinaryUploadHelper.upload(request.getPart("image"), CLOUDINARY_FOLDER);
+            String finalImageUrl = (uploaded != null) ? uploaded : oldImage;
 
             Banner b = new Banner(id, title, description, finalImageUrl, link, linkType, linkTarget, order, status);
             dao.update(b);
@@ -87,23 +85,4 @@ public class AdminBannerServlet extends HttpServlet {
         response.sendRedirect("banners");
     }
 
-    private String uploadFile(HttpServletRequest request) throws IOException, ServletException {
-        Part filePart = request.getPart("image");
-        if (filePart == null || filePart.getSize() == 0 || filePart.getSubmittedFileName().isEmpty()) {
-            return null;
-        }
-
-        String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-
-        fileName = System.currentTimeMillis() + "_" + fileName;
-
-        String applicationPath = request.getServletContext().getRealPath("");
-        String uploadPath = applicationPath + File.separator + UPLOAD_DIR;
-
-        File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()) uploadDir.mkdirs();
-
-        filePart.write(uploadPath + File.separator + fileName);
-        return fileName;
-    }
 }
