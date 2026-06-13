@@ -85,6 +85,15 @@ public class AddressServlet extends HttpServlet {
         String city = getParamTrim(request, "city");
         boolean isDefault = "on".equals(request.getParameter("isDefault"));
 
+        int provinceId = 0;
+        int districtId = 0;
+        String wardCode = request.getParameter("wardCode");
+        try {
+            provinceId = Integer.parseInt(request.getParameter("provinceId"));
+            districtId = Integer.parseInt(request.getParameter("districtId"));
+        } catch (Exception e) {
+        }
+
         if (addressDetail.isEmpty()) {
             throw new RuntimeException("Địa chỉ không được để trống!");
         }
@@ -102,7 +111,7 @@ public class AddressServlet extends HttpServlet {
         }
 
         Address address = new Address(addressId, user.getId(), receiverName, phoneNumber, addressDetail, city,
-                isDefault);
+                isDefault, provinceId, districtId, wardCode);
         addressDAO.updateAddress(address);
     }
 
@@ -149,6 +158,15 @@ public class AddressServlet extends HttpServlet {
         boolean isDefault = "on".equals(request.getParameter("isDefault"))
                 || "1".equals(request.getParameter("isDefault"));
 
+        int provinceId = 0;
+        int districtId = 0;
+        String wardCode = request.getParameter("wardCode");
+        try {
+            provinceId = Integer.parseInt(request.getParameter("provinceId"));
+            districtId = Integer.parseInt(request.getParameter("districtId"));
+        } catch (Exception e) {
+        }
+
         if (addressDetail.isEmpty()) {
             request.setAttribute("error", "Địa chỉ không được để trống!");
             return;
@@ -169,7 +187,7 @@ public class AddressServlet extends HttpServlet {
             return;
         }
 
-        Address address = new Address(0, user.getId(), receiverName, phoneNumber, addressDetail, city, isDefault);
+        Address address = new Address(0, user.getId(), receiverName, phoneNumber, addressDetail, city, isDefault, provinceId, districtId, wardCode);
         boolean success = addressDAO.addAddress(address);
 
         if (success) {
@@ -185,7 +203,7 @@ public class AddressServlet extends HttpServlet {
     }
 
     private boolean validateVietnamesePhone(String phone) {
-        return phone != null && phone.matches("0[3578][0-9]{8}");
+        return phone != null && phone.matches("0[35789][0-9]{8}");
     }
 
     private String getParamTrim(HttpServletRequest request, String name) {

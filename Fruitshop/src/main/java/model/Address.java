@@ -8,12 +8,14 @@ public class Address {
     private String address;
     private String city;
     private boolean isDefault;
+    private int provinceId;
+    private int districtId;
+    private String wardCode;
 
     public Address(){
-
     }
 
-    public Address(int id, int userId, String receiverName, String phoneNumber, String address, String city, boolean isDefault) {
+    public Address(int id, int userId, String receiverName, String phoneNumber, String address, String city, boolean isDefault, int provinceId, int districtId, String wardCode) {
         this.id = id;
         this.userId = userId;
         this.receiverName = receiverName;
@@ -21,6 +23,9 @@ public class Address {
         this.address = address;
         this.city = city;
         this.isDefault = isDefault;
+        this.provinceId = provinceId;
+        this.districtId = districtId;
+        this.wardCode = wardCode;
     }
 
     public boolean isDefault() {
@@ -81,5 +86,29 @@ public class Address {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getProvinceId() {
+        return provinceId;
+    }
+
+    public void setProvinceId(int provinceId) {
+        this.provinceId = provinceId;
+    }
+
+    public int getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(int districtId) {
+        this.districtId = districtId;
+    }
+
+    public String getWardCode() {
+        return wardCode;
+    }
+
+    public void setWardCode(String wardCode) {
+        this.wardCode = wardCode;
     }
 }
