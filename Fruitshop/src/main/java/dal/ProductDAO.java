@@ -2,6 +2,7 @@ package dal;
 
 import model.Product;
 import model.ProductImage;
+import model.StockAvailability;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -75,6 +76,26 @@ public class ProductDAO {
         }
 
         return product;
+    }
+
+    public StockAvailability checkStockAvailability(int productId, int requestedQuantity) {
+        String sql = "SELECT quantity FROM products WHERE id = :productId AND status = 1";
+
+        Integer availableQuantity = DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .bind("productId", productId)
+                .mapTo(Integer.class)
+                .findFirst()
+                .orElse(0));
+
+        int safeRequestedQuantity = Math.max(0, requestedQuantity);
+        int safeAvailableQuantity = Math.max(0, availableQuantity == null ? 0 : availableQuantity);
+
+        StockAvailability result = new StockAvailability();
+        result.setProductId(productId);
+        result.setRequestedQuantity(safeRequestedQuantity);
+        result.setAvailableQuantity(safeAvailableQuantity);
+        result.setAvailable(safeRequestedQuantity > 0 && safeAvailableQuantity >= safeRequestedQuantity);
+        return result;
     }
 
     public int getSoldQuantityByProductId(int productId) {
@@ -437,6 +458,8 @@ public class ProductDAO {
         Set<Integer> seen = new HashSet<>();
 
         appendUnique(result, seen, getActiveWeekendDealProductsByCategory(categoryId, excludeProductId, limit), limit);
+        appendUnique(result, seen, getBestSellingByCategory(categoryId, excludeProductId, limit), limit);
+        appendUnique(result, seen, getProductsByPriceRange(categoryId, excludeProductId, basePrice, limit), limit);
         appendUnique(result, seen, getProductsByPriceRange(categoryId, excludeProductId, basePrice, limit), limit);
         appendUnique(result, seen, getBestSellingByCategory(categoryId, excludeProductId, limit), limit);
         appendUnique(result, seen, getNewestByCategory(categoryId, excludeProductId, limit), limit);

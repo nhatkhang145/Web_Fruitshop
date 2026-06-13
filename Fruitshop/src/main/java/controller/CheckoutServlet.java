@@ -265,6 +265,25 @@ public class CheckoutServlet extends HttpServlet {
 
         syncCheckoutCartImages(cart);
 
+        dal.ProductDAO productDAO = new dal.ProductDAO();
+        for (CartItem item : cart) {
+            Product currentProduct = productDAO.getProductByID(item.getProduct().getId());
+
+            if (currentProduct == null || currentProduct.getStatus() != 1) {
+                req.setAttribute("error", "Sản phẩm [" + item.getProduct().getName()
+                        + "] hiện không còn kinh doanh. Vui lòng xóa khỏi giỏ hàng!");
+                doGet(req, resp);
+                return;
+            }
+
+            if (item.getQuantity() > currentProduct.getQuantity()) {
+                req.setAttribute("error", "Sản phẩm [" + item.getProduct().getName() + "] chỉ còn "
+                        + currentProduct.getQuantity() + " sản phẩm trong kho. Vui lòng cập nhật lại số lượng!");
+                doGet(req, resp);
+                return;
+            }
+        }
+
         try {
             double totalProducts = 0;
             int totalWeight = 0;
@@ -272,7 +291,6 @@ public class CheckoutServlet extends HttpServlet {
                 totalProducts += item.getFinalPrice().doubleValue() * item.getQuantity();
                 totalWeight += 500 * item.getQuantity();
             }
-
             double shippingFee = 30000;
             if (toDistrictId > 0) {
                 try {
@@ -301,26 +319,24 @@ public class CheckoutServlet extends HttpServlet {
             order.setPaymentStatus(0);
             order.setStatus("pending");
 
-            int orderId = orderDAO.createOrder(order);
+            List<OrderItem> orderItems = new ArrayList<>();
+            for (CartItem cartItem : cart) {
+                OrderItem item = new OrderItem();
+                item.setProductId(cartItem.getProduct().getId());
+                item.setProductName(cartItem.getProduct().getName());
+                item.setDealType(cartItem.getDealType());
+                item.setDealId(cartItem.getDealId());
+                item.setOriginalPrice(cartItem.getOriginalPrice());
+                item.setDiscountAmount(cartItem.getDiscountAmount());
+                item.setFinalPrice(cartItem.getFinalPrice());
+                item.setQuantity(cartItem.getQuantity());
+                item.setTotal(cartItem.getTotalPrice());
+                orderItems.add(item);
+            }
+
+            int orderId = orderDAO.placeOrder(order, orderItems);
 
             if (orderId > 0) {
-                List<OrderItem> orderItems = new ArrayList<>();
-                for (CartItem cartItem : cart) {
-                    OrderItem item = new OrderItem();
-                    item.setOrderId(orderId);
-                    item.setProductId(cartItem.getProduct().getId());
-                    item.setProductName(cartItem.getProduct().getName());
-                    item.setDealType(cartItem.getDealType());
-                    item.setDealId(cartItem.getDealId());
-                    item.setOriginalPrice(cartItem.getOriginalPrice());
-                    item.setDiscountAmount(cartItem.getDiscountAmount());
-                    item.setFinalPrice(cartItem.getFinalPrice());
-                    item.setQuantity(cartItem.getQuantity());
-                    item.setTotal(cartItem.getTotalPrice());
-                    orderItems.add(item);
-                }
-
-                orderDAO.addOrderDetails(orderId, orderItems);
 
                 try {
                     dal.NotificationDAO notificationDAO = new dal.NotificationDAO();
