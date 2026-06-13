@@ -14,7 +14,7 @@ public class VNPayConfig {
     public static final String vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     public static final String vnp_ReturnUrl = "http://localhost:8080/Fruitshop_Web/vnpay-return";
     public static final String vnp_TmnCode = "0VJ27KB8";
-    public static final String vnp_HashSecret = "TNPNY372A0QCMUP3V2QNRHRTXPQ2ZK6P";
+    public static final String vnp_HashSecret = "81XD3RUJIHTYBBYSP4KLO8LW9GDI7I78";
     public static final String vnp_Version = "2.1.0";
     public static final String vnp_Command = "pay";
 
@@ -42,25 +42,21 @@ public class VNPayConfig {
     public static String hashAllFields(Map<String, String> fields) {
         List<String> fieldNames = new ArrayList<>(fields.keySet());
         Collections.sort(fieldNames);
-        StringBuilder sb = new StringBuilder();
-        Iterator<String> itr = fieldNames.iterator();
-        while (itr.hasNext()) {
-            String fieldName = itr.next();
+        List<String> queryStrings = new ArrayList<>();
+        for (String fieldName : fieldNames) {
             String fieldValue = fields.get(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                sb.append(fieldName);
-                sb.append("=");
+            if (fieldValue != null && fieldValue.length() > 0) {
                 try {
-                    sb.append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8.toString()).replace("+", "%20"));
+                    String encodedName = URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString());
+                    String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString());
+                    queryStrings.add(encodedName + "=" + encodedValue);
                 } catch (UnsupportedEncodingException e) {
-                    sb.append(fieldValue);
+                    e.printStackTrace();
                 }
             }
-            if (itr.hasNext()) {
-                sb.append("&");
-            }
         }
-        return hmacSHA512(vnp_HashSecret, sb.toString());
+        String hashData = String.join("&", queryStrings);
+        return hmacSHA512(vnp_HashSecret, hashData);
     }
 
     public static String getIpAddress(HttpServletRequest request){
