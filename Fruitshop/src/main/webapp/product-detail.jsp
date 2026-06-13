@@ -242,7 +242,7 @@
                                                 <c:when test="${canReview}">
                                                     <h4 style="margin-bottom: 15px; font-weight: bold; color: #333;">Thêm đánh giá của bạn</h4>
 
-                                                    <form action="ReviewServlet" method="post" class="review-form" enctype="multipart/form-data" id="reviewForm">
+                                                    <form action="${pageContext.request.contextPath}/review" method="post" class="review-form" enctype="multipart/form-data" id="reviewForm">
                                                         <input type="hidden" name="action" value="add">
                                                         <input type="hidden" name="productId" value="${detail.id}">
 
