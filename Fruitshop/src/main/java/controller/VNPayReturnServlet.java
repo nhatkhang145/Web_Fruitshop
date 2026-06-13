@@ -27,10 +27,11 @@ public class VNPayReturnServlet extends HttpServlet {
         String vnp_OrderInfo = request.getParameter("vnp_OrderInfo");
         int orderId = 0;
         try {
-            String[] parts = vnp_OrderInfo.split(" ");
-            orderId = Integer.parseInt(parts[4]);
-        } catch (NumberFormatException e) {
-            System.err.println("Mã đơn hàng không hợp lệ từ VNPAY");
+            // vnp_OrderInfo format: "ThanhToanDonHang_42"
+            String[] parts = vnp_OrderInfo.split("_");
+            orderId = Integer.parseInt(parts[parts.length - 1]);
+        } catch (Exception e) {
+            System.err.println("Mã đơn hàng không hợp lệ từ VNPAY: " + vnp_OrderInfo);
         }
 
         if ("00".equals(vnp_ResponseCode)) {
