@@ -4,15 +4,12 @@ import dal.CategoryDAO;
 import dal.ProductDAO;
 import dal.ReviewDAO;
 import dal.WeekendDealDAO;
-import model.Category;
-import model.Product;
-import model.WeekendDeal;
+import model.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import model.Review;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -63,6 +60,19 @@ public class ProductDetailServlet extends HttpServlet {
             }
             request.setAttribute("listR", listR);
 
+            User user = (User) request.getSession().getAttribute("account");
+            boolean canReview = false;
+
+            if (user != null) {
+                // Sử dụng hàm JDBI đã viết trong ReviewDAO để tìm đơn hàng thỏa mãn (đã giao, chưa review)
+                Integer eligibleOrderDetailId = rDao.getEligibleOrderDetailId(user.getId(), p.getId());
+                if (eligibleOrderDetailId != null) {
+                    canReview = true; // Thỏa mãn điều kiện -> Đổi cờ thành true
+                }
+            }
+            // Truyền biến canReview (true/false) sang trang product-detail.jsp
+            request.setAttribute("canReview", canReview);
+
             request.setAttribute("detail", p);
             request.setAttribute("relatedP", relatedP);
 
@@ -84,5 +94,10 @@ public class ProductDetailServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
+    }
+
+    @Override
+    public String getServletInfo() {
+        return "Short description";
     }
 }

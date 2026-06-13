@@ -184,6 +184,20 @@
                                                         đơn</button>
                                                 </form>
                                             </c:if>
+                                            <c:if test="${order.status == 'completed'}">
+                                                <jsp:useBean id="orderDAOFrontend" class="dal.OrderDAO" scope="page" />
+                                                <c:set var="chiTietDonHang" value="${orderDAOFrontend.getOrderDetails(order.id)}" />
+
+                                                <c:if test="${not empty chiTietDonHang}">
+                                                    <c:set var="firstItem" value="${chiTietDonHang[0]}" />
+
+                                                    <a href="${pageContext.request.contextPath}/product-detail?pid=${firstItem.productId}#reviews"
+                                                       class="btn btn-outline btn-review-now"
+                                                       style="display: inline-block; padding: 8px 20px; border: 1px solid #ee4d2d; color: #ee4d2d; background: #fff; border-radius: 5px; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: 500; margin-right: 10px; transition: all 0.2s;">
+                                                        Đánh giá ngay
+                                                    </a>
+                                                </c:if>
+                                            </c:if>
                                             <c:if test="${order.status == 'completed' || order.status == 'cancelled'}">
                                                 <form action="${pageContext.request.contextPath}/repurchase" method="POST"
                                                       style="display: inline;">
