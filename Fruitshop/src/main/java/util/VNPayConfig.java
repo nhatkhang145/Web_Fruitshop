@@ -51,7 +51,6 @@ public class VNPayConfig {
                 sb.append(fieldName);
                 sb.append("=");
                 try {
-                    // Đồng bộ cách encode khoảng trắng thành %20 thay vì dấu +
                     sb.append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8.toString()).replace("+", "%20"));
                 } catch (UnsupportedEncodingException e) {
                     sb.append(fieldValue);

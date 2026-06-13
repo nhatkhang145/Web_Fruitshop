@@ -1,5 +1,5 @@
 .stats-grid--kpi {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
 .stat-card.accent-rose .stat-icon {
@@ -108,10 +108,6 @@
 }
 
 @media (max-width: 1200px) {
-    .stats-grid--kpi {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
     .report-filters .filter-form {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -126,11 +122,64 @@
 }
 
 @media (max-width: 768px) {
-    .stats-grid--kpi {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
     .report-filters .filter-form {
         grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* Tab Navigation */
+.tab-nav {
+    display: flex;
+    gap: 8px;
+    margin: 18px 0 24px;
+    border-bottom: 2px solid var(--grey, #e5e7eb);
+    padding-bottom: 0;
+}
+
+.tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    border-radius: 8px 8px 0 0;
+    transition: all .2s;
+}
+
+.tab-btn:hover {
+    background: rgba(47, 128, 135, .07);
+    color: #2f8087;
+}
+
+.tab-btn.active {
+    color: #2f8087;
+    border-bottom-color: #2f8087;
+    background: rgba(47, 128, 135, .08);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn .25s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

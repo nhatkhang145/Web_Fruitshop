@@ -274,4 +274,131 @@ public class AdminReportDAO {
                 .list()
         );
     }
+
+    public double getWeekendDealRevenue(String startDate, String endDate) {
+        String sql = "SELECT COALESCE(SUM(od.total), 0) " +
+                "FROM order_details od " +
+                "JOIN orders o ON od.order_id = o.id " +
+                "WHERE o.status = 'completed' " +
+                "AND od.deal_type = 'WEEKEND' " +
+                "AND DATE(o.created_at) >= :startDate " +
+                "AND DATE(o.created_at) <= :endDate";
+        return DBContext.get().withHandle(handle ->
+            handle.createQuery(sql)
+                .bind("startDate", startDate)
+                .bind("endDate", endDate)
+                .mapTo(Double.class).findFirst().orElse(0.0)
+        );
+    }
+
+    public double getSalePriceRevenue(String startDate, String endDate) {
+        String sql = "SELECT COALESCE(SUM(od.total), 0) " +
+                "FROM order_details od " +
+                "JOIN orders o ON od.order_id = o.id " +
+                "WHERE o.status = 'completed' " +
+                "AND od.deal_type = 'SALE' " +
+                "AND DATE(o.created_at) >= :startDate " +
+                "AND DATE(o.created_at) <= :endDate";
+        return DBContext.get().withHandle(handle ->
+            handle.createQuery(sql)
+                .bind("startDate", startDate)
+                .bind("endDate", endDate)
+                .mapTo(Double.class).findFirst().orElse(0.0)
+        );
+    }
+
+    public double getTotalDiscountAmount(String startDate, String endDate) {
+        String sql = "SELECT COALESCE(SUM(od.discount_amount), 0) " +
+                "FROM order_details od " +
+                "JOIN orders o ON od.order_id = o.id " +
+                "WHERE o.status = 'completed' " +
+                "AND od.deal_type IS NOT NULL AND od.deal_type != '' " +
+                "AND DATE(o.created_at) >= :startDate " +
+                "AND DATE(o.created_at) <= :endDate";
+        return DBContext.get().withHandle(handle ->
+            handle.createQuery(sql)
+                .bind("startDate", startDate)
+                .bind("endDate", endDate)
+                .mapTo(Double.class).findFirst().orElse(0.0)
+        );
+    }
+
+    public int getActiveWeekendDeals() {
+        String sql = "SELECT COUNT(*) FROM weekend_deals " +
+                "WHERE status = 1 AND NOW() BETWEEN start_date AND end_date";
+        return DBContext.get().withHandle(handle ->
+            handle.createQuery(sql).mapTo(Integer.class).findFirst().orElse(0)
+        );
+    }
+
+    public int getActiveSaleProducts() {
+        String sql = "SELECT COUNT(*) FROM products " +
+                "WHERE sale_price > 0 AND status = 1 " +
+                "AND (sale_price_expires_at IS NULL OR sale_price_expires_at > NOW())";
+        return DBContext.get().withHandle(handle ->
+            handle.createQuery(sql).mapTo(Integer.class).findFirst().orElse(0)
+        );
+    }
+
+    public int getTotalCompletedOrders(String startDate, String endDate) {
+        String sql = "SELECT COUNT(*) FROM orders WHERE status = 'completed' " +
+                "AND DATE(created_at) >= :startDate AND DATE(created_at) <= :endDate";
+        return DBContext.get().withHandle(handle ->
+            handle.createQuery(sql)
+                .bind("startDate", startDate)
+                .bind("endDate", endDate)
+                .mapTo(Integer.class).findFirst().orElse(0)
+        );
+    }
+
+    public int getPromotionOrders(String startDate, String endDate) {
+        String sql = "SELECT COUNT(DISTINCT od.order_id) " +
+                "FROM order_details od " +
+                "JOIN orders o ON od.order_id = o.id " +
+                "WHERE o.status = 'completed' " +
+                "AND od.deal_type IS NOT NULL AND od.deal_type != '' " +
+                "AND DATE(o.created_at) >= :startDate " +
+                "AND DATE(o.created_at) <= :endDate";
+        return DBContext.get().withHandle(handle ->
+            handle.createQuery(sql)
+                .bind("startDate", startDate)
+                .bind("endDate", endDate)
+                .mapTo(Integer.class).findFirst().orElse(0)
+        );
+    }
+
+    public Map<java.time.LocalDate, Double> getWeekendDealRevenueByDate(String startDate, String endDate) {
+        String sql = "SELECT DATE(o.created_at) AS day, COALESCE(SUM(od.total), 0) AS total " +
+                "FROM order_details od " +
+                "JOIN orders o ON od.order_id = o.id " +
+                "WHERE o.status = 'completed' AND od.deal_type = 'WEEKEND' " +
+                "AND DATE(o.created_at) >= :startDate AND DATE(o.created_at) <= :endDate " +
+                "GROUP BY DATE(o.created_at)";
+        return DBContext.get().withHandle(handle ->
+            handle.createQuery(sql)
+                .bind("startDate", startDate).bind("endDate", endDate)
+                .map((rs, ctx) -> new java.util.AbstractMap.SimpleEntry<>(
+                    rs.getDate("day").toLocalDate(), rs.getDouble("total")))
+                .list().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+        );
+    }
+
+    public Map<java.time.LocalDate, Double> getSalePriceRevenueByDate(String startDate, String endDate) {
+        String sql = "SELECT DATE(o.created_at) AS day, COALESCE(SUM(od.total), 0) AS total " +
+                "FROM order_details od " +
+                "JOIN orders o ON od.order_id = o.id " +
+                "WHERE o.status = 'completed' AND od.deal_type = 'SALE' " +
+                "AND DATE(o.created_at) >= :startDate AND DATE(o.created_at) <= :endDate " +
+                "GROUP BY DATE(o.created_at)";
+        return DBContext.get().withHandle(handle ->
+            handle.createQuery(sql)
+                .bind("startDate", startDate).bind("endDate", endDate)
+                .map((rs, ctx) -> new java.util.AbstractMap.SimpleEntry<>(
+                    rs.getDate("day").toLocalDate(), rs.getDouble("total")))
+                .list().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+        );
+    }
 }
+
