@@ -140,4 +140,23 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    const exportBtn = document.getElementById('exportBtn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const exportType = document.getElementById('exportType').value;
+            const tab = document.getElementById('activeTabInput')?.value || 'profit';
+
+            const url = new URL(window.location.href);
+            url.searchParams.set('action', 'export');
+            url.searchParams.set('startDate', startDate);
+            url.searchParams.set('endDate', endDate);
+            url.searchParams.set('exportType', exportType);
+            url.searchParams.set('tab', tab);
+
+            window.location.href = url.toString();
+        });
+    }
 });

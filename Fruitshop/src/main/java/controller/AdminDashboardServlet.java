@@ -7,7 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import java.io.OutputStream;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import dal.AdminReportDAO;
+import model.ReportProduct;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -76,8 +81,8 @@ public class AdminDashboardServlet extends HttpServlet {
             exportTypeSeries.add(exportValueByType.getOrDefault(label, 0.0));
         }
 
-        List<?> topProfitProducts = List.of();
-        List<?> topLossProducts = List.of();
+        List<ReportProduct> topProfitProducts = List.of();
+        List<ReportProduct> topLossProducts = List.of();
         if ("all".equalsIgnoreCase(exportType) || "SALES".equalsIgnoreCase(exportType)) {
             topProfitProducts = reportDAO.getTopProfitProducts(startDateStr, endDateStr, 5);
             topLossProducts = reportDAO.getTopLossProducts(startDateStr, endDateStr, 5);
@@ -117,6 +122,12 @@ public class AdminDashboardServlet extends HttpServlet {
         request.setAttribute("reportLabels", reportLabels);
         request.setAttribute("revenueSeries", revenueSeries);
         request.setAttribute("cogsSeries", cogsSeries);
+        String action = request.getParameter("action");
+        if ("export".equals(action)) {
+            exportToExcel(response, startDateStr, endDateStr, totalImportValue, totalRevenue, totalCogs, totalWasteCost, totalProfit, totalInventoryValue, topProfitProducts, topLossProducts);
+            return;
+        }
+
         request.setAttribute("profitSeries", profitSeries);
 
         request.setAttribute("exportTypeLabels", exportTypeLabels);
@@ -143,6 +154,115 @@ public class AdminDashboardServlet extends HttpServlet {
         request.setAttribute("currentExportType", exportType);
 
         request.getRequestDispatcher("/admin/index.jsp").forward(request, response);
+    }
+
+    private void exportToExcel(HttpServletResponse response, String startDate, String endDate, 
+                               double totalImportValue, double totalRevenue, double totalCogs, 
+                               double totalWasteCost, double totalProfit, double totalInventoryValue,
+                               List<ReportProduct> topProfitProducts, List<ReportProduct> topLossProducts) throws IOException {
+        
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Bao Cao Thong Ke");
+
+            // Header Style
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerStyle.setFont(headerFont);
+
+            // Tieu de
+            Row titleRow = sheet.createRow(0);
+            Cell titleCell = titleRow.createCell(0);
+            titleCell.setCellValue("BÁO CÁO THỐNG KÊ KINH DOANH");
+            titleCell.setCellStyle(headerStyle);
+
+            Row dateRow = sheet.createRow(1);
+            dateRow.createCell(0).setCellValue("Từ ngày: " + startDate + "  Đến ngày: " + endDate);
+
+            // KPI
+            Row kpiHeaderRow = sheet.createRow(3);
+            kpiHeaderRow.createCell(0).setCellValue("Chỉ số KPI");
+            kpiHeaderRow.createCell(1).setCellValue("Giá trị (VND)");
+            kpiHeaderRow.getCell(0).setCellStyle(headerStyle);
+            kpiHeaderRow.getCell(1).setCellStyle(headerStyle);
+
+            int r = 4;
+            sheet.createRow(r).createCell(0).setCellValue("Tổng Nhập Kho");
+            sheet.getRow(r++).createCell(1).setCellValue(totalImportValue);
+            
+            sheet.createRow(r).createCell(0).setCellValue("Doanh Thu");
+            sheet.getRow(r++).createCell(1).setCellValue(totalRevenue);
+
+            sheet.createRow(r).createCell(0).setCellValue("Giá Vốn Bán Hàng (COGS)");
+            sheet.getRow(r++).createCell(1).setCellValue(totalCogs);
+
+            sheet.createRow(r).createCell(0).setCellValue("Hư Hỏng (Waste)");
+            sheet.getRow(r++).createCell(1).setCellValue(totalWasteCost);
+
+            sheet.createRow(r).createCell(0).setCellValue("Lợi Nhuận Gộp");
+            sheet.getRow(r++).createCell(1).setCellValue(totalProfit);
+
+            sheet.createRow(r).createCell(0).setCellValue("Tồn Kho Hiện Tại");
+            sheet.getRow(r++).createCell(1).setCellValue(totalInventoryValue);
+
+            // Top san pham loi nhuan cao
+            r += 2;
+            Row topProRow = sheet.createRow(r++);
+            topProRow.createCell(0).setCellValue("TOP SẢN PHẨM LỢI NHUẬN CAO");
+            topProRow.getCell(0).setCellStyle(headerStyle);
+
+            Row th1 = sheet.createRow(r++);
+            th1.createCell(0).setCellValue("Tên SP");
+            th1.createCell(1).setCellValue("Số Lượng");
+            th1.createCell(2).setCellValue("Doanh Thu");
+            th1.createCell(3).setCellValue("COGS");
+            th1.createCell(4).setCellValue("Lợi Nhuận");
+            for(int i=0; i<=4; i++) th1.getCell(i).setCellStyle(headerStyle);
+
+            for (ReportProduct p : topProfitProducts) {
+                Row row = sheet.createRow(r++);
+                row.createCell(0).setCellValue(p.getProductName());
+                row.createCell(1).setCellValue(p.getQuantity());
+                row.createCell(2).setCellValue(p.getRevenue());
+                row.createCell(3).setCellValue(p.getCogs());
+                row.createCell(4).setCellValue(p.getProfit());
+            }
+
+            // Top san pham loi nhuan thap
+            r += 2;
+            Row topLossRow = sheet.createRow(r++);
+            topLossRow.createCell(0).setCellValue("TOP SẢN PHẨM LỢI NHUẬN THẤP");
+            topLossRow.getCell(0).setCellStyle(headerStyle);
+
+            Row th2 = sheet.createRow(r++);
+            th2.createCell(0).setCellValue("Tên SP");
+            th2.createCell(1).setCellValue("Số Lượng");
+            th2.createCell(2).setCellValue("Doanh Thu");
+            th2.createCell(3).setCellValue("COGS");
+            th2.createCell(4).setCellValue("Lợi Nhuận");
+            for(int i=0; i<=4; i++) th2.getCell(i).setCellStyle(headerStyle);
+
+            for (ReportProduct p : topLossProducts) {
+                Row row = sheet.createRow(r++);
+                row.createCell(0).setCellValue(p.getProductName());
+                row.createCell(1).setCellValue(p.getQuantity());
+                row.createCell(2).setCellValue(p.getRevenue());
+                row.createCell(3).setCellValue(p.getCogs());
+                row.createCell(4).setCellValue(p.getProfit());
+            }
+
+            sheet.autoSizeColumn(0);
+            sheet.autoSizeColumn(1);
+            sheet.autoSizeColumn(2);
+            sheet.autoSizeColumn(3);
+            sheet.autoSizeColumn(4);
+
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=\"Bao_Cao_Thong_Ke.xlsx\"");
+            try (OutputStream out = response.getOutputStream()) {
+                workbook.write(out);
+            }
+        }
     }
 
     private LocalDate parseDateOrDefault(String rawValue, LocalDate defaultValue) {
