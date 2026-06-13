@@ -12,6 +12,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const lineContainer = document.getElementById("lineItemsContainer");
     const saveReceiptBtn = document.getElementById("saveReceiptBtn");
     const resetFormBtn = document.getElementById("resetFormBtn");
+    const importExcelBtn = document.getElementById("importExcelBtn");
+    const excelFileInput = document.getElementById("excelFileInput");
 
     const summaryCode = document.getElementById("summaryCode");
     const summaryDate = document.getElementById("summaryDate");
@@ -157,6 +159,84 @@ document.addEventListener("DOMContentLoaded", function () {
     addLineBtn?.addEventListener("click", function () {
         const clone = cloneFirstLineItem();
         if (clone && lineContainer) lineContainer.appendChild(clone);
+    });
+
+    importExcelBtn?.addEventListener("click", function () {
+        if (excelFileInput) excelFileInput.click();
+    });
+
+    excelFileInput?.addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+            try {
+                const data = evt.target.result;
+                const workbook = XLSX.read(data, { type: 'binary' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                if (json.length <= 1) {
+                    showMsg("File Excel không có dữ liệu.", true);
+                    return;
+                }
+
+                // Clear existing lines except first
+                const existingRows = lineContainer.querySelectorAll(".js-line-item");
+                existingRows.forEach((r, i) => { if (i > 0) r.remove(); });
+                
+                let firstRowUsed = false;
+
+                // Start from index 1 to skip header row
+                for (let i = 1; i < json.length; i++) {
+                    const row = json[i];
+                    if (!row || row.length < 3) continue;
+
+                    const productId = row[0];
+                    const qty = row[1];
+                    const price = row[2];
+
+                    if (!productId || isNaN(qty) || isNaN(price)) continue;
+
+                    let lineItem;
+                    if (!firstRowUsed) {
+                        lineItem = lineContainer.querySelector(".js-line-item");
+                        firstRowUsed = true;
+                    } else {
+                        lineItem = cloneFirstLineItem();
+                        if (lineItem) lineContainer.appendChild(lineItem);
+                    }
+
+                    if (lineItem) {
+                        const productSelect = lineItem.querySelector(".line-product-select");
+                        const qtyInput = lineItem.querySelector(".line-qty");
+                        const priceInput = lineItem.querySelector(".line-price");
+
+                        // Check if productId exists in select
+                        const optionExists = Array.from(productSelect.options).some(opt => opt.value == productId);
+                        if (optionExists) {
+                            productSelect.value = productId;
+                        }
+                        
+                        qtyInput.value = qty;
+                        priceInput.value = price;
+
+                        // Trigger calculate total
+                        qtyInput.dispatchEvent(new Event('input'));
+                    }
+                }
+                
+                showMsg("Nhập dữ liệu từ Excel thành công!", false);
+            } catch (error) {
+                console.error(error);
+                showMsg("Lỗi khi đọc file Excel. Vui lòng kiểm tra lại định dạng.", true);
+            }
+            // Reset input so user can select the same file again if needed
+            excelFileInput.value = '';
+        };
+        reader.readAsBinaryString(file);
     });
 
     resetFormBtn?.addEventListener("click", function () {

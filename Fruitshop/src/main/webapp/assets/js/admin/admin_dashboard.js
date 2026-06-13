@@ -36,7 +36,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     {
                         label: 'Doanh thu',
                         data: dashboardData.revenueSeries,
-                        borderColor: '#2f8087',
+                        borderColor: '#522f87ff',
                         backgroundColor: 'rgba(47, 128, 135, 0.18)',
                         borderWidth: 2,
                         tension: 0.35,

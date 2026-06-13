@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/admin_style.css" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin/inventory-receipt-create.css" />
     <meta name="contextPath" content="${pageContext.request.contextPath}" />
+    <!-- SheetJS for Excel parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 
 <body>
@@ -102,10 +104,17 @@
                                     <h2>Danh sách hàng nhập</h2>
                                     <span class="card-subtitle">Thêm từng dòng sản phẩm, đơn giá và số lượng.</span>
                                 </div>
-                                <button type="button" class="btn btn-dashed" id="addLineItemBtn">
-                                    <i class='bx bx-plus'></i>
-                                    <span>Thêm dòng hàng</span>
-                                </button>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="display: none;" />
+                                    <button type="button" class="btn btn-ghost" id="importExcelBtn" style="border: 1px solid #e2e8f0;">
+                                        <i class='bx bx-upload'></i>
+                                        <span>Nhập từ Excel</span>
+                                    </button>
+                                    <button type="button" class="btn btn-dashed" id="addLineItemBtn">
+                                        <i class='bx bx-plus'></i>
+                                        <span>Thêm dòng hàng</span>
+                                    </button>
+                                </div>
                             </div>
                             <div class="line-grid line-grid--head">
                                 <span>Mã sản phẩm</span>
