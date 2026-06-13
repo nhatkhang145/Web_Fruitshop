@@ -70,7 +70,7 @@ public class AdminDashboardServlet extends HttpServlet {
         }
 
         Map<String, Double> exportValueByType = reportDAO.getExportValueByType(startDateStr, endDateStr);
-        List<String> exportTypeLabels = List.of("SALES", "INTERNAL", "TRANSFER", "WASTE");
+        List<String> exportTypeLabels = List.of("SALES", "WASTE");
         List<Double> exportTypeSeries = new ArrayList<>();
         for (String label : exportTypeLabels) {
             exportTypeSeries.add(exportValueByType.getOrDefault(label, 0.0));

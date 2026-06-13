@@ -1,15 +1,5 @@
 package controller;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
-import java.util.Optional;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dal.CartDAO;
@@ -27,7 +17,10 @@ import util.AdminPermissionHelper;
 import util.CartSessionUtils;
 import util.FacebookOAuthConfig;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -142,8 +135,10 @@ public class FacebookCallbackServlet extends HttpServlet {
             CartSessionUtils.updateSessionCart(session, mergedCart);
             cartDAO.replaceCartItems(user.getId(), mergedCart);
 
-            if (user.getRole() == 1) {
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+            if (AdminPermissionHelper.isAdminAccount(user)) {
+                String landingPath = (String) session.getAttribute("adminLandingPath");
+                if (landingPath == null || landingPath.equals("/")) landingPath = "/admin/dashboard";
+                response.sendRedirect(request.getContextPath() + landingPath);
             } else {
                 response.sendRedirect(request.getContextPath() + "/");
             }
