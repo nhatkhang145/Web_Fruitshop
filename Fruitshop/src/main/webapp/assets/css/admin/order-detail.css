@@ -1,5 +1,4 @@
-
-
+/* Cải tiến Layout chính */
 .order-detail {
     width: 100%;
 }
@@ -8,77 +7,76 @@
     display: flex;
     flex-wrap: wrap;
     gap: 24px;
+    align-items: flex-start;
 }
 
 .order-detail__main {
-    display: flex;
     flex: 3;
+    display: flex;
     flex-direction: column;
-    gap: 24px;
     min-width: 400px;
 }
 
 .order-detail__sidebar {
-    display: flex;
     flex: 1;
+    display: flex;
     flex-direction: column;
-    gap: 24px;
-    min-width: 280px;
+    min-width: 320px;
 }
 
+/* Các thẻ Card */
 .order-detail__card {
+    background: #ffffff;
+    border-radius: 12px;
     padding: 24px;
-    border-radius: 10px;
-    background: var(--light);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    border: 1px solid #f0f0f0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.order-detail__card:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+}
+
+.highlight-card {
+    border-top: 4px solid var(--primary, #1a8b9d);
+}
+
+.mt-4 {
+    margin-top: 24px;
+}
+.mt-3 {
+    margin-top: 16px;
+}
+.mt-2 {
+    margin-top: 8px;
+}
+.mt-1 {
+    margin-top: 4px;
+}
+
+/* Tiêu đề card */
 .order-detail__legend {
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--grey);
-    color: var(--dark);
+    display: flex;
+    align-items: center;
     font-size: 1.1rem;
     font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee;
 }
 
-.order-detail__group {
-    margin-bottom: 15px;
+.order-detail__legend i {
+    font-size: 1.4rem;
+    color: var(--primary, #1a8b9d);
+    margin-right: 8px;
 }
 
-.order-detail__input,
-.order-detail__textarea,
-.order-detail__select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid var(--grey);
-    border-radius: 6px;
-    outline: none;
-    background: var(--grey);
-    color: var(--dark);
-    font-size: 14px;
+/* Bảng sản phẩm */
+.table-responsive {
+    overflow-x: auto;
 }
-
-.order-detail__textarea {
-    resize: vertical;
-}
-
-.order-detail__save-btn {
-    width: 100%;
-    margin-top: 15px;
-}
-
-.order-detail__action-links {
-    margin-top: 15px;
-    text-align: center;
-}
-
-.order-detail__action-links a {
-    color: var(--primary);
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-
 
 .order-detail__item-table {
     width: 100%;
@@ -86,122 +84,213 @@
 }
 
 .order-detail__item-table th {
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--grey);
-    color: var(--dark-grey);
-    font-size: 13px;
     text-align: left;
+    padding: 12px 10px;
+    font-size: 0.9rem;
+    color: #777;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #eee;
 }
 
 .order-detail__item-table td {
-    padding: 16px 4px;
-    border-bottom: 1px solid var(--grey);
-    color: var(--dark);
+    padding: 16px 10px;
     vertical-align: middle;
+    border-bottom: 1px solid #f5f5f5;
+    color: #444;
+}
+
+.order-detail__item-table tbody tr:hover {
+    background-color: #fafafa;
 }
 
 .item-product {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 15px;
 }
 
 .item-product img {
-    width: 40px;
-    height: 40px;
-    border-radius: 6px;
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
     object-fit: cover;
+    border: 1px solid #eee;
 }
 
-.item-product .item-info p {
-    font-weight: 500;
+.product-name {
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 4px;
+    font-size: 0.95rem;
 }
 
-.item-product .item-info small {
-    color: var(--dark-grey);
+.product-id {
+    color: #888;
     font-size: 0.8rem;
 }
 
+.font-weight-bold {
+    font-weight: 600;
+}
 
+.text-primary {
+    color: var(--primary, #1a8b9d) !important;
+}
+
+/* Ghi chú khách hàng */
+.order-detail__customer-note-box {
+    background: #fff9e6;
+    border-left: 4px solid #ffc107;
+    padding: 16px;
+    border-radius: 0 6px 6px 0;
+}
 
 .order-detail__customer-note {
-    color: var(--dark-grey);
+    margin: 0;
+    color: #555;
     font-style: italic;
+    line-height: 1.5;
 }
 
-.order-detail__customer-info p,
-.order-detail__card p {
-    margin-bottom: 5px;
-    color: var(--dark);
+/* Select Box & Button */
+.custom-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #333;
+    background-color: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px top 50%;
+    background-size: 12px auto;
 }
 
-.order-detail__customer-info p {
-    margin-bottom: 8px;
-    line-height: 1.6;
+.custom-select:focus {
+    border-color: var(--primary, #1a8b9d);
+    outline: none;
 }
 
-.order-detail__customer-info hr,
-.order-detail__card hr {
-    margin: 10px 0;
+.order-detail__save-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    background: var(--primary, #1a8b9d);
+    color: #fff;
     border: none;
-    border-top: 1px solid var(--grey);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.1s;
 }
 
-.order-detail__card hr {
-    margin: 15px 0;
+.order-detail__save-btn:hover {
+    background: #136a78;
+    transform: translateY(-1px);
 }
 
+/* Thông tin Khách hàng */
+.info-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 12px;
+}
+
+.info-row.align-items-start {
+    align-items: flex-start;
+}
+
+.info-row i {
+    font-size: 1.2rem;
+    color: #888;
+}
+
+.info-row span {
+    color: #444;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+.text-muted {
+    color: #777;
+    font-size: 0.9rem;
+}
+
+.divider {
+    border: none;
+    border-top: 1px dashed #ddd;
+    margin: 16px 0;
+}
+
+/* Tài chính */
 .order-detail__financials {
     list-style: none;
-    color: var(--dark);
+    padding: 0;
+    margin: 0;
 }
 
 .order-detail__financials li {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    color: #555;
 }
 
-.order-detail__financials li.total strong {
-    color: var(--primary);
+.order-detail__financials li.discount {
+    color: #e53e3e;
+}
+
+.order-detail__financials li.total {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
     font-size: 1.1rem;
 }
 
-
-
-.order-detail__card .status {
+/* Badge & Trạng thái */
+.badge {
     padding: 4px 10px;
     border-radius: 20px;
-    color: var(--light);
-    font-size: 10px;
-    font-weight: 700;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
 }
 
-.order-detail__card .status.pending {
-    background: var(--warning);
+.badge-light {
+    background: #f0f2f5;
+    color: #444;
+    border: 1px solid #ddd;
 }
 
-
-
-.order-detail__notes-list {
-    max-height: 200px;
-    margin-bottom: 15px;
-    overflow-y: auto;
-}
-
-.note-item {
-    margin-bottom: 10px;
-    padding: 10px;
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
     border-radius: 6px;
-    background: var(--grey);
+    font-size: 0.85rem;
+    font-weight: 600;
 }
 
-.note-item p {
-    color: var(--dark);
-    font-size: 0.9rem;
+.status-paid {
+    background: #e6fffa;
+    color: #319795;
+    border: 1px solid #b2f5ea;
 }
 
-.note-item small {
-    color: var(--dark-grey);
-    font-size: 0.75rem;
+.status-unpaid {
+    background: #fff5f5;
+    color: #e53e3e;
+    border: 1px solid #fed7d7;
 }
