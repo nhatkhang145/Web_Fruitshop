@@ -134,7 +134,25 @@
                             </td>
                             <td>${p.name}</td>
                             <td>
-                                <fmt:formatNumber value="${p.price}" type="currency" currencySymbol="đ" />
+                                <c:choose>
+                                    <c:when test="${p.salePrice > 0}">
+                                        <div style="text-decoration: line-through; color: #888; font-size: 13px;">
+                                            <fmt:formatNumber value="${p.price}" type="number" groupingUsed="true"/> đ
+                                        </div>
+                                        <div style="color: #ee4d2d; font-weight: bold; font-size: 15px; margin-top: 2px;">
+                                            <fmt:formatNumber value="${p.salePrice}" type="number" groupingUsed="true"/> đ
+                                        </div>
+                                        <span style="display: inline-block; background-color: #ff4d4f; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-top: 5px;">
+                                            <i class='bx bxs-hot'></i> Đang Sale
+                                        </span>
+                                    </c:when>
+
+                                    <c:otherwise>
+                                        <div style="color: #333; font-weight: 500; font-size: 15px;">
+                                            <fmt:formatNumber value="${p.price}" type="number" groupingUsed="true"/> đ
+                                        </div>
+                                    </c:otherwise>
+                                </c:choose>
                             </td>
                             <td>${p.quantity}</td>
                             <td>

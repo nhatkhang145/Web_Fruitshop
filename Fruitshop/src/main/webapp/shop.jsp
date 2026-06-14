@@ -21,10 +21,8 @@
 
             <body>
                 <div class="main">
-                    <!-- HEADER -->
                     <jsp:include page="header.jsp"></jsp:include>
-                    <!-- CONTAINER -->
-                    <!-- page title -->
+
                     <div class="breadcrumb">
                         <div class="grid">
                             <a href="${pageContext.request.contextPath}/index.jsp">Trang chủ</a>
@@ -32,11 +30,11 @@
                             <span>Sản phẩm</span>
                         </div>
                     </div>
-                    <!--  -->
+
                     <div class="app__container">
                         <div class="grid">
                             <div class="grid__row app__content">
-                                <!-- CỘT 2 -->
+
                                 <div class="grid__column-2">
                                     <nav class="category">
                                         <h3 class="category_heading">
@@ -48,7 +46,6 @@
                                             <c:forEach items="${listC}" var="c">
                                                 <c:if test="${c.parentId == 0}">
                                                     <li class="category-item">
-                                                        <!-- Kiểm tra xem có danh mục con nào được chọn không -->
                                                         <c:set var="isChildSelected" value="false" />
                                                         <c:forEach items="${listC}" var="sub">
                                                             <c:if test="${sub.parentId == c.id && tag == sub.id}">
@@ -123,11 +120,8 @@
                                         </ul>
                                     </nav>
                                 </div>
-                                <!-- KẾT THÚC CỘT 2 -->
 
-                                <!-- CỘT 10 -->
                                 <div class="grid__column-10">
-                                    <!-- Hiển thị thông báo tìm kiếm -->
                                     <c:if test="${isSearch}">
                                         <div
                                             style="padding: 15px; background: #f8f9fa; border-left: 4px solid #28a745; margin-bottom: 20px;">
@@ -184,7 +178,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Product item -->
                                     <div class="home-product">
                                         <div class="grid__row">
                                             <c:forEach items="${listP}" var="p">
@@ -198,9 +191,7 @@
                                                                 <img src="${p.image}" alt="${p.name}" loading="lazy" />
                                                             </a>
 
-                                                            <%-- Hiển thị badge discount --%>
                                                                 <c:choose>
-                                                                    <%-- Ưu tiên 1: Weekend Deal badge --%>
                                                                         <c:when test="${not empty weekendDeal}">
                                                                             <div class="product-badge sale"
                                                                                 style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f);">
@@ -213,7 +204,6 @@
                                                                                 </div>
                                                                             </c:if>
                                                                         </c:when>
-                                                                        <%-- Ưu tiên 2: Sale thường badge --%>
                                                                             <c:when
                                                                                 test="${p.salePrice > 0 && p.salePrice < p.price}">
                                                                                 <div class="product-badge sale">-
@@ -298,7 +288,7 @@
                                                                                 style="color: #999; font-weight: 600;">Hết
                                                                                 hàng</span>
                                                                         </c:when>
-                                                                        <%-- Ưu tiên 1: Weekend Deal price --%>
+                                                                        <%--Weekend Deal price --%>
                                                                             <c:when test="${not empty weekendDeal}">
                                                                                 <c:set var="weekendPrice"
                                                                                     value="${p.price * (1 - weekendDeal.discountPercent / 100.0)}" />
@@ -313,7 +303,7 @@
                                                                                         pattern="#,###" />đ
                                                                                 </span>
                                                                             </c:when>
-                                                                            <%-- Ưu tiên 2: Sale thường --%>
+                                                                            <%--Sale thường --%>
                                                                                 <c:when
                                                                                     test="${p.salePrice > 0 && p.salePrice < p.price}">
                                                                                     <span class="current">
@@ -327,7 +317,7 @@
                                                                                             pattern="#,###" />đ
                                                                                     </span>
                                                                                 </c:when>
-                                                                                <%-- Mặc định: Giá gốc --%>
+                                                                                <%--Giá gốc --%>
                                                                                     <c:otherwise>
                                                                                         <span class="current">
                                                                                             <fmt:formatNumber
