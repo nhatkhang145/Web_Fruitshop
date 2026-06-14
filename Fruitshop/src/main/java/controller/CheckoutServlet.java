@@ -9,6 +9,8 @@ import model.Order;
 import model.OrderItem;
 import model.Product;
 import model.User;
+import service.GHNService;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -27,6 +29,9 @@ public class CheckoutServlet extends HttpServlet {
     private OrderDAO orderDAO = new OrderDAO();
     private AddressDAO addressDAO = new AddressDAO();
     private CartDAO cartDAO = new CartDAO();
+    private GHNService ghnService = new GHNService();
+
+    private static final int STORE_DISTRICT_ID = 1442;
 
     private List<CartItem> resolveCheckoutCart(HttpServletRequest req, HttpSession session) {
         List<CartItem> buyNowCart = (List<CartItem>) session.getAttribute("buyNowCart");
@@ -141,39 +146,60 @@ public class CheckoutServlet extends HttpServlet {
 
         List<Address> addresses = addressDAO.getAddressesByUserId(user.getId());
 
+        Address defaultAddress = null;
+
         if (addresses == null || addresses.isEmpty()) {
             req.setAttribute("addresses", new ArrayList<Address>());
             req.setAttribute("addressMissing", true);
             req.setAttribute("addressMessage", "Bạn chưa có địa chỉ nhận hàng. Hãy thêm địa chỉ trước khi đặt hàng.");
         } else {
             req.setAttribute("addresses", addresses);
+            for (Address a : addresses) {
+                if (a.isDefault()) {
+                    defaultAddress = a;
+                    break;
+                }
+            }
+            if (defaultAddress == null) {
+                defaultAddress = addresses.get(0);
+            }
         }
+
         req.setAttribute("user", user);
+
         double totalProducts = 0;
         double totalOriginalPrice = 0;
+        int totalWeight = 0;
+
         for (CartItem item : cart) {
             totalProducts += item.getFinalPrice().doubleValue() * item.getQuantity();
             totalOriginalPrice += item.getOriginalPrice().doubleValue() * item.getQuantity();
+            totalWeight += 500 * item.getQuantity();
         }
 
-        double shippingFee = 30000;
+        double shippingFee = 0;
+        if (defaultAddress != null && defaultAddress.getDistrictId() > 0) {
+            try {
+                shippingFee = ghnService.calculateShippingFee(STORE_DISTRICT_ID, defaultAddress.getDistrictId(),
+                        defaultAddress.getWardCode(), totalWeight, (int) totalProducts);
+            } catch (Exception e) {
+                e.printStackTrace();
+                shippingFee = 30000;
+            }
+        } else if (defaultAddress != null) {
+            shippingFee = 30000;
+        }
+
         double discount = 0;
         double finalAmount = totalProducts + shippingFee - discount;
-
-        System.out.println("=== CHECKOUT DEBUG ===");
-        System.out.println("Total Products (after discount): " + totalProducts);
-        System.out.println("Total Original Price: " + totalOriginalPrice);
-        System.out.println("Shipping Fee: " + shippingFee);
-        System.out.println("Discount: " + discount);
-        System.out.println("Final Amount: " + finalAmount);
-        System.out.println("Cart size: " + cart.size());
-        System.out.println("Addresses size: " + addresses.size());
 
         req.setAttribute("totalProducts", totalProducts);
         req.setAttribute("totalOriginalPrice", totalOriginalPrice);
         req.setAttribute("shippingFee", shippingFee);
         req.setAttribute("discount", discount);
         req.setAttribute("finalAmount", finalAmount);
+        req.setAttribute("storeDistrictId", 1442);
+        req.setAttribute("totalWeight", totalWeight);
 
         req.getRequestDispatcher("/checkout.jsp").forward(req, resp);
     }
@@ -193,6 +219,8 @@ public class CheckoutServlet extends HttpServlet {
         String fullname;
         String phone;
         String address;
+        int toDistrictId = 0;
+        String toWardCode = null;
 
         if (addressIdStr != null && !addressIdStr.isEmpty()) {
             int addressId = Integer.parseInt(addressIdStr);
@@ -203,6 +231,8 @@ public class CheckoutServlet extends HttpServlet {
                 fullname = selectedAddress.getReceiverName();
                 phone = selectedAddress.getPhoneNumber();
                 address = selectedAddress.getAddress() + ", " + selectedAddress.getCity();
+                toDistrictId = selectedAddress.getDistrictId();
+                toWardCode = selectedAddress.getWardCode();
             } else {
                 fullname = req.getParameter("fullname");
                 phone = req.getParameter("phone");
@@ -235,19 +265,48 @@ public class CheckoutServlet extends HttpServlet {
 
         syncCheckoutCartImages(cart);
 
-        try {
-            double totalProducts = 0;
-            for (CartItem item : cart) {
-                totalProducts += item.getFinalPrice().doubleValue() * item.getQuantity();
+        dal.ProductDAO productDAO = new dal.ProductDAO();
+        for (CartItem item : cart) {
+            Product currentProduct = productDAO.getProductByID(item.getProduct().getId());
+
+            if (currentProduct == null || currentProduct.getStatus() != 1) {
+                req.setAttribute("error", "Sản phẩm [" + item.getProduct().getName()
+                        + "] hiện không còn kinh doanh. Vui lòng xóa khỏi giỏ hàng!");
+                doGet(req, resp);
+                return;
             }
 
+            if (item.getQuantity() > currentProduct.getQuantity()) {
+                req.setAttribute("error", "Sản phẩm [" + item.getProduct().getName() + "] chỉ còn "
+                        + currentProduct.getQuantity() + " sản phẩm trong kho. Vui lòng cập nhật lại số lượng!");
+                doGet(req, resp);
+                return;
+            }
+        }
+
+        try {
+            double totalProducts = 0;
+            int totalWeight = 0;
+            for (CartItem item : cart) {
+                totalProducts += item.getFinalPrice().doubleValue() * item.getQuantity();
+                totalWeight += 500 * item.getQuantity();
+            }
             double shippingFee = 30000;
+            if (toDistrictId > 0) {
+                try {
+                    shippingFee = ghnService.calculateShippingFee(STORE_DISTRICT_ID, toDistrictId, toWardCode, totalWeight,
+                            (int) totalProducts);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    shippingFee = 30000;
+                }
+            }
+
             double discount = 0;
             double finalAmount = totalProducts + shippingFee - discount;
 
             Order order = new Order();
             order.setUserId(user.getId());
-            order.setCouponId(null); // Không dùng coupon nữa
             order.setFullname(fullname);
             order.setPhone(phone);
             order.setAddress(address);
@@ -260,26 +319,24 @@ public class CheckoutServlet extends HttpServlet {
             order.setPaymentStatus(0);
             order.setStatus("pending");
 
-            int orderId = orderDAO.createOrder(order);
+            List<OrderItem> orderItems = new ArrayList<>();
+            for (CartItem cartItem : cart) {
+                OrderItem item = new OrderItem();
+                item.setProductId(cartItem.getProduct().getId());
+                item.setProductName(cartItem.getProduct().getName());
+                item.setDealType(cartItem.getDealType());
+                item.setDealId(cartItem.getDealId());
+                item.setOriginalPrice(cartItem.getOriginalPrice());
+                item.setDiscountAmount(cartItem.getDiscountAmount());
+                item.setFinalPrice(cartItem.getFinalPrice());
+                item.setQuantity(cartItem.getQuantity());
+                item.setTotal(cartItem.getTotalPrice());
+                orderItems.add(item);
+            }
+
+            int orderId = orderDAO.placeOrder(order, orderItems);
 
             if (orderId > 0) {
-                List<OrderItem> orderItems = new ArrayList<>();
-                for (CartItem cartItem : cart) {
-                    OrderItem item = new OrderItem();
-                    item.setOrderId(orderId);
-                    item.setProductId(cartItem.getProduct().getId());
-                    item.setProductName(cartItem.getProduct().getName());
-                    item.setDealType(cartItem.getDealType());
-                    item.setDealId(cartItem.getDealId());
-                    item.setOriginalPrice(cartItem.getOriginalPrice());
-                    item.setDiscountAmount(cartItem.getDiscountAmount());
-                    item.setFinalPrice(cartItem.getFinalPrice());
-                    item.setQuantity(cartItem.getQuantity());
-                    item.setTotal(cartItem.getTotalPrice());
-                    orderItems.add(item);
-                }
-
-                orderDAO.addOrderDetails(orderId, orderItems);
 
                 try {
                     dal.NotificationDAO notificationDAO = new dal.NotificationDAO();
@@ -303,11 +360,9 @@ public class CheckoutServlet extends HttpServlet {
                 }
 
                 session.removeAttribute("checkoutCart");
-//
-//                session.removeAttribute("size");
-//                session.removeAttribute("totalMoney");
                 if ("vnpay".equals(paymentMethod) || "VNPay".equalsIgnoreCase(paymentMethod)) {
-                    resp.sendRedirect(req.getContextPath() + "/vnpay-payment?orderId=" + orderId + "&amount=" + (long)finalAmount);
+                    resp.sendRedirect(req.getContextPath() + "/vnpay-payment?orderId=" + orderId + "&amount="
+                            + (long) finalAmount);
                 } else {
                     session.setAttribute("successMessage", "Đặt hàng thành công! Mã đơn hàng: #" + orderId);
                     resp.sendRedirect(req.getContextPath() + "/order-detail?id=" + orderId);

@@ -284,7 +284,7 @@
 
                 <script>
                     function validateVietnamesePhone(phone) {
-                        const phoneRegex = /^0[3578][0-9]{8}$/;
+                        const phoneRegex = /^0[35789][0-9]{8}$/;
                         return phoneRegex.test(phone);
                     }
 

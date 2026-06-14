@@ -30,7 +30,7 @@ public class ReviewDAO {
     // Lấy đánh giá theo Product ID (kèm thông tin User)
     public List<Review> getReviewsByProductId(int productId) {
         String query = """
-                SELECT r.id, r.user_id, r.product_id, r.rating, r.comment, r.created_at,
+                SELECT r.id, r.user_id, r.product_id, r.rating, r.comment, r.admin_reply, r.created_at,
                        u.fullname AS u_fullname, u.avatar AS u_avatar
                 FROM reviews r
                 LEFT JOIN users u ON r.user_id = u.id
@@ -48,6 +48,7 @@ public class ReviewDAO {
                             r.setProductId(rs.getInt("product_id"));
                             r.setRating(rs.getInt("rating"));
                             r.setComment(rs.getString("comment"));
+                            r.setAdminReply(rs.getString("admin_reply"));
                             r.setCreatedAt(rs.getTimestamp("created_at"));
 
                             User u = new User();
