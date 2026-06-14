@@ -50,7 +50,16 @@ public class AdminWarehouseServlet extends HttpServlet {
 
     private void handleWarehousePage(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<WarehouseBatchRow> rows = warehouseDAO.getWarehouseBatchRows();
+        String filter = request.getParameter("filter");
+        List<WarehouseBatchRow> rows;
+
+        if ("on_sale".equals(filter)) {
+            rows = warehouseDAO.getBatchesOnSale();
+            request.setAttribute("currentFilter", "on_sale");
+        } else {
+            rows = warehouseDAO.getWarehouseBatchRows();
+            request.setAttribute("currentFilter", "all");
+        }
         Map<Integer, ProductStockView> productMap = new LinkedHashMap<>();
 
         for (WarehouseBatchRow row : rows) {
@@ -95,6 +104,7 @@ public class AdminWarehouseServlet extends HttpServlet {
         product.setProductName(row.getProductName());
         product.setProductCode(row.getProductCode());
         product.setPrice(row.getProductPrice());
+        product.setSalePrice(row.getSalePrice());
         product.setQuantity(row.getProductQuantity());
         product.setImage(row.getProductImage());
         product.setGroupKey("product-" + row.getProductId());
