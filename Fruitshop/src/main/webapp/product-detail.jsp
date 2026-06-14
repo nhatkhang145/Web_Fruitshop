@@ -393,7 +393,22 @@
                                                             </c:forEach>
                                                         </div>
                                                         <p class="review-text" style="color: #333; line-height: 1.5;">
-                                                            ${r.comment}</p>
+                                                            ${r.comment}
+                                                        </p>
+                                                        <c:if test="${not empty r.adminReply}">
+                                                            <div class="admin-reply-box" style="margin-top: 15px; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #ee4d2d; border-radius: 4px; position: relative;">
+                                                                <div style="position: absolute; top: -8px; left: 20px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 8px solid #f8f9fa;"></div>
+
+                                                                <div style="font-weight: 600; color: #ee4d2d; margin-bottom: 8px; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+                                                                    <i class="fa-solid fa-headset"></i>
+                                                                    <span>Phản hồi từ Người bán</span>
+                                                                </div>
+
+                                                                <div style="color: #495057; font-size: 14px; line-height: 1.6; white-space: pre-line;">
+                                                                        ${r.adminReply}
+                                                                </div>
+                                                            </div>
+                                                        </c:if>
                                                     </div>
                                                 </div>
                                             </c:forEach>
