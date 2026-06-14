@@ -7,27 +7,30 @@ import model.User;
 import java.util.List;
 
 public class ReviewDAO {
-    // Thêm đánh giá mới
+
 
     public boolean insertReview(Review review) {
         String query = """
-                INSERT INTO reviews (user_id, product_id, rating, comment, status, created_at)
-                VALUES (:userId, :productId, :rating, :comment, 'approved', NOW())
+                INSERT INTO reviews (user_id, product_id, order_detail_id, rating, comment, images, video, status, created_at)
+                VALUES (:userId, :productId, :orderDetailId, :rating, :comment, :images, :video, 'approved', NOW())
                 """;
 
         return DBContext.get().withHandle(handle ->
                 handle.createUpdate(query)
                         .bind("userId", review.getUserId())
                         .bind("productId", review.getProductId())
+                        .bind("orderDetailId", review.getOrderDetailId())
                         .bind("rating", review.getRating())
                         .bind("comment", review.getComment())
+                        .bind("images", review.getImages())
+                        .bind("video", review.getVideo())
                         .execute() > 0);
     }
 
     // Lấy đánh giá theo Product ID (kèm thông tin User)
     public List<Review> getReviewsByProductId(int productId) {
         String query = """
-                SELECT r.id, r.user_id, r.product_id, r.rating, r.comment, r.created_at,
+                SELECT r.id, r.user_id, r.product_id, r.rating, r.comment, r.admin_reply, r.created_at,
                        u.fullname AS u_fullname, u.avatar AS u_avatar
                 FROM reviews r
                 LEFT JOIN users u ON r.user_id = u.id
@@ -45,6 +48,7 @@ public class ReviewDAO {
                             r.setProductId(rs.getInt("product_id"));
                             r.setRating(rs.getInt("rating"));
                             r.setComment(rs.getString("comment"));
+                            r.setAdminReply(rs.getString("admin_reply"));
                             r.setCreatedAt(rs.getTimestamp("created_at"));
 
                             User u = new User();
@@ -168,5 +172,25 @@ public class ReviewDAO {
                         .mapTo(Double.class)
                         .findFirst()
                         .orElse(0.0));
+    }
+
+    // Tìm Order Detail ID hợp lệ (đã mua & chưa đánh giá)
+    public Integer getEligibleOrderDetailId(int userId, int productId) {
+        String query = """
+                SELECT od.id FROM order_details od 
+                JOIN orders o ON o.id = od.order_id
+                WHERE o.user_id = :userId
+                  AND od.product_id = :productId
+                  AND o.status = 'completed'
+                  AND od.id NOT IN (SELECT order_detail_id FROM reviews WHERE order_detail_id IS NOT NULL)
+                LIMIT 1""";
+
+        return DBContext.get().withHandle(handle ->
+                handle.createQuery(query)
+                        .bind("userId", userId)
+                        .bind("productId", productId)
+                        .mapTo(Integer.class)
+                        .findFirst()
+                        .orElse(null));
     }
 }

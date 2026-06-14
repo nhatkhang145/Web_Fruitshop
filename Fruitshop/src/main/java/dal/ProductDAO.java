@@ -2,7 +2,11 @@ package dal;
 
 import model.Product;
 import model.ProductImage;
+import model.StockAvailability;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ProductDAO {
 
@@ -72,6 +76,26 @@ public class ProductDAO {
         }
 
         return product;
+    }
+
+    public StockAvailability checkStockAvailability(int productId, int requestedQuantity) {
+        String sql = "SELECT quantity FROM products WHERE id = :productId AND status = 1";
+
+        Integer availableQuantity = DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .bind("productId", productId)
+                .mapTo(Integer.class)
+                .findFirst()
+                .orElse(0));
+
+        int safeRequestedQuantity = Math.max(0, requestedQuantity);
+        int safeAvailableQuantity = Math.max(0, availableQuantity == null ? 0 : availableQuantity);
+
+        StockAvailability result = new StockAvailability();
+        result.setProductId(productId);
+        result.setRequestedQuantity(safeRequestedQuantity);
+        result.setAvailableQuantity(safeAvailableQuantity);
+        result.setAvailable(safeRequestedQuantity > 0 && safeAvailableQuantity >= safeRequestedQuantity);
+        return result;
     }
 
     public int getSoldQuantityByProductId(int productId) {
@@ -427,6 +451,115 @@ public class ProductDAO {
 
             return query.mapTo(Integer.class).one();
         });
+    }
+
+    public List<Product> getRecommendedProducts(int categoryId, int excludeProductId, double basePrice, int limit) {
+        List<Product> result = new ArrayList<>();
+        Set<Integer> seen = new HashSet<>();
+
+        appendUnique(result, seen, getActiveWeekendDealProductsByCategory(categoryId, excludeProductId, limit), limit);
+        appendUnique(result, seen, getBestSellingByCategory(categoryId, excludeProductId, limit), limit);
+        appendUnique(result, seen, getProductsByPriceRange(categoryId, excludeProductId, basePrice, limit), limit);
+        appendUnique(result, seen, getProductsByPriceRange(categoryId, excludeProductId, basePrice, limit), limit);
+        appendUnique(result, seen, getBestSellingByCategory(categoryId, excludeProductId, limit), limit);
+        appendUnique(result, seen, getNewestByCategory(categoryId, excludeProductId, limit), limit);
+        appendUnique(result, seen, getRelatedProducts(categoryId, excludeProductId, limit), limit);
+
+        return result.size() > limit ? result.subList(0, limit) : result;
+    }
+
+    private void appendUnique(List<Product> target, Set<Integer> seen, List<Product> items, int limit) {
+        if (items == null || items.isEmpty() || target.size() >= limit) {
+            return;
+        }
+        for (Product p : items) {
+            if (target.size() >= limit) {
+                break;
+            }
+            if (seen.add(p.getId())) {
+                target.add(p);
+            }
+        }
+    }
+
+    private List<Product> getProductsByPriceRange(int categoryId, int excludeProductId, double basePrice, int limit) {
+        double minPrice = Math.max(0, basePrice * 0.8);
+        double maxPrice = basePrice * 1.2;
+
+        String sql = "SELECT p.id, p.name, p.price, p.sale_price AS salePrice, p.quantity, p.short_description AS description, p.image, p.category_id AS categoryId, "
+                + "COALESCE(rv.avg_rating, 0) AS averageRating, COALESCE(rv.review_count, 0) AS reviewCount "
+                + "FROM products p "
+                + "LEFT JOIN (SELECT product_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count FROM reviews WHERE status = 'approved' GROUP BY product_id) rv ON p.id = rv.product_id "
+                + "WHERE p.status = 1 AND p.category_id = :categoryId AND p.id <> :excludeProductId "
+                + "AND COALESCE(NULLIF(p.sale_price, 0), p.price) BETWEEN :minPrice AND :maxPrice "
+                + "ORDER BY ABS(COALESCE(NULLIF(p.sale_price, 0), p.price) - :basePrice) ASC "
+                + "LIMIT :limit";
+
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .bind("categoryId", categoryId)
+                .bind("excludeProductId", excludeProductId)
+                .bind("minPrice", minPrice)
+                .bind("maxPrice", maxPrice)
+                .bind("basePrice", basePrice)
+                .bind("limit", limit)
+                .mapToBean(Product.class)
+                .list());
+    }
+
+    private List<Product> getBestSellingByCategory(int categoryId, int excludeProductId, int limit) {
+        String sql = "SELECT p.id, p.name, p.price, p.sale_price AS salePrice, p.quantity, p.short_description AS description, p.image, p.category_id AS categoryId, "
+                + "COALESCE(rv.avg_rating, 0) AS averageRating, COALESCE(rv.review_count, 0) AS reviewCount "
+                + "FROM products p "
+                + "LEFT JOIN (SELECT product_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count FROM reviews WHERE status = 'approved' GROUP BY product_id) rv ON p.id = rv.product_id "
+                + "LEFT JOIN order_details od ON p.id = od.product_id "
+                + "LEFT JOIN orders o ON od.order_id = o.id AND o.status = 'completed' "
+                + "WHERE p.status = 1 AND p.category_id = :categoryId AND p.id <> :excludeProductId "
+                + "GROUP BY p.id, p.name, p.price, p.sale_price, p.quantity, p.short_description, p.image, p.category_id, rv.avg_rating, rv.review_count "
+                + "ORDER BY COALESCE(SUM(od.quantity), 0) DESC, p.id DESC "
+                + "LIMIT :limit";
+
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .bind("categoryId", categoryId)
+                .bind("excludeProductId", excludeProductId)
+                .bind("limit", limit)
+                .mapToBean(Product.class)
+                .list());
+    }
+
+    private List<Product> getNewestByCategory(int categoryId, int excludeProductId, int limit) {
+        String sql = "SELECT p.id, p.name, p.price, p.sale_price AS salePrice, p.quantity, p.short_description AS description, p.image, p.category_id AS categoryId, "
+                + "COALESCE(rv.avg_rating, 0) AS averageRating, COALESCE(rv.review_count, 0) AS reviewCount "
+                + "FROM products p "
+                + "LEFT JOIN (SELECT product_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count FROM reviews WHERE status = 'approved' GROUP BY product_id) rv ON p.id = rv.product_id "
+                + "WHERE p.status = 1 AND p.category_id = :categoryId AND p.id <> :excludeProductId "
+                + "ORDER BY p.created_at DESC "
+                + "LIMIT :limit";
+
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .bind("categoryId", categoryId)
+                .bind("excludeProductId", excludeProductId)
+                .bind("limit", limit)
+                .mapToBean(Product.class)
+                .list());
+    }
+
+    private List<Product> getActiveWeekendDealProductsByCategory(int categoryId, int excludeProductId, int limit) {
+        String sql = "SELECT p.id, p.name, p.price, p.sale_price AS salePrice, p.quantity, p.short_description AS description, p.image, p.category_id AS categoryId, "
+                + "COALESCE(rv.avg_rating, 0) AS averageRating, COALESCE(rv.review_count, 0) AS reviewCount "
+                + "FROM weekend_deals wd "
+                + "JOIN products p ON wd.product_id = p.id "
+                + "LEFT JOIN (SELECT product_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count FROM reviews WHERE status = 'approved' GROUP BY product_id) rv ON p.id = rv.product_id "
+                + "WHERE wd.status = 1 AND NOW() BETWEEN wd.start_date AND wd.end_date "
+                + "AND p.status = 1 AND p.category_id = :categoryId AND p.id <> :excludeProductId "
+                + "ORDER BY wd.sort_order ASC, wd.created_at DESC "
+                + "LIMIT :limit";
+
+        return DBContext.get().withHandle(handle -> handle.createQuery(sql)
+                .bind("categoryId", categoryId)
+                .bind("excludeProductId", excludeProductId)
+                .bind("limit", limit)
+                .mapToBean(Product.class)
+                .list());
     }
 
     public List<Product> filterProductsWithCategoryList(List<Integer> categoryIds, Double minPrice, Double maxPrice,

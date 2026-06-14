@@ -1,27 +1,28 @@
 package controller;
 
+import java.io.IOException;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import com.google.gson.Gson;
+
 import dal.AdminInventoryDAO;
-import model.InventoryReceipt;
-import model.InventoryReceiptItem;
-import model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.google.gson.Gson;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ArrayList;
-import java.time.format.DateTimeFormatter;
+import model.InventoryReceipt;
+import model.InventoryReceiptItem;
+import model.User;
+import util.AdminPermissionHelper;
 
 
-@WebServlet({"/admin/inventory-management", "/admin/inventory-receipt-detail", "/admin/inventory-receipt-create", "/admin/inventory-receipt-approve", "/admin/inventory-receipt-new"})
+@WebServlet({"/admin/inventory-management", "/admin/inventory-receipt-detail", "/admin/inventory-receipt-create", "/admin/inventory-receipt-approve", "/admin/inventory-receipt-reject", "/admin/inventory-receipt-new"})
 public class AdminInventoryServlet extends HttpServlet {
     private AdminInventoryDAO inventoryDAO;
 
@@ -75,6 +76,8 @@ public class AdminInventoryServlet extends HttpServlet {
                 handleCreateReceipt(request, response);
             } else if ("/admin/inventory-receipt-approve".equals(path)) {
                 handleApproveReceipt(request, response);
+            } else if ("/admin/inventory-receipt-reject".equals(path)) {
+                handleRejectReceipt(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -249,6 +252,41 @@ public class AdminInventoryServlet extends HttpServlet {
         response.getWriter().write(gson.toJson(result));
     }
 
+    private void handleRejectReceipt(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        Gson gson = new Gson();
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            String receiptIdParam = request.getParameter("receiptId");
+            if (receiptIdParam == null || receiptIdParam.isEmpty()) {
+                receiptIdParam = request.getParameter("id");
+            }
+            if (receiptIdParam == null || receiptIdParam.isEmpty()) {
+                result.put("success", false);
+                result.put("message", "ID phiếu không hợp lệ");
+                response.getWriter().write(gson.toJson(result));
+                return;
+            }
+
+            int receiptId = Integer.parseInt(receiptIdParam);
+            inventoryDAO.rejectReceipt(receiptId);
+
+            result.put("success", true);
+            result.put("message", "Từ chối phiếu thành công");
+        } catch (NumberFormatException e) {
+            result.put("success", false);
+            result.put("message", "ID phiếu không hợp lệ");
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("success", false);
+            result.put("message", e.getMessage());
+        }
+
+        response.getWriter().write(gson.toJson(result));
+    }
+
     
      // Hiển thị trang danh sách phiếu nhập kho
     private void handleListPage(HttpServletRequest request, HttpServletResponse response) 
@@ -292,6 +330,7 @@ public class AdminInventoryServlet extends HttpServlet {
 
             for (InventoryReceipt r : receipts) {
                 Map<String, Object> map = new HashMap<>();
+                map.put("id", r.getId());
                 map.put("code", r.getCode());
                 map.put("dateData", r.getReceiptDate() != null ? r.getReceiptDate().format(dateFormatter) : "");
                 map.put("dateDisplay", r.getReceiptDate() != null ? r.getReceiptDate().format(timeFormatter) : "");
@@ -301,10 +340,12 @@ public class AdminInventoryServlet extends HttpServlet {
                 if ("PENDING".equalsIgnoreCase(r.getStatus())) statusDisplay = "Chờ duyệt";
                 else if ("APPROVED".equalsIgnoreCase(r.getStatus())) statusDisplay = "Đã duyệt";
                 else if ("DRAFT".equalsIgnoreCase(r.getStatus())) statusDisplay = "Tạm lưu";
+                else if ("REJECTED".equalsIgnoreCase(r.getStatus())) statusDisplay = "Đã từ chối";
                 
                 String statusClass = "draft";
                 if ("PENDING".equalsIgnoreCase(r.getStatus())) statusClass = "pending";
                 else if ("APPROVED".equalsIgnoreCase(r.getStatus())) statusClass = "approved";
+                else if ("REJECTED".equalsIgnoreCase(r.getStatus())) statusClass = "cancelled";
                 
                 map.put("statusDisplay", statusDisplay);
                 map.put("statusClass", statusClass);
@@ -438,12 +479,28 @@ public class AdminInventoryServlet extends HttpServlet {
                 return;
             }
 
-            List<AdminInventoryDAO.ReceiptItemDetailDTO> items = inventoryDAO.getReceiptItemsDetail(receiptId);
+                AdminInventoryDAO.ReceiptDetailDTO detail = receiptDetail.get();
+                List<AdminInventoryDAO.ReceiptItemDetailDTO> items = inventoryDAO.getReceiptItemsDetail(receiptId);
+
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                String receiptDateDisplay = detail.getReceiptDate() != null
+                    ? detail.getReceiptDate().format(dateFormatter)
+                    : "";
+                String createdAtDisplay = detail.getCreatedAt() != null
+                    ? detail.getCreatedAt().format(dateTimeFormatter)
+                    : "";
+                String updatedAtDisplay = detail.getUpdatedAt() != null
+                    ? detail.getUpdatedAt().format(dateTimeFormatter)
+                    : "";
 
             // Set attributes cho JSP
-            request.setAttribute("receipt", receiptDetail.get());
+                request.setAttribute("receipt", detail);
             request.setAttribute("items", items);
             request.setAttribute("itemCount", items.size());
+                request.setAttribute("receiptDateDisplay", receiptDateDisplay);
+                request.setAttribute("createdAtDisplay", createdAtDisplay);
+                request.setAttribute("updatedAtDisplay", updatedAtDisplay);
 
             // Forward tới JSP
             request.getRequestDispatcher("/admin/inventory-receipt-detail.jsp").forward(request, response);
@@ -467,7 +524,7 @@ public class AdminInventoryServlet extends HttpServlet {
     private boolean isAdmin(HttpServletRequest request) { 
         Object accountObj = request.getSession().getAttribute("account");
         if (accountObj instanceof User) {
-            return ((User) accountObj).getRole() == 1; // Assuming role 1 is Admin
+            return AdminPermissionHelper.isAdminAccount((User) accountObj); 
         }
         return false; 
     }

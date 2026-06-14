@@ -9,8 +9,8 @@
             </a>
             <ul class="side-menu">
                 <li class="${param.activePage == 'dashboard' ? 'active' : ''}">
-                    <a href="${pageContext.request.contextPath}/admin/dashboard"><i class='bx bxs-dashboard'></i>Tổng
-                        quan</a>
+                    <a href="${pageContext.request.contextPath}/admin/dashboard"><i class='bx bxs-dashboard'></i>Thống
+                        kê</a>
                 </li>
                 <li class="${param.activePage == 'products' ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/products"><i class='bx bx-basket'></i>Quản lý sản
@@ -25,15 +25,15 @@
                         hàng</a>
                 </li>
                 <li class="${param.activePage == 'stock-management' ? 'active' : ''}">
-                    <a href="${pageContext.request.contextPath}/admin/inventory-warehouse.jsp"><i
-                            class='bx bx-box'></i>Quản lý tồn kho</a>
+                    <a href="${pageContext.request.contextPath}/admin/inventory-warehouse"><i class='bx bx-box'></i>Quản
+                        lý tồn kho</a>
                 </li>
                 <li class="${param.activePage == 'inventory' ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/inventory-management"><i
                             class='bx bx-archive-in'></i>Phiếu nhập/xuất kho</a>
                 </li>
                 <li class="${param.activePage == 'stock-export' ? 'active' : ''}">
-                    <a href="${pageContext.request.contextPath}/admin/stock-export.jsp"><i
+                    <a href="${pageContext.request.contextPath}/admin/stock-export"><i
                             class='bx bx-archive-out'></i>Phiếu xuất kho</a>
                 </li>
                 <li class="${param.activePage == 'weekend-deals' ? 'active' : ''}">
@@ -45,7 +45,7 @@
                         hàng</a>
                 </li>
                 <li class="${param.activePage == 'roles' ? 'active' : ''}">
-                    <a href="${pageContext.request.contextPath}/admin/roles.jsp"><i
+                    <a href="${pageContext.request.contextPath}/admin/roles"><i
                             class='bx bx-shield-quarter'></i>Phân quyền</a>
                 </li>
                 <li class="${param.activePage == 'banners' ? 'active' : ''}">
@@ -55,13 +55,13 @@
                 <li class="${param.activePage == 'reviews' ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/reviews"><i class='bx bx-star'></i>Đánh giá</a>
                 </li>
-                <li class="${param.activePage == 'notifications' ? 'active' : ''}">
+                <!-- <li class="${param.activePage == 'notifications' ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/notifications"><i class='bx bx-bell'></i>Lịch sử
                         Thông báo</a>
                 </li>
                 <li class="${param.activePage == 'reports' ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/admin/reports"><i class='bx bx-line-chart'></i>Thống
                         kê</a>
-                </li>
+                </li> -->
             </ul>
         </div>

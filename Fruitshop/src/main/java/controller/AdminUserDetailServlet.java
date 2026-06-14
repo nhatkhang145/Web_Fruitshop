@@ -1,16 +1,17 @@
 package controller;
 
+import java.io.IOException;
+import java.util.List;
 import dal.AdminUserDAO;
-import model.Address;
-import model.User;
+import dal.RoleDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-import java.util.List;
+import model.Address;
+import model.Role;
+import model.User;
 
 @WebServlet(name = "AdminUserDetailServlet", urlPatterns = { "/admin/user-detail" })
 public class AdminUserDetailServlet extends HttpServlet {
@@ -27,6 +28,7 @@ public class AdminUserDetailServlet extends HttpServlet {
 
             int userId = Integer.parseInt(idStr);
             AdminUserDAO userDAO = new AdminUserDAO();
+            RoleDAO roleDAO = new RoleDAO();
             User user = userDAO.getUserById(userId);
             if (user == null) {
                 response.sendRedirect("users");
@@ -34,9 +36,11 @@ public class AdminUserDetailServlet extends HttpServlet {
             }
 
             List<Address> addresses = userDAO.getAllAddressesByUserId(userId);
+            List<Role> roles = roleDAO.getAllRolesWithStats();
 
             request.setAttribute("user", user);
             request.setAttribute("addresses", addresses);
+            request.setAttribute("roles", roles);
 
             request.getRequestDispatcher("/admin/user-detail.jsp").forward(request, response);
 
@@ -57,6 +61,7 @@ public class AdminUserDetailServlet extends HttpServlet {
             String gender = request.getParameter("gender");
             String birthDateStr = request.getParameter("birthDate");
             int role = Integer.parseInt(request.getParameter("role"));
+            Integer roleId = parseOptionalInt(request.getParameter("roleId"));
 
             String statusRaw = request.getParameter("status");
 
@@ -81,15 +86,14 @@ public class AdminUserDetailServlet extends HttpServlet {
                         java.util.Date utilDate = sdf.parse(birthDateStr);
                         java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
                         user.setBirthDate(sqlDate);
-                    } catch (Exception e) {
-
+                    } catch (java.text.ParseException ignored) {
                     }
                 }
 
 
                 userDAO.updateProfile(user);
 
-                userDAO.updateUserStatusAndRole(userId, role, statusToDb);
+                userDAO.updateUserStatusAndRole(userId, role, roleId, Integer.parseInt(statusToDb));
 
 
                 response.sendRedirect("user-detail?id=" + userId + "&msg=success");
@@ -97,9 +101,19 @@ public class AdminUserDetailServlet extends HttpServlet {
                 response.sendRedirect("users");
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (NumberFormatException | IOException e) {
             response.sendRedirect("users");
+        }
+    }
+
+    private Integer parseOptionalInt(String value) {
+        try {
+            if (value == null || value.isBlank()) {
+                return null;
+            }
+            return Integer.valueOf(value);
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 }

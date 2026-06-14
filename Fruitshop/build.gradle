@@ -1,0 +1,95 @@
+plugins {
+    id 'java'
+    id 'war'
+    id "org.hidetake.ssh" version "2.11.2"
+}
+
+
+
+apply plugin: 'org.hidetake.ssh'
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://maven.cksource.com/'
+    }
+}
+
+dependencies {
+    compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+    implementation 'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:3.0.0'
+    implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1'
+
+    implementation 'org.jdbi:jdbi3-core:3.41.3'
+    implementation 'com.mysql:mysql-connector-j:8.4.0'
+
+    implementation 'net.coobird:thumbnailator:0.4.8'
+    implementation 'com.cksource:ckfinder3:3.5.2'
+
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.cloudinary:cloudinary-http45:1.39.0'
+    implementation 'com.sun.mail:jakarta.mail:2.0.2'
+    implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
+    implementation 'org.slf4j:slf4j-simple:1.7.36'
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+}
+
+war {
+    archiveFileName = 'ROOT.war'
+}
+
+def localProps = new Properties()
+def localPropsFile = rootProject.file('gradle-local.properties')
+if (localPropsFile.exists()) {
+    localPropsFile.withInputStream { localProps.load(it) }
+}
+
+remotes {
+    host {
+        host     = localProps.getProperty('vps.host', '127.0.0.1')
+        port     = (localProps.getProperty('vps.port', '22')).toInteger()
+        user     = localProps.getProperty('vps.user', 'root')
+        password = localProps.getProperty('vps.password', '')
+    }
+}
+
+ssh.settings {
+    knownHosts = allowAnyHosts
+}
+
+task docker_app_start {
+    doLast {
+        println 'begin docker_app_start'
+        ssh.run {
+            session(remotes.host) {
+                execute 'docker stop tomcat10', ignoreError: true
+                execute 'docker run -it --rm -d ' +
+                        '--name tomcat10 ' +
+                        '-v /usr/deploy:/usr/local/tomcat/webapps ' +
+                        '-p 80:8080 ' +
+                        'tomcat:10.1&'
+            }
+        }
+    }
+}
+
+task docker_upload_file_to_server {
+    doLast {
+        println 'begin docker_upload_file_to_server'
+        ssh.run {
+            session(remotes.host) {
+                execute 'rm -rf /usr/deploy/ROOT.war', ignoreError: true
+                execute 'rm -rf /usr/deploy/ROOT/', ignoreError: true
+                put from: "${project.projectDir}/build/libs/ROOT.war",
+                        into: "/usr/deploy/ROOT.war"
+            }
+        }
+    }
+}
+
+task docker_deploy {
+    docker_deploy.dependsOn docker_app_start
+    docker_deploy.dependsOn docker_upload_file_to_server
+    docker_deploy.dependsOn build
+    tasks.getByName('docker_app_start').mustRunAfter docker_upload_file_to_server
+}

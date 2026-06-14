@@ -29,7 +29,7 @@
     <main class="receipt-create-page">
         <section class="receipt-hero">
             <div class="hero-copy">
-                <a class="back-link" href="${pageContext.request.contextPath}/admin/stock-export.jsp">
+                <a class="back-link" href="${pageContext.request.contextPath}/admin/stock-export">
                     <i class='bx bx-arrow-back'></i>
                     Quay lại danh sách phiếu xuất
                 </a>
@@ -70,8 +70,15 @@
                                 </div>
                             </div>
 
-                            <div class="form-grid form-grid--2">
+                            <div class="form-grid form-grid--3">
                                 <div class="form-group">
+                                    <label for="inputExportType">Loại xuất <span class="required">*</span></label>
+                                    <select id="inputExportType" name="export_type" required>
+                                        <option value="SALES">Bán hàng</option>
+                                        <option value="WASTE">Sản phẩm hỏng</option>
+                                    </select>
+                                </div>
+                                <div id="recipientField" class="form-group">
                                     <label for="inputSupplierSelect">Chọn đơn vị nhận <span class="required">*</span></label>
                                     <select id="inputSupplierSelect" name="supplier_select">
                                         <option value="">-- Chọn đơn vị nhận --</option>
@@ -80,9 +87,13 @@
                                         </c:forEach>
                                     </select>
                                 </div>
-                                <div class="form-group">
+                                <div id="recipientNameField" class="form-group">
                                     <label for="inputSupplierName">Hoặc nhập đơn vị nhận mới</label>
                                     <input type="text" id="inputSupplierName" name="supplier_name" placeholder="Nhập đơn vị nhận mới" />
+                                </div>
+                                <div id="wasteReasonField" class="form-group is-hidden">
+                                    <label for="inputWasteReason">Lý do loại bỏ  <span class="required">*</span></label>
+                                    <input type="text" id="inputWasteReason" name="waste_reason" placeholder="Mô tả lý do hỏng/không sử dụng" />
                                 </div>
                             </div>
                             <input type="hidden" id="inputSupplierId" name="supplier_id" />

@@ -1,4 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -30,10 +33,7 @@
 				
 			</div>
 			<div class="hero-actions">
-				<a class="btn btn-ghost" href="${pageContext.request.contextPath}/admin/inventory-management">
-					<i class='bx bx-archive-in'></i>
-					<span>Phiếu nhập/xuất kho</span>
-				</a>
+
 			</div>
 		</div>
 
@@ -42,7 +42,7 @@
 				<div class="stat-icon"><i class='bx bx-grid-alt'></i></div>
 				<div>
 					<span class="stat-label">Tổng loại trái cây</span>
-					<strong>68</strong>
+					<strong><fmt:formatNumber value="${totalProductTypes != null ? totalProductTypes : 0}" type="number" groupingUsed="true"/></strong>
 					<small>Đang lưu thông trong kho</small>
 				</div>
 			</article>
@@ -50,7 +50,7 @@
 				<div class="stat-icon"><i class='bx bx-error-circle'></i></div>
 				<div>
 					<span class="stat-label">Sắp hết (SL &lt; 10)</span>
-					<strong>9</strong>
+					<strong><fmt:formatNumber value="${lowStockCount != null ? lowStockCount : 0}" type="number" groupingUsed="true"/></strong>
 					<small>Cần nhập bổ sung</small>
 				</div>
 			</article>
@@ -58,7 +58,7 @@
 				<div class="stat-icon"><i class='bx bx-timer'></i></div>
 				<div>
 					<span class="stat-label">Lô quá 3 ngày</span>
-					<strong>6</strong>
+					<strong><fmt:formatNumber value="${oldBatchCount != null ? oldBatchCount : 0}" type="number" groupingUsed="true"/></strong>
 					<small>Ưu tiên đẩy bán gấp</small>
 				</div>
 			</article>
@@ -77,14 +77,6 @@
 					<label class="sr-only" for="stockSearch">Tìm kiếm sản phẩm</label>
 					<i class='bx bx-search'></i>
 					<input type="text" id="stockSearch" placeholder="Tìm theo mã hoặc tên trái cây" />
-				</div>
-				<div class="filter-field">
-					<label for="stockCategory">Danh mục</label>
-					<select id="stockCategory">
-						<option value="all">Tất cả</option>
-						<option value="imported">Trái cây nhập khẩu</option>
-						<option value="domestic">Trái cây nội địa</option>
-					</select>
 				</div>
 				<div class="filter-field">
 					<label for="stockFreshness">Tình trạng</label>
@@ -108,7 +100,6 @@
 					<thead>
 					<tr>
 						<th>Sản phẩm / Lô</th>
-						<th>Danh mục</th>
 						<th>Giá bán</th>
 						<th>Số lượng tồn</th>
 						<th>Ngày nhập</th>
@@ -118,172 +109,102 @@
 					</tr>
 					</thead>
 					<tbody>
-					<tr class="stock-row" data-group="apple" data-code="FRU-0012" data-name="Táo Fuji" data-category="imported" data-freshness="fresh">
-						<td>
-							<button class="tree-toggle" type="button" data-toggle="apple" aria-expanded="false">
-								<i class='bx bx-chevron-right'></i>
-							</button>
-							<div class="fruit-info">
-								<img class="stock-thumb" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect width='64' height='64' rx='12' fill='%23e8f3f4'/><text x='50%25' y='55%25' text-anchor='middle' font-size='20' font-family='Arial' fill='%232f8087'>T</text></svg>" alt="Táo Fuji" />
-								<div>
-									<strong>Táo Fuji</strong>
-									<span class="fruit-code">FRU-0012</span>
+					<c:forEach var="product" items="${productStocks}">
+						<tr class="stock-row" data-group="${product.groupKey}" data-code="${product.productCode}" data-name="${product.productName}" data-freshness="${product.freshnessKey}">
+							<td>
+									<div class="stock-main">
+										<button class="tree-toggle" type="button" data-toggle="${product.groupKey}" aria-expanded="false">
+											<i class='bx bx-chevron-right'></i>
+										</button>
+										<div class="fruit-info">
+									<c:choose>
+										<c:when test="${not empty product.image}">
+											<c:choose>
+												<c:when test="${fn:startsWith(product.image, 'http')}">
+													<img class="stock-thumb" src="${product.image}" alt="${product.productName}" />
+												</c:when>
+												<c:otherwise>
+													<img class="stock-thumb" src="${pageContext.request.contextPath}/${product.image}" alt="${product.productName}" />
+												</c:otherwise>
+											</c:choose>
+										</c:when>
+										<c:otherwise>
+											<img class="stock-thumb" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect width='64' height='64' rx='12' fill='%23e8f3f4'/><text x='50%25' y='55%25' text-anchor='middle' font-size='20' font-family='Arial' fill='%232f8087'>P</text></svg>" alt="${product.productName}" />
+										</c:otherwise>
+									</c:choose>
+										<div>
+											<strong>${product.productName}</strong>
+											<span class="fruit-code">${product.productCode}</span>
+										</div>
+									</div>
 								</div>
-							</div>
-						</td>
-						<td>Trái cây nhập khẩu</td>
-						<td>52.000 VND</td>
-						<td>
-							<span class="stock-qty">120</span>
-						</td>
-						<td>22/05/2026</td>
-						<td>2 ngày</td>
-						<td><span class="status-badge safe">Tươi</span></td>
-						<td>—</td>
-					</tr>
-					<tr class="batch-row is-hidden" data-group="apple" data-freshness="near">
-						<td class="batch-cell">
-							
-							<div>
-								<strong class="batch-code">LO-AP-240519</strong>
-								<span class="batch-note">Táo Fuji</span>
-							</div>
-						</td>
-						<td>—</td>
-						<td>—</td>
-						<td>
-							<span class="stock-qty">40</span>
-						</td>
-						<td>19/05/2026</td>
-						<td>4 ngày</td>
-						<td><span class="status-badge near"> Chú ý</span></td>
-						<td>
-							<div class="action-group">
-								<button type="button" class="icon-btn danger js-batch-action" data-action="waste" data-batch="LO-AP-240519" data-product="Táo Fuji" data-qty="40" title="Báo hỏng">
-									<i class='bx bx-trash'></i>
-								</button>
-								<button type="button" class="icon-btn warn js-batch-action" data-action="grade" data-batch="LO-AP-240519" data-product="Táo Fuji" data-qty="40" title="Chuyển loại">
-									<i class='bx bx-down-arrow-alt'></i>
-								</button>
-								<button type="button" class="icon-btn flash js-batch-action" data-action="flash" data-batch="LO-AP-240519" data-product="Táo Fuji" data-qty="40" data-price="52000" title="Đẩy sales">
-									<i class='bx bx-bolt'></i>
-								</button>
-							</div>
-						</td>
-					</tr>
-					<tr class="batch-row is-hidden" data-group="apple" data-freshness="fresh">
-						<td class="batch-cell">
-							
-							<div>
-								<strong class="batch-code">LO-AP-240521</strong>
-								<span class="batch-note">Táo Fuji</span>
-							</div>
-						</td>
-						<td>—</td>
-						<td>—</td>
-						<td>
-							<span class="stock-qty">80</span>
-						</td>
-						<td>21/05/2026</td>
-						<td>2 ngày</td>
-						<td><span class="status-badge safe">Tươi</span></td>
-						<td>
-							<div class="action-group">
-								<button type="button" class="icon-btn danger js-batch-action" data-action="waste" data-batch="LO-AP-240521" data-product="Táo Fuji" data-qty="80" title="Báo hỏng">
-									<i class='bx bx-trash'></i>
-								</button>
-								<button type="button" class="icon-btn warn js-batch-action" data-action="grade" data-batch="LO-AP-240521" data-product="Táo Fuji" data-qty="80" title="Chuyển loại">
-									<i class='bx bx-down-arrow-alt'></i>
-								</button>
-								<button type="button" class="icon-btn flash js-batch-action" data-action="flash" data-batch="LO-AP-240521" data-product="Táo Fuji" data-qty="80" data-price="52000" title="Đẩy sales">
-									<i class='bx bx-bolt'></i>
-								</button>
-							</div>
-						</td>
-					</tr>
-					<tr class="stock-row" data-group="strawberry" data-code="FRU-0077" data-name="Dâu tây Đà Lạt" data-category="domestic" data-freshness="critical">
-						<td>
-							<button class="tree-toggle" type="button" data-toggle="strawberry" aria-expanded="false">
-								<i class='bx bx-chevron-right'></i>
-							</button>
-							<div class="fruit-info">
-								<img class="stock-thumb" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect width='64' height='64' rx='12' fill='%23e8f3f4'/><text x='50%25' y='55%25' text-anchor='middle' font-size='20' font-family='Arial' fill='%232f8087'>D</text></svg>" alt="Dâu tây Đà Lạt" />
-								<div>
-									<strong>Dâu tây Đà Lạt</strong>
-									<span class="fruit-code">FRU-0077</span>
-								</div>
-							</div>
-						</td>
-						<td>Trái cây nội địa</td>
-						<td>88.000 VND</td>
-						<td>
-							<span class="stock-qty stock-low">26</span>
-						</td>
-						<td>19/05/2026</td>
-						<td>4 ngày</td>
-						<td><span class="status-badge critical"><i class='bx bxs-error'></i>Cảnh báo hỏng</span></td>
-						<td>—</td>
-					</tr>
-					<tr class="batch-row is-hidden" data-group="strawberry" data-freshness="critical">
-						<td class="batch-cell">
-							
-							<div>
-								<strong class="batch-code">LO-DAU-240517</strong>
-								<span class="batch-note">Dâu tây Đà Lạt</span>
-							</div>
-						</td>
-						<td>—</td>
-						<td>—</td>
-						<td>
-							<span class="stock-qty stock-low">10</span>
-						</td>
-						<td>17/05/2026</td>
-						<td>6 ngày</td>
-						<td><span class="status-badge critical"><i class='bx bxs-error'></i>Cảnh báo hỏng</span></td>
-						<td>
-							<div class="action-group">
-								<button type="button" class="icon-btn danger js-batch-action" data-action="waste" data-batch="LO-DAU-240517" data-product="Dâu tây Đà Lạt" data-qty="10" title="Báo hỏng">
-									<i class='bx bx-trash'></i>
-								</button>
-								<button type="button" class="icon-btn warn js-batch-action" data-action="grade" data-batch="LO-DAU-240517" data-product="Dâu tây Đà Lạt" data-qty="10" title="Chuyển loại">
-									<i class='bx bx-down-arrow-alt'></i>
-								</button>
-								<button type="button" class="icon-btn flash js-batch-action" data-action="flash" data-batch="LO-DAU-240517" data-product="Dâu tây Đà Lạt" data-qty="10" data-price="88000" title="Đẩy sales">
-									<i class='bx bx-bolt'></i>
-								</button>
-							</div>
-						</td>
-					</tr>
-					<tr class="batch-row is-hidden" data-group="strawberry" data-freshness="near">
-						<td class="batch-cell">
-							
-							<div>
-								<strong class="batch-code">LO-DAU-240520</strong>
-								<span class="batch-note">Dâu tây Đà Lạt</span>
-							</div>
-						</td>
-						<td>—</td>
-						<td>—</td>
-						<td>
-							<span class="stock-qty">16</span>
-						</td>
-						<td>20/05/2026</td>
-						<td>3 ngày</td>
-						<td><span class="status-badge near">Cần chú ý</span></td>
-						<td>
-							<div class="action-group">
-								<button type="button" class="icon-btn danger js-batch-action" data-action="waste" data-batch="LO-DAU-240520" data-product="Dâu tây Đà Lạt" data-qty="16" title="Báo hỏng">
-									<i class='bx bx-trash'></i>
-								</button>
-								<button type="button" class="icon-btn warn js-batch-action" data-action="grade" data-batch="LO-DAU-240520" data-product="Dâu tây Đà Lạt" data-qty="16" title="Chuyển loại">
-									<i class='bx bx-down-arrow-alt'></i>
-								</button>
-								<button type="button" class="icon-btn flash js-batch-action" data-action="flash" data-batch="LO-DAU-240520" data-product="Dâu tây Đà Lạt" data-qty="16" data-price="88000" title="Đẩy sales">
-									<i class='bx bx-bolt'></i>
-								</button>
-							</div>
-						</td>
-					</tr>
+							</td>
+							<td><fmt:formatNumber value="${product.price}" type="number" groupingUsed="true"/> VND</td>
+							<td>
+								<span class="stock-qty ${product.quantity < 10 ? 'stock-low' : ''}">${product.quantity}</span>
+							</td>
+							<td>${product.oldestDateDisplay}</td>
+							<td>
+								<c:choose>
+									<c:when test="${product.oldestAgeDays >= 0}">${product.oldestAgeDays} ngày</c:when>
+									<c:otherwise>—</c:otherwise>
+								</c:choose>
+							</td>
+							<td>
+								<span class="status-badge ${product.statusBadgeClass}">
+									<c:choose>
+										<c:when test="${product.freshnessKey == 'critical'}">Cảnh báo hỏng</c:when>
+										<c:when test="${product.freshnessKey == 'near'}">Cần chú ý</c:when>
+										<c:otherwise>Tươi</c:otherwise>
+									</c:choose>
+								</span>
+							</td>
+							<td>—</td>
+						</tr>
+						<c:forEach var="batch" items="${product.batches}">
+							<tr class="batch-row is-hidden" data-group="${product.groupKey}" data-freshness="${batch.freshnessKey}" data-item-id="${batch.itemId}">
+								<td class="batch-cell">
+									<div>
+										<strong class="batch-code">${batch.batchCode}</strong>
+										<span class="batch-note">${product.productName}</span>
+									</div>
+								</td>
+								<td>—</td>
+								<td>
+									<span class="stock-qty ${batch.quantity < 10 ? 'stock-low' : ''}">${batch.quantity}</span>
+								</td>
+								<td>${batch.receiptDateDisplay}</td>
+								<td>
+									<c:choose>
+										<c:when test="${batch.ageDays >= 0}">${batch.ageDays} ngày</c:when>
+										<c:otherwise>—</c:otherwise>
+									</c:choose>
+								</td>
+								<td>
+									<span class="status-badge ${batch.statusBadgeClass}">
+										<c:choose>
+											<c:when test="${batch.freshnessKey == 'critical'}">Cảnh báo hỏng</c:when>
+											<c:when test="${batch.freshnessKey == 'near'}">Cần chú ý</c:when>
+											<c:otherwise>Tươi</c:otherwise>
+										</c:choose>
+									</span>
+								</td>
+								<td>
+									<div class="action-group">
+										<a href="${pageContext.request.contextPath}/admin/inventory-receipt-detail?id=${batch.receiptId}" class="icon-btn view" title="Xem chi tiết lô">
+											<i class='bx bx-show'></i>
+										</a>
+										<button type="button" class="icon-btn danger js-batch-action" data-action="waste" data-batch="${batch.batchCode}" data-product="${product.productName}" data-qty="${batch.quantity}" title="Báo hỏng">
+											<i class='bx bx-trash'></i>
+										</button>
+										<button type="button" class="icon-btn flash js-batch-action" data-action="flash" data-batch="${batch.batchCode}" data-product="${product.productName}" data-qty="${batch.quantity}" data-price="${product.price}" title="Đẩy sales">
+											<i class='bx bx-bolt'></i>
+										</button>
+									</div>
+								</td>
+							</tr>
+						</c:forEach>
+					</c:forEach>
 					</tbody>
 				</table>
 			</div>
@@ -383,7 +304,7 @@
 		</div>
 		<div class="modal-footer">
 			<button type="button" class="btn btn-ghost" data-close-modal>Hủy</button>
-			<button type="button" class="btn btn-primary">Tạo Flash Sale ngay</button>
+			<button type="button" class="btn btn-primary"><i class='bx bx-bolt'></i> Tạo Flash Sale ngay</button>
 		</div>
 	</div>
 </div>

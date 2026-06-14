@@ -5,14 +5,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const receiptDateInput = document.getElementById("inputReceiptDate");
     const creatorInput = document.getElementById("inputCreator");
     const noteInput = document.getElementById("inputNote");
+    const exportTypeSelect = document.getElementById("inputExportType");
     const supplierSelect = document.getElementById("inputSupplierSelect");
     const supplierNameInput = document.getElementById("inputSupplierName");
     const supplierIdInput = document.getElementById("inputSupplierId");
+    const wasteReasonField = document.getElementById("wasteReasonField");
+    const wasteReasonInput = document.getElementById("inputWasteReason");
+    const recipientField = document.getElementById("recipientField");
+    const recipientNameField = document.getElementById("recipientNameField");
     const addLineBtn = document.getElementById("addLineItemBtn");
     const lineContainer = document.getElementById("lineItemsContainer");
     const saveReceiptBtn = document.getElementById("saveReceiptBtn");
     const resetFormBtn = document.getElementById("resetFormBtn");
-
     const summaryCode = document.getElementById("summaryCode");
     const summaryDate = document.getElementById("summaryDate");
     const summarySupplier = document.getElementById("summarySupplier");
@@ -39,6 +43,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function getSupplierLabel() {
         const typedName = (supplierNameInput?.value || "").trim();
+        if (exportTypeSelect?.value === 'WASTE') {
+            return wasteReasonInput?.value?.trim() || 'Sản phẩm hỏng';
+        }
         if (typedName) return typedName;
         if (supplierSelect && supplierSelect.value) {
             return supplierSelect.selectedOptions[0]?.textContent || "";
@@ -147,6 +154,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
     supplierSelect?.addEventListener("change", syncSupplierFromSelect);
     supplierNameInput?.addEventListener("input", syncSupplierFromInput);
+    exportTypeSelect?.addEventListener("change", function () {
+        const val = exportTypeSelect.value || "";
+        if (val === 'WASTE') {
+           
+            recipientField?.classList.add('is-hidden');
+            recipientNameField?.classList.add('is-hidden');
+            if (supplierSelect) supplierSelect.value = '';
+            if (supplierNameInput) supplierNameInput.value = '';
+            if (supplierIdInput) supplierIdInput.value = '';
+            wasteReasonField?.classList.remove('is-hidden');
+        } else {
+            recipientField?.classList.remove('is-hidden');
+            recipientNameField?.classList.remove('is-hidden');
+            wasteReasonField?.classList.add('is-hidden');
+            if (wasteReasonInput) wasteReasonInput.value = '';
+        }
+        updateSummary();
+    });
     receiptCodeInput?.addEventListener("input", updateSummary);
     receiptDateInput?.addEventListener("change", updateSummary);
     creatorInput?.addEventListener("input", updateSummary);
@@ -170,6 +195,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const receiptDate = receiptDateInput?.value?.trim();
         const creatorName = creatorInput?.value?.trim();
         const note = noteInput?.value?.trim() || "";
+        const exportType = exportTypeSelect?.value || "SALES";
 
         if (!receiptCode) {
             showMsg("Vui lòng nhập mã phiếu xuất.", true);
@@ -179,9 +205,18 @@ document.addEventListener("DOMContentLoaded", function () {
             showMsg("Vui lòng nhập người lập phiếu.", true);
             return;
         }
-        if (!supplierName && !supplierIdValue) {
-            showMsg("Vui lòng chọn hoặc nhập đơn vị nhận.", true);
-            return;
+        // For WASTE exports, supplier/receiver is not required but waste reason is required
+        if (exportType === 'WASTE') {
+            const wasteReason = wasteReasonInput?.value?.trim();
+            if (!wasteReason) {
+                showMsg("Vui lòng nhập lý do loại bỏ cho 'Sản phẩm hỏng'.", true);
+                return;
+            }
+        } else {
+            if (!supplierName && !supplierIdValue) {
+                showMsg("Vui lòng chọn hoặc nhập đơn vị nhận.", true);
+                return;
+            }
         }
         if (!receiptDate) {
             showMsg("Vui lòng nhập ngày xuất kho.", true);
@@ -231,7 +266,11 @@ document.addEventListener("DOMContentLoaded", function () {
         if (supplierName) {
             body.append("supplier_name", supplierName);
         }
+        if (wasteReasonInput?.value) {
+            body.append('waste_reason', wasteReasonInput.value.trim());
+        }
         body.append("receipt_date", receiptDate);
+        body.append("export_type", exportType);
         body.append("note", note);
         body.append("items", JSON.stringify(items.map(function (i) {
             return {productId: i.productId, quantity: i.quantity, unitPrice: i.unitPrice};
@@ -249,7 +288,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (data.success) {
                     showMsg("Tạo phiếu xuất thành công! Mã: " + data.receipt_code, false);
                     setTimeout(function () {
-                        window.location.href = ctx + "/admin/stock-export.jsp";
+                        window.location.href = ctx + "/admin/stock-export";
                     }, 1200);
                 } else {
                     showMsg("Lỗi: " + (data.message || "Không xác định"), true);

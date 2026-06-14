@@ -1,5 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <nav>
+    <c:if test="${not empty param.permMsg}">
+        <div data-flash-message class="perm-notification perm-notification-danger">
+            <i class="bx bx-check-circle"></i>
+            <span>${param.permMsg}</span>
+        </div>
+    </c:if>
     <i class="bx bx-menu"></i>
     <form action="#">
         <div class="form-input">
@@ -65,3 +72,4 @@
         </div>
     </div>
 </nav>
+<script src="${pageContext.request.contextPath}/assets/js/flash-message.js"></script>
