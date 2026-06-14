@@ -46,8 +46,14 @@
                                                         <div class="slide-item"
                                                             onclick="window.location.href='${bannerUrl}'"
                                                             style="cursor: ${bannerUrl != '#' ? 'pointer' : 'default'};">
-                                                            <img src="${pageContext.request.contextPath}/${banner.imageUrl}"
-                                                                alt="${banner.title}" />
+                                                            <c:choose>
+                                                                <c:when test="${fn:startsWith(banner.imageUrl, 'http')}">
+                                                                    <img src="${banner.imageUrl}" alt="${banner.title}" />
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <img src="${pageContext.request.contextPath}/${banner.imageUrl}" alt="${banner.title}" />
+                                                                </c:otherwise>
+                                                            </c:choose>
                                                             <div class="slide-caption">
                                                                 <h2>${banner.title}</h2>
                                                                 <p>${banner.description}</p>
