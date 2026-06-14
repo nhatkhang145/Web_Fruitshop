@@ -131,7 +131,7 @@
 
             <div class="form-group">
                 <label>Tiêu đề</label>
-                <input type="text" name="title" id="title" required class="form-control" placeholder="Nhập tiêu đề banner">
+                <input type="text" name="title" id="title" class="form-control" placeholder="Nhập tiêu đề banner">
             </div>
 
             <div class="form-group">
