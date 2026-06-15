@@ -173,7 +173,7 @@
                                                style="padding: 8px 20px; border: 1px solid var(--primary-color); color: var(--primary-color); border-radius: 5px; text-decoration: none;">
                                                 Xem chi tiết
                                             </a>
-                                            <c:if test="${order.status == 'pending' || order.status == 'processing'}">
+                                            <c:if test="${order.status == 'pending'}">
                                                 <form action="${pageContext.request.contextPath}/orders" method="post"
                                                       style="display: inline;"
                                                       onsubmit="return confirm('Bạn có chắc muốn hủy đơn hàng này?');">

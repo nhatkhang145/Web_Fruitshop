@@ -76,9 +76,16 @@ public class AdminCategoryServlet extends HttpServlet {
                 redirectWithError(resp, req, "category_not_found");
                 return;
             }
-            int detachedCount = categoryDAO.countProductsInCategoryTree(id);
+            int productCount = categoryDAO.countProductsInCategoryTree(id);
+            if (productCount > 0) {
+                String msg = java.net.URLEncoder.encode(
+                    "Không thể xóa danh mục vì còn " + productCount + " sản phẩm bên trong. Hãy chuyển sản phẩm sang danh mục khác trước.",
+                    "UTF-8");
+                resp.sendRedirect(req.getContextPath() + "/admin/categories?error=" + msg);
+                return;
+            }
             categoryDAO.deleteCategoryAndChildren(id);
-            resp.sendRedirect(req.getContextPath() + "/admin/categories?success=deleted&detached=" + detachedCount);
+            resp.sendRedirect(req.getContextPath() + "/admin/categories?success=deleted");
             return;
         }
         resp.sendRedirect(req.getContextPath() + "/admin/categories?success=deleted");

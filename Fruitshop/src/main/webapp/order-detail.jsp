@@ -198,7 +198,7 @@
                                         Quay lại
                                     </a>
 
-                                    <c:if test="${order.status == 'pending' || order.status == 'processing'}">
+                                    <c:if test="${order.status == 'pending'}">
                                         <form action="${pageContext.request.contextPath}/orders" method="post"
                                             style="display: inline;"
                                             onsubmit="return confirm('Bạn có chắc muốn hủy đơn hàng này?');">

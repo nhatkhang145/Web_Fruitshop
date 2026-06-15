@@ -101,7 +101,6 @@ public class OrderDAO {
                     .one();
 
             var detailBatch = handle.prepareBatch(insertDetailSql);
-            var inventoryBatch = handle.prepareBatch(updateInventorySql);
 
             for (OrderItem item : items) {
                 detailBatch.bind("orderId", orderId)
@@ -115,20 +114,32 @@ public class OrderDAO {
                         .bind("quantity", item.getQuantity())
                         .bind("total", item.getTotal())
                         .add();
-
-                inventoryBatch.bind("quantity", item.getQuantity())
-                        .bind("productId", item.getProductId())
-                        .add();
             }
 
             detailBatch.execute();
-            int[] updateCounts = inventoryBatch.execute();
 
-            for (int count : updateCounts) {
-                if (count == 0) {
-                    throw new RuntimeException("Insufficient inventory");
-                }
+            // Tự động tạo phiếu xuất chờ duyệt
+            String exportCode = "EXP-ORD-" + orderId + "-" + System.currentTimeMillis();
+            int exportId = handle.createUpdate("INSERT INTO inventory_export_receipts (code, receiver_name, export_date, export_type, total_amount, status, note, created_by) VALUES (?, ?, NOW(), 'SALES', ?, 'PENDING', ?, ?)")
+                .bind(0, exportCode)
+                .bind(1, order.getFullname())
+                .bind(2, order.getTotalProductsMoney())
+                .bind(3, "Đơn hàng #" + orderId)
+                .bind(4, order.getUserId())
+                .executeAndReturnGeneratedKeys("id")
+                .mapTo(Integer.class)
+                .one();
+
+            var exportItemBatch = handle.prepareBatch("INSERT INTO inventory_export_items (export_id, product_id, quantity, unit_price, total_price) VALUES (?, ?, ?, ?, ?)");
+            for (OrderItem item : items) {
+                exportItemBatch.bind(0, exportId)
+                               .bind(1, item.getProductId())
+                               .bind(2, item.getQuantity())
+                               .bind(3, item.getFinalPrice())
+                               .bind(4, item.getTotal())
+                               .add();
             }
+            exportItemBatch.execute();
 
             return orderId;
         });
@@ -268,7 +279,7 @@ public class OrderDAO {
 
     public boolean cancelOrder(int orderId, int userId) {
         String sql = "UPDATE orders SET status = 'cancelled' " +
-                "WHERE id = :orderId AND user_id = :userId AND status IN ('pending', 'processing')";
+                "WHERE id = :orderId AND user_id = :userId AND status = 'pending'";
 
         return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
                 .bind("orderId", orderId)
