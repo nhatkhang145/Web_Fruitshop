@@ -99,10 +99,21 @@ public class AdminProductDAO {
 
 
     public int delete(int id) {
-        String sql = "DELETE FROM products WHERE id = ?";
-        return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
-                .bind(0, id)
-                .execute());
+        try {
+            String sql = "DELETE FROM products WHERE id = ?";
+            return DBContext.get().withHandle(handle -> handle.createUpdate(sql)
+                    .bind(0, id)
+                    .execute());
+        } catch (Exception e) {
+            if (e.getMessage() != null && e.getMessage().contains("foreign key constraint")) {
+                // Soft delete fallback: change status to 0 (Hidden)
+                String softDeleteSql = "UPDATE products SET status = 0 WHERE id = ?";
+                return DBContext.get().withHandle(handle -> handle.createUpdate(softDeleteSql)
+                        .bind(0, id)
+                        .execute());
+            }
+            throw e;
+        }
     }
 
     public void deleteProductImages(int productId) {

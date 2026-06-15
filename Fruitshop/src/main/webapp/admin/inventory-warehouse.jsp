@@ -72,6 +72,22 @@
 				</div>
 			</div>
 
+			<div style="margin-bottom: 20px; display: flex; gap: 10px; padding: 0 20px;">
+				<a href="${pageContext.request.contextPath}/admin/inventory-warehouse"
+				   class="btn"
+				   style="padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 500; transition: all 0.2s;
+						  ${currentFilter != 'on_sale' ? 'background-color: var(--primary-color); color: white;' : 'background-color: #f8f9fa; color: #555; border: 1px solid #ddd;'}">
+					<i class='bx bx-boxes'></i> Tất cả lô hàng
+				</a>
+
+				<a href="${pageContext.request.contextPath}/admin/inventory-warehouse?filter=on_sale"
+				   class="btn"
+				   style="padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 500; transition: all 0.2s;
+						  ${currentFilter == 'on_sale' ? 'background-color: #ee4d2d; color: white; box-shadow: 0 2px 4px rgba(238,77,45,0.2);' : 'background-color: #fff; color: #ee4d2d; border: 1px solid #ee4d2d;'}">
+					<i class='bx bxs-purchase-tag-alt'></i> Lô đang giảm giá
+				</a>
+			</div>
+
 			<div class="stock-filters">
 				<div class="search-box">
 					<label class="sr-only" for="stockSearch">Tìm kiếm sản phẩm</label>
@@ -139,7 +155,24 @@
 									</div>
 								</div>
 							</td>
-							<td><fmt:formatNumber value="${product.price}" type="number" groupingUsed="true"/> VND</td>
+							<td class="price-cell">
+								<c:choose>
+									<c:when test="${product.salePrice > 0}">
+										<div style="text-decoration: line-through; color: #888; font-size: 12px;">
+											<fmt:formatNumber value="${product.price}" type="number" groupingUsed="true"/> đ
+										</div>
+										<div style="color: #ee4d2d; font-weight: bold; font-size: 14px; margin-top: 2px;">
+											<fmt:formatNumber value="${product.salePrice}" type="number" groupingUsed="true"/> đ
+										</div>
+									</c:when>
+
+									<c:otherwise>
+										<div style="color: #333; font-weight: 500;">
+											<fmt:formatNumber value="${product.price}" type="number" groupingUsed="true"/> đ
+										</div>
+									</c:otherwise>
+								</c:choose>
+							</td>
 							<td>
 								<span class="stock-qty ${product.quantity < 10 ? 'stock-low' : ''}">${product.quantity}</span>
 							</td>
@@ -166,6 +199,11 @@
 								<td class="batch-cell">
 									<div>
 										<strong class="batch-code">${batch.batchCode}</strong>
+										<c:if test="${currentFilter == 'on_sale'}">
+											<span style="background-color: #ee4d2d; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-left: 6px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;">
+												<i class='bx bxs-hot'></i> Đang Sale
+											</span>
+										</c:if>
 										<span class="batch-note">${product.productName}</span>
 									</div>
 								</td>

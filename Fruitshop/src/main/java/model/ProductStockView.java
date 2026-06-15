@@ -8,6 +8,7 @@ public class ProductStockView {
     private String productName;
     private String productCode;
     private double price;
+    private double salePrice;
     private int quantity;
     private String image;
     private List<BatchStockView> batches = new ArrayList<>();
@@ -53,6 +54,14 @@ public class ProductStockView {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public double getSalePrice() {
+        return salePrice;
+    }
+
+    public void setSalePrice(double salePrice) {
+        this.salePrice = salePrice;
     }
 
     public int getQuantity() {
