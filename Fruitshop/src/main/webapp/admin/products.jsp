@@ -47,6 +47,19 @@
             </a>
         </div>
 
+        <c:if test="${not empty param.success}">
+            <div data-flash-message class="perm-notification perm-notification-success">
+                <i class="bx bx-check-circle"></i>
+                <span>${param.success}</span>
+            </div>
+        </c:if>
+        <c:if test="${not empty param.error}">
+            <div data-flash-message class="perm-notification perm-notification-danger">
+                <i class="bx bx-error-circle"></i>
+                <span>${param.error}</span>
+            </div>
+        </c:if>
+
         <c:set var="activeCount" value="0" />
         <c:set var="hiddenCount" value="0" />
         <c:set var="lowStockCount" value="0" />
@@ -120,10 +133,18 @@
                                     <c:when test="${not empty p.image}">
                                         <c:choose>
                                             <c:when test="${fn:startsWith(p.image, 'http')}">
-                                                <img src="${p.image}" alt="${p.name}" class="product-img" />
+                                                <c:choose>
+                                                    <c:when test="${fn:contains(p.image, '/upload/')}">
+                                                        <img src="${fn:replace(p.image, '/upload/', '/upload/c_fill,w_80,h_80,q_auto,f_auto/')}"
+                                                             alt="${p.name}" class="product-img" loading="lazy" />
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <img src="${p.image}" alt="${p.name}" class="product-img" loading="lazy" />
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </c:when>
                                             <c:otherwise>
-                                                <img src="${pageContext.request.contextPath}/${p.image}" alt="${p.name}" class="product-img" />
+                                                <img src="${pageContext.request.contextPath}/${p.image}" alt="${p.name}" class="product-img" loading="lazy" />
                                             </c:otherwise>
                                         </c:choose>
                                     </c:when>

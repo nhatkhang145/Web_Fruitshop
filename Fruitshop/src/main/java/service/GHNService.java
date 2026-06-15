@@ -11,8 +11,20 @@ import java.time.Duration;
 
 public class GHNService {
 
-    private static final String GHN_TOKEN = "7a640d51-671c-11f1-88e6-ea1f56ca9fee";
-    private static final String GHN_SHOP_ID = "6490018";
+    private static final String GHN_TOKEN;
+    private static final String GHN_SHOP_ID;
+
+    static {
+        try {
+            java.io.InputStream is = GHNService.class.getClassLoader().getResourceAsStream("db.properties");
+            java.util.Properties props = new java.util.Properties();
+            props.load(is);
+            GHN_TOKEN = props.getProperty("ghn.token");
+            GHN_SHOP_ID = props.getProperty("ghn.shop_id");
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi cấu hình GHN: " + e.getMessage());
+        }
+    }
 
     private static final String FEE_API_URL = "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee";
     private static final String PROVINCE_API_URL = "https://online-gateway.ghn.vn/shiip/public-api/master-data/province";

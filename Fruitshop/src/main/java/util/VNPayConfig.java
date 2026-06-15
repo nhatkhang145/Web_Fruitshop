@@ -11,10 +11,25 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class VNPayConfig {
-    public static final String vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static final String vnp_ReturnUrl = "http://localhost:8080/Fruitshop_Web/vnpay-return";
-    public static final String vnp_TmnCode = "0VJ27KB8";
-    public static final String vnp_HashSecret = "81XD3RUJIHTYBBYSP4KLO8LW9GDI7I78";
+    public static final String vnp_Url;
+    public static final String vnp_ReturnUrl;
+    public static final String vnp_TmnCode;
+    public static final String vnp_HashSecret;
+
+    static {
+        try {
+            java.io.InputStream is = VNPayConfig.class.getClassLoader().getResourceAsStream("db.properties");
+            java.util.Properties props = new java.util.Properties();
+            props.load(is);
+            vnp_Url = props.getProperty("vnpay.url");
+            vnp_ReturnUrl = props.getProperty("vnpay.return_url");
+            vnp_TmnCode = props.getProperty("vnpay.tmn_code");
+            vnp_HashSecret = props.getProperty("vnpay.hash_secret");
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi cấu hình VNPAY: " + e.getMessage());
+        }
+    }
+
     public static final String vnp_Version = "2.1.0";
     public static final String vnp_Command = "pay";
 

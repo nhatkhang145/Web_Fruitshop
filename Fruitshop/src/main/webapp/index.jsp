@@ -47,11 +47,14 @@
                                                             onclick="window.location.href='${bannerUrl}'"
                                                             style="cursor: ${bannerUrl != '#' ? 'pointer' : 'default'};">
                                                             <c:choose>
-                                                                <c:when test="${fn:startsWith(banner.imageUrl, 'http')}">
-                                                                    <img src="${banner.imageUrl}" alt="${banner.title}" />
+                                                                <c:when
+                                                                    test="${fn:startsWith(banner.imageUrl, 'http')}">
+                                                                    <img src="${banner.imageUrl}"
+                                                                        alt="${banner.title}" />
                                                                 </c:when>
                                                                 <c:otherwise>
-                                                                    <img src="${pageContext.request.contextPath}/${banner.imageUrl}" alt="${banner.title}" />
+                                                                    <img src="${pageContext.request.contextPath}/${banner.imageUrl}"
+                                                                        alt="${banner.title}" />
                                                                 </c:otherwise>
                                                             </c:choose>
                                                             <div class="slide-caption">
@@ -292,9 +295,9 @@
                                                                                             </c:otherwise>
                                                                         </c:choose>
                                                                         <c:if test="${product.quantity > 0}">
-                                                                            <span class="unit"
+                                                                            <!-- <span class="unit"
                                                                                 style="font-size: 12px; color: #666;">/
-                                                                                Kg</span>
+                                                                                Kg</span> -->
                                                                         </c:if>
                                                                     </div>
                                                                 </div>
@@ -356,12 +359,12 @@
                                                                                 </span>
                                                                             </c:if>
                                                                         </div>
-                                                                        <span class="price-unit">/Kg</span>
+                                                                        <!-- <span class="price-unit">/Kg</span> -->
                                                                     </div>
 
                                                                     <div class="deal-timer"
                                                                         data-end-time="${deal.endDate.time}">
-                                                                        <div class="timer-label">⏰ Kết thúc sau:</div>
+                                                                        <div class="timer-label"> Kết thúc sau:</div>
                                                                         <div class="timer-boxes">
                                                                             <div class="timer-box">
                                                                                 <span class="timer-value days">0</span>
@@ -638,9 +641,9 @@
                                                                                         </c:otherwise>
                                                                     </c:choose>
                                                                     <c:if test="${product.quantity > 0}">
-                                                                        <span class="unit"
+                                                                        <!-- <span class="unit"
                                                                             style="font-size: 12px; color: #666;">/
-                                                                            Kg</span>
+                                                                            Kg</span> -->
                                                                     </c:if>
                                                                 </div>
                                                             </div>

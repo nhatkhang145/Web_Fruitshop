@@ -100,10 +100,17 @@ public class AdminProductServlet extends HttpServlet {
    
     private void deleteProduct(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String idStr = req.getParameter("id");
-        if (idStr != null) {
-            productDAO.delete(Integer.parseInt(idStr));
+        if (idStr != null && !idStr.isEmpty()) {
+            try {
+                productDAO.delete(Integer.parseInt(idStr));
+                resp.sendRedirect(req.getContextPath() + "/admin/products?success=" + java.net.URLEncoder.encode("Xóa sản phẩm thành công", "UTF-8"));
+            } catch (Exception e) {
+                e.printStackTrace();
+                resp.sendRedirect(req.getContextPath() + "/admin/products?error=" + java.net.URLEncoder.encode("Không thể xóa sản phẩm đã có dữ liệu giao dịch (đơn hàng, nhập kho). Vui lòng chuyển sang trạng thái Ẩn.", "UTF-8"));
+            }
+        } else {
+            resp.sendRedirect(req.getContextPath() + "/admin/products");
         }
-        resp.sendRedirect(req.getContextPath() + "/admin/products");
     }
 
     
