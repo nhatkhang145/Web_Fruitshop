@@ -191,63 +191,63 @@
                                                                 <img src="${p.image}" alt="${p.name}" loading="lazy" />
                                                             </a>
 
+                                                            <c:choose>
+                                                                <c:when test="${not empty weekendDeal}">
+                                                                    <div class="product-badge sale"
+                                                                        style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f);">
+                                                                        -${weekendDeal.discountPercent}%</div>
+                                                                    <c:if test="${not empty weekendDeal.tag}">
+                                                                        <div
+                                                                            style="position: absolute; top: 45px; left: 10px; z-index: 10;">
+                                                                            <span
+                                                                                class="product-tag">${weekendDeal.tag}</span>
+                                                                        </div>
+                                                                    </c:if>
+                                                                </c:when>
+                                                                <c:when
+                                                                    test="${p.salePrice > 0 && p.salePrice < p.price}">
+                                                                    <div class="product-badge sale">-
+                                                                        <fmt:formatNumber
+                                                                            value="${(p.price - p.salePrice) / p.price * 100}"
+                                                                            maxFractionDigits="0" />%
+                                                                    </div>
+                                                                </c:when>
+                                                            </c:choose>
+
+                                                            <div class="product-actions">
+                                                                <c:set var="isLiked"
+                                                                    value="${likedIds.contains(p.id)}" />
+
+                                                                <a href="wishlist?action=${isLiked ? 'remove' : 'add'}&pid=${p.id}"
+                                                                    class="action-btn"
+                                                                    title="${isLiked ? 'Bỏ yêu thích' : 'Thêm vào yêu thích'}">
+
+                                                                    <i class="${isLiked ? 'fas fa-heart' : 'far fa-heart'}"
+                                                                        style="${isLiked ? 'color: red;' : ''}"></i>
+                                                                </a>
+
+                                                                <a href="${pageContext.request.contextPath}/product-detail?pid=${p.id}"
+                                                                    class="action-btn" title="Xem nhanh">
+                                                                    <i class="far fa-eye"></i>
+                                                                </a>
+
                                                                 <c:choose>
-                                                                        <c:when test="${not empty weekendDeal}">
-                                                                            <div class="product-badge sale"
-                                                                                style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f);">
-                                                                                -${weekendDeal.discountPercent}%</div>
-                                                                            <c:if test="${not empty weekendDeal.tag}">
-                                                                                <div
-                                                                                    style="position: absolute; top: 45px; left: 10px; z-index: 10;">
-                                                                                    <span
-                                                                                        class="product-tag">${weekendDeal.tag}</span>
-                                                                                </div>
-                                                                            </c:if>
-                                                                        </c:when>
-                                                                            <c:when
-                                                                                test="${p.salePrice > 0 && p.salePrice < p.price}">
-                                                                                <div class="product-badge sale">-
-                                                                                    <fmt:formatNumber
-                                                                                        value="${(p.price - p.salePrice) / p.price * 100}"
-                                                                                        maxFractionDigits="0" />%
-                                                                                </div>
-                                                                            </c:when>
+                                                                    <c:when test="${p.quantity == 0}">
+                                                                        <a href="${pageContext.request.contextPath}/product-detail?pid=${p.id}"
+                                                                            class="action-btn"
+                                                                            style="opacity: 0.5; cursor: not-allowed;"
+                                                                            title="Hết hàng">
+                                                                            <i class="fas fa-shopping-basket"></i>
+                                                                        </a>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <button class="action-btn add-to-cart-btn"
+                                                                            data-id="${p.id}" title="Thêm vào giỏ">
+                                                                            <i class="fas fa-shopping-basket"></i>
+                                                                        </button>
+                                                                    </c:otherwise>
                                                                 </c:choose>
-
-                                                                <div class="product-actions">
-                                                                    <c:set var="isLiked"
-                                                                        value="${likedIds.contains(p.id)}" />
-
-                                                                    <a href="wishlist?action=${isLiked ? 'remove' : 'add'}&pid=${p.id}"
-                                                                        class="action-btn"
-                                                                        title="${isLiked ? 'Bỏ yêu thích' : 'Thêm vào yêu thích'}">
-
-                                                                        <i class="${isLiked ? 'fas fa-heart' : 'far fa-heart'}"
-                                                                            style="${isLiked ? 'color: red;' : ''}"></i>
-                                                                    </a>
-
-                                                                    <a href="${pageContext.request.contextPath}/product-detail?pid=${p.id}"
-                                                                        class="action-btn" title="Xem nhanh">
-                                                                        <i class="far fa-eye"></i>
-                                                                    </a>
-
-                                                                    <c:choose>
-                                                                        <c:when test="${p.quantity == 0}">
-                                                                            <a href="${pageContext.request.contextPath}/product-detail?pid=${p.id}"
-                                                                                class="action-btn"
-                                                                                style="opacity: 0.5; cursor: not-allowed;"
-                                                                                title="Hết hàng">
-                                                                                <i class="fas fa-shopping-basket"></i>
-                                                                            </a>
-                                                                        </c:when>
-                                                                        <c:otherwise>
-                                                                            <button class="action-btn add-to-cart-btn"
-                                                                                data-id="${p.id}" title="Thêm vào giỏ">
-                                                                                <i class="fas fa-shopping-basket"></i>
-                                                                            </button>
-                                                                        </c:otherwise>
-                                                                    </c:choose>
-                                                                </div>
+                                                            </div>
                                                         </div>
 
                                                         <div class="product-info">
@@ -327,9 +327,9 @@
                                                                                     </c:otherwise>
                                                                 </c:choose>
                                                                 <c:if test="${p.quantity > 0}">
-                                                                    <span class="unit"
+                                                                    <!-- <span class="unit"
                                                                         style="font-size: 12px; color: #666;">/
-                                                                        Kg</span>
+                                                                        Kg</span> -->
                                                                 </c:if>
                                                             </div>
                                                         </div>
@@ -340,7 +340,7 @@
                                         <div class="col-12">
                                             <div class="pagination-wrapper">
                                                 <c:if test="${endP > 1}">
-                                                        <c:set var="currentPage"
+                                                    <c:set var="currentPage"
                                                         value="${empty param.index ? 1 : param.index + 0}" />
                                                     <c:choose>
                                                         <c:when test="${currentPage <= 3}">
