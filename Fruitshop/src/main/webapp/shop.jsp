@@ -43,6 +43,12 @@
                                         </h3>
 
                                         <ul class="category-list">
+                                            <li class="category-item">
+                                                <a href="${pageContext.request.contextPath}/shop?price=${priceTag}&sort=${sortTag}"
+                                                   style="${empty param.cid ? 'color: var(--primary-color); font-weight: bold; text-decoration: none;' : 'text-decoration: none; color: inherit;'}">
+                                                   🛒 Tất cả sản phẩm
+                                                </a>
+                                            </li>
                                             <c:forEach items="${listC}" var="c">
                                                 <c:if test="${c.parentId == 0}">
                                                     <li class="category-item">

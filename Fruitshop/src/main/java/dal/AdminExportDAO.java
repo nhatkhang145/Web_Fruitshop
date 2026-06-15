@@ -243,7 +243,7 @@ public class AdminExportDAO {
 
                     while (remaining > 0) {
                         java.util.Map<String, Object> batchRow = handle.createQuery(
-                            "SELECT id, available_quantity FROM inventory_receipt_items WHERE product_id = ? AND available_quantity > 0 ORDER BY receipt_date ASC LIMIT 1 FOR UPDATE")
+                            "SELECT id, available_quantity FROM inventory_receipt_items WHERE product_id = ? AND available_quantity > 0 ORDER BY id ASC LIMIT 1 FOR UPDATE")
                             .bind(0, productId)
                             .mapToMap()
                             .findFirst()
@@ -319,6 +319,24 @@ public class AdminExportDAO {
             handle.createUpdate("UPDATE inventory_export_receipts SET status = 'APPROVED' WHERE id = ?")
                 .bind(0, exportId)
                 .execute();
+
+            // Nếu phiếu xuất này được tạo từ một đơn hàng (có lưu mã đơn hàng trong note), tự động chuyển trạng thái đơn hàng sang processing (xác nhận)
+            String note = handle.createQuery("SELECT note FROM inventory_export_receipts WHERE id = ?")
+                .bind(0, exportId)
+                .mapTo(String.class)
+                .findFirst()
+                .orElse("");
+                
+            if (note != null && note.startsWith("Đơn hàng #")) {
+                try {
+                    int orderId = Integer.parseInt(note.replace("Đơn hàng #", "").trim());
+                    handle.createUpdate("UPDATE orders SET status = 'processing' WHERE id = ? AND status = 'pending'")
+                        .bind(0, orderId)
+                        .execute();
+                } catch (Exception e) {
+                    // Ignore parse exception if note format changes
+                }
+            }
 
             return null;
         });

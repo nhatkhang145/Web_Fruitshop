@@ -187,6 +187,10 @@ public class AdminInventoryDAO {
                 if (updatedRows == 0) {
                     throw new IllegalStateException("Không tìm thấy sản phẩm ID " + item.getProductId());
                 }
+
+                handle.createUpdate("UPDATE inventory_receipt_items SET available_quantity = quantity, status = 'AVAILABLE' WHERE id = ?")
+                    .bind(0, item.getId())
+                    .execute();
             }
 
             return null;
